@@ -13,7 +13,7 @@ const getStyles = ({primaryColor, secondaryColor}: PdfConfigurationStyles) =>
     tableHead: {
       display: 'flex',
       flexDirection: 'row',
-      paddingVertical: 4,
+      paddingVertical: 2,
     },
     tableHeading: {
       color: primaryColor,
@@ -24,7 +24,7 @@ const getStyles = ({primaryColor, secondaryColor}: PdfConfigurationStyles) =>
     tableRow: {
       flexDirection: 'row',
       fontSize: 10,
-      marginVertical: 4,
+      paddingVertical: 4,
       width: '100%',
       display: 'flex',
       flexWrap: 'wrap',
@@ -92,7 +92,7 @@ const ArticleTableHeader = ({
   const priceWidth = showDiscountCol ? styles.col12Right.width : '18.5%';
 
   return (
-    <View style={styles.tableHead} wrap={false}>
+    <View style={styles.tableHead}>
       <View style={styles.tableRow}>
         <View style={[styles.col6Left]}>
           <Text style={[styles.tableHeading]}>#</Text>

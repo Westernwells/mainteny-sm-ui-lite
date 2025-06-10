@@ -411,7 +411,6 @@ const JobOverviewPdfTemplate = React.memo(
               {serviceOrderItems.length && (
                 <View
                   style={{
-                    marginTop: 16,
                     paddingRight: 5,
                   }}>
                   <View style={styles.table}>

@@ -290,7 +290,7 @@ const InvoicePositionTable = ({
       unitPurchaseAmount: defaultProps,
       article: {
         type: ArticleType.OTHER,
-        unit: 'kg',
+        unit: 'pcs',
         unitSellingAmount: defaultProps,
         unitPurchaseAmount: defaultProps,
         name: '',
@@ -344,7 +344,7 @@ const InvoicePositionTable = ({
       unitPurchaseAmount: defaultProps,
       article: {
         type: ArticleType.OTHER,
-        unit: 'kg',
+        unit: 'pcs',
       },
     };
 
@@ -786,6 +786,7 @@ const InvoicePositionTable = ({
           name="description"
           control={descriptionControl}
           html={watchDescription}
+          updateHtml={(h) => setDescriptionValue('description', h)}
           hasSignatureButton={false}
           hasAttachFileButton={false}
         />

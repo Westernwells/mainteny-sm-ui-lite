@@ -1180,6 +1180,7 @@ const MixedPositions = () => {
             html={watchDescription}
             hasSignatureButton={false}
             hasAttachFileButton={false}
+            updateHtml={(h) => setDescription('description', h)}
           />
         </Dialog>
 

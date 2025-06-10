@@ -22,7 +22,7 @@ const validArticle: ICreateArticleForm = {
         unitSellingVat: '19',
         unitPurchaseAmountCurrency: 'EUR',
         unitSellingAmountCurrency: 'EUR',
-        unit: 'kg',
+        unit: 'pcs',
         storageLocation: 'Test Location',
         type: ArticleType.MATERIAL,
         unitPurchaseAmount: '300',

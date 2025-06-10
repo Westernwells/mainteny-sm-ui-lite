@@ -5,6 +5,7 @@ import {
 } from 'models/text-block';
 import {getPlainStringFromHtml} from 'utils/rich-field-string';
 import {getByteSize} from 'utils/string';
+import DOMPurify from 'dompurify';
 
 export const mapJsonToTextBlockView = (json: any): TextBlockView => ({
   id: json.id,
@@ -214,3 +215,36 @@ export const isFileSizeValid = (text?: string) => {
 
   return getByteSize(text) <= TEXT_BLOCK_MEMORY_SIZE_UPPER_LIMIT;
 };
+
+// This function takes a chunk of (already-sanitized) HTML and “collapse” any paragraph (<p>) whose only content is a single <span> containing a non-breaking space (&nbsp;)
+export const collapseNBSPParagraphs = (rawHtml: string): string => {
+  const container = document.createElement('div');
+  container.innerHTML = rawHtml;
+
+  container.querySelectorAll('p').forEach((p) => {
+    if (p.children.length === 1 && p.firstElementChild?.tagName === 'SPAN') {
+      const span = p.firstElementChild as HTMLElement;
+
+      if (span.textContent === '\u00A0') {
+        p.style.margin = '0';
+        p.style.padding = '0';
+        p.style.lineHeight = '0';
+        p.style.overflow = 'hidden';
+      }
+    }
+  });
+
+  return container.innerHTML;
+};
+
+// check if a test has html
+export const isHTML = (str: string) => /<\/?[a-z][\s\S]*>/i.test(str);
+
+export const plainTextToParagraphs = (str: string) =>
+  str
+    .split(/\r?\n/)
+    .map((line) => {
+      if (!line.trim()) return '<p><br/></p>';
+      return `<p>${DOMPurify.sanitize(line)}</p>`;
+    })
+    .join('');

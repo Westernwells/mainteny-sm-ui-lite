@@ -5,6 +5,7 @@ import {
   generateTextIndent,
   modifyHTMLFontSizeForPDFRendering,
   normalizePdfInlineStyles,
+  ensureEmptyBlocksRender,
 } from 'utils/rich-text-field';
 import {ContextProps} from 'context/PdfStylesProvider';
 
@@ -34,11 +35,13 @@ export const HtmlPDF = ({
   // 4) bump font-sizes
   const sized = modifyHTMLFontSizeForPDFRendering(normalized);
 
-  // 5) tabs → &nbsp;
-  const modifiedHtmlString = sized.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+  // 5) ensure empty blocks render
+  const ensured = ensureEmptyBlocksRender(sized);
+
+  // 6) tabs → &nbsp;
+  const modifiedHtmlString = ensured.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
 
   const fontSize = explicitFontSize ?? HTML_PDF_FONT_SIZE;
-
   const DEFAULT_HTML_PDF_FONT_SIZE = fontSize.NORMAL;
 
   return (
@@ -49,10 +52,15 @@ export const HtmlPDF = ({
         ...rootStyle,
       }}
       stylesheet={{
-        '*': {
+        p: {
           fontSize: DEFAULT_HTML_PDF_FONT_SIZE,
           fontFamily: fontStyles.regular.fontFamily,
         },
+        'div[style*="text-align: right"]': {
+          textAlign: 'right',
+        },
+        'div[style*="text-align: center"]': {textAlign: 'center'},
+        'div[style*="text-align: left"]': {textAlign: 'left'},
         '*:not(div:empty)': {
           margin: '0px',
         },
@@ -64,19 +72,20 @@ export const HtmlPDF = ({
         },
         'ul, ol': {
           lineHeight: '1.6',
-          padding: '10px 0px',
         },
         li: {
           fontSize: '11px',
+          margin: '2px 0px 2px 0px',
+          lineHeight: '1.5',
         },
         'div:empty': {
-          margin: '8px 0px',
+          margin: '6px 0px',
         },
         'div span:empty': {
-          margin: '8px 0px',
+          margin: '6px 0px',
         },
-        'p:empty': {
-          padding: '8px 0px',
+        'p:empty, div > strong:empty, div > u:empty': {
+          padding: '6px 0px',
         },
         [`p span[style*="font-size: ${HTML_PDF_FONT_SIZE.SMALL}"] strong`]: {
           minHeight: '11px',
@@ -90,8 +99,17 @@ export const HtmlPDF = ({
           minHeight: '15px',
           fontSize: fontSize.LARGE,
         },
-        'p strong': {
-          fontSize: '10px',
+        [`p span[style*="font-size: ${HTML_PDF_FONT_SIZE.SMALL}"]`]: {
+          minHeight: '11px',
+          fontSize: fontSize.SMALL,
+        },
+        [`p span[style*="font-size: ${HTML_PDF_FONT_SIZE.NORMAL}"]`]: {
+          minHeight: '13px',
+          fontSize: fontSize.NORMAL,
+        },
+        [`p span[style*="font-size: ${HTML_PDF_FONT_SIZE.LARGE}"]`]: {
+          minHeight: '15px',
+          fontSize: fontSize.LARGE,
         },
         [`span[style*="font-size: ${HTML_PDF_FONT_SIZE.SMALL}"]`]: {
           minHeight: '11px',

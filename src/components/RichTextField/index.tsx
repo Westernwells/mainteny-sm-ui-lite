@@ -16,7 +16,14 @@ import {
   Slate,
   withReact,
 } from 'slate-react';
-import {BaseEditor, createEditor, Descendant, Editor, Transforms} from 'slate';
+import {
+  BaseEditor,
+  createEditor,
+  Descendant,
+  Editor,
+  Transforms,
+  Node,
+} from 'slate';
 import {HistoryEditor, withHistory} from 'slate-history';
 import {theme} from 'theme';
 import {FormControl, FormHelperText} from '@mui/material';
@@ -36,16 +43,23 @@ const CustomElements = ({
   attributes,
   children,
 }: RenderElementProps) => {
-  const style = {
+  const baseStyle: CSSProperties = {
     fontSize: element.fontSize,
     color: element.color,
     textIndent: element.textIndent,
   };
+
+  const isSlateEmpty = () => {
+    const fullText = Node.string(element);
+    return fullText.trim() === '';
+  };
+  const empty = isSlateEmpty();
+
   switch (element.type) {
     case 'paragraph':
       return (
         <p
-          style={{...style, margin: 0}}
+          style={{...baseStyle, margin: 0}}
           {...attributes}
           ref={attributes.ref as Ref<HTMLParagraphElement>}>
           {children}
@@ -55,10 +69,10 @@ const CustomElements = ({
       return (
         <ul
           style={{
-            ...style,
+            ...baseStyle,
             marginLeft: '20px',
             listStyleType: 'disc',
-            listStylePosition: 'inside',
+            listStylePosition: 'outside',
           }}
           {...attributes}
           ref={attributes.ref as Ref<HTMLUListElement>}>
@@ -68,7 +82,7 @@ const CustomElements = ({
     case 'list-item':
       return (
         <li
-          style={style}
+          style={baseStyle}
           {...attributes}
           ref={attributes.ref as Ref<HTMLLIElement>}>
           {children}
@@ -78,43 +92,58 @@ const CustomElements = ({
       return (
         <ol
           style={{
-            ...style,
+            ...baseStyle,
             marginLeft: '20px',
             listStyleType: 'decimal',
-            listStylePosition: 'inside',
+            listStylePosition: 'outside',
           }}
           {...attributes}
           ref={attributes.ref as Ref<HTMLOListElement>}>
           {children}
         </ol>
       );
-    case 'left':
+    case 'left': {
+      const style: CSSProperties = {
+        textAlign: 'left',
+        ...(empty ? {lineHeight: 1.1} : {}),
+      };
       return (
         <div
-          style={{textAlign: 'left'}}
+          style={style}
           {...attributes}
           ref={attributes.ref as Ref<HTMLDivElement>}>
           {children}
         </div>
       );
-    case 'center':
+    }
+    case 'center': {
+      const style: CSSProperties = {
+        textAlign: 'center',
+        ...(empty ? {lineHeight: 1.1} : {}),
+      };
       return (
         <div
-          style={{textAlign: 'center'}}
+          style={style}
           {...attributes}
           ref={attributes.ref as Ref<HTMLDivElement>}>
           {children}
         </div>
       );
-    case 'right':
+    }
+    case 'right': {
+      const style: CSSProperties = {
+        textAlign: 'right',
+        ...(empty ? {lineHeight: 1.1} : {}),
+      };
       return (
         <div
-          style={{textAlign: 'right'}}
+          style={style}
           {...attributes}
           ref={attributes.ref as Ref<HTMLDivElement>}>
           {children}
         </div>
       );
+    }
     default:
       return <DefaultElement {...{element, children, attributes}} />;
   }

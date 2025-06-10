@@ -16,7 +16,7 @@ export const DEFAULT_FONT_SIZE = FONT_SIZE.NORMAL;
 export enum HTML_PDF_FONT_SIZE {
   SMALL = '9px',
   NORMAL = '11px',
-  LARGE = '13px',
+  LARGE = '14px',
 }
 
 export enum HTML_PDF_FONT_SIZE_DESCRIPTION {

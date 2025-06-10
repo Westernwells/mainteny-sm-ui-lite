@@ -293,7 +293,7 @@ const PositionTable = ({
       unitPurchaseAmount: defaultProps,
       article: {
         type: ArticleType.OTHER,
-        unit: 'kg',
+        unit: 'pcs',
         unitSellingAmount: defaultProps,
         unitPurchaseAmount: defaultProps,
         name: '',
@@ -347,7 +347,7 @@ const PositionTable = ({
       unitPurchaseAmount: defaultProps,
       article: {
         type: ArticleType.OTHER,
-        unit: 'kg',
+        unit: 'pcs',
       },
     };
 
@@ -777,6 +777,7 @@ const PositionTable = ({
           html={watchDescription}
           hasSignatureButton={false}
           hasAttachFileButton={false}
+          updateHtml={(h) => setDescriptionValue('description', h)}
         />
       </Dialog>
     </>
