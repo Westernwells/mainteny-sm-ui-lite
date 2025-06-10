@@ -6,7 +6,7 @@ import {
   Typography,
 } from '@mui/material';
 import {EditorProvider} from '@tiptap/react';
-import {useEffect, useRef, useState} from 'react';
+import {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Control, Controller} from 'react-hook-form';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
@@ -15,8 +15,13 @@ import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import {ONE_KB_IN_BYTES, ONE_MB_IN_BYTES} from 'utils/constants';
 import CircularProgress from '@mui/material/CircularProgress';
-import {cleanHtmlContent} from 'utils/text-block';
+import {
+  cleanHtmlContent,
+  isHTML,
+  plainTextToParagraphs,
+} from 'utils/text-block';
 import {EmailSignature} from 'models/employee';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import EditorMenuControls from './EditorMenuControls';
 import useExtensions from './useExtensions';
 
@@ -173,13 +178,13 @@ const RichTextEditor = ({
   showTextBlock,
   onSignatureSelect,
 }: Props) => {
+  const {fontStyles} = useContext(PdfStylesContext);
   const {t} = useTranslation();
   const dropzoneRef = useRef<{
     open: () => void;
     removeFile: (fileKey: string) => void;
     files: FileWithPreview[];
   }>(null);
-
   const extensions = useExtensions({placeholder});
   const [focused, setFocused] = useState(false);
   const [files, setFiles] = useState<FileWithPreview[]>(existingFiles);
@@ -187,8 +192,23 @@ const RichTextEditor = ({
     setFiles(existingFiles);
   }, [existingFiles]);
 
+  const initialContent = useMemo(() => {
+    if (!html) return '';
+    return isHTML(html) ? html : plainTextToParagraphs(html);
+  }, [html]);
+
+  const [content, setContent] = useState(initialContent);
+
+  const onEditorUpdate = ({editor}: any) => {
+    const cleaned = cleanHtmlContent(editor.getHTML(), false);
+    setContent(cleaned);
+    updateHtml?.(cleaned);
+  };
+
   const renderEditor = (value: string, onChange: (value: string) => void) => (
     <EditorProvider
+      content={content}
+      onUpdate={onEditorUpdate}
       slotAfter={
         <>
           <Box margin="1rem 0">
@@ -211,14 +231,13 @@ const RichTextEditor = ({
         </>
       }
       extensions={extensions}
-      content={value}
-      onUpdate={({editor}) => {
-        const cleanedHtml = cleanHtmlContent(editor.getHTML(), true);
-        updateHtml?.(cleanedHtml);
-        onChange(cleanedHtml);
-      }}
     />
   );
+
+  // if the parent ever passes you a new html prop, re-init
+  useEffect(() => {
+    setContent(initialContent);
+  }, [initialContent]);
 
   return (
     <FormControl fullWidth variant="outlined">
@@ -254,6 +273,9 @@ const RichTextEditor = ({
             '& *': {
               marginBlockStart: 0,
               marginBlockEnd: 0,
+              fontFamily: fontStyles.name
+                ? `${fontStyles.name} !important`
+                : 'Arial, sans-serif !important',
             },
           },
           '& .ProseMirror-focused': {
@@ -261,7 +283,8 @@ const RichTextEditor = ({
           },
           '& .ProseMirror ul, .ProseMirror ol': {
             marginLeft: '20px',
-            listStylePosition: 'inside',
+            listStylePosition: 'outside',
+            lineHeight: 0,
           },
           '& .ProseMirror ul': {
             listStyleType: 'disc',
@@ -270,7 +293,7 @@ const RichTextEditor = ({
             listStyleType: 'decimal',
           },
           '& .ProseMirror li p': {
-            display: 'inline-flex',
+            display: 'block',
             margin: 0,
             padding: 0,
           },

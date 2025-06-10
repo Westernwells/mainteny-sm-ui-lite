@@ -2,7 +2,7 @@ import {Box, Grid, Typography} from '@mui/material';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
 import {ServiceCompanyItem} from 'models/service-company';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useContext, useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {createEmptyResource, makePage} from 'utils/paging';
 import * as Yup from 'yup';
@@ -30,12 +30,15 @@ import {
 import {theme} from 'theme';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {
+  collapseNBSPParagraphs,
   convertCategoryToMacro,
   convertCategoryToText,
   isFileSizeValid,
   mapJsonToTextBlockView,
 } from 'utils/text-block';
 import DOMPurify from 'dompurify';
+import {dialogPaperStyles} from 'components/MixedPositions/MixedPositions.styles';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {TextBlockForm} from './TextBlockForm';
 import {columns, makeRows} from './TextBlockDataGridProps';
 import {Order, OrderByParams} from '../../../models/pagination';
@@ -73,6 +76,8 @@ const TextBlocks = ({company}: Props) => {
   const textInput = useRef<HTMLInputElement>(null);
   const {values} = useSearchValues<OrderByParams<TextBlockOrderField>>();
   const {sortOrder, orderByField} = values;
+
+  const {fontStyles} = useContext(PdfStylesContext);
 
   const formik = useFormik<TextBlockFormModel>({
     initialValues: {
@@ -309,8 +314,13 @@ const TextBlocks = ({company}: Props) => {
         }}
         onSave={handleEditOnSave}
         dialogProps={{
-          maxWidth: 'sm',
+          maxWidth: 'lg',
           open: openDialog || false,
+        }}
+        sx={{
+          '& .MuiDialog-paper': {
+            ...dialogPaperStyles,
+          },
         }}>
         <TextBlockForm formik={formik} />
       </Dialog>
@@ -334,8 +344,13 @@ const TextBlocks = ({company}: Props) => {
           setOpenDialog(true);
         }}
         dialogProps={{
-          maxWidth: 'sm',
+          maxWidth: 'lg',
           open: openPreviewDialog || false,
+        }}
+        sx={{
+          '& .MuiDialog-paper': {
+            ...dialogPaperStyles,
+          },
         }}>
         <Box>
           {infoItems?.map((item, index) => (
@@ -348,11 +363,19 @@ const TextBlocks = ({company}: Props) => {
               {item.label === t('Text') ? (
                 <Box
                   dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(item.value),
+                    __html: collapseNBSPParagraphs(
+                      DOMPurify.sanitize(item.value),
+                    ),
                   }}
                   sx={{
                     margin: '0em',
                     padding: '0em',
+                    '& *': {
+                      fontFamily:
+                        item.label === t('Text')
+                          ? `${fontStyles.name} !important`
+                          : 'Aventa',
+                    },
                     '& p': {
                       marginBottom: '0em',
                       lineHeight: '1.1em',

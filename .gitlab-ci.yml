@@ -1,5 +1,6 @@
 stages:
   - lint
+  - playwright-tests
   - test
   - build-project
   - build-images
@@ -15,6 +16,7 @@ variables:
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   dependencies:
     - lint-project
+    - playwright-tests
     - e2e-tests
     - component-tests
   script:
@@ -135,6 +137,58 @@ lint-project:
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn check-all
+  rules:
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
+    - when: never
+
+playwright-tests:
+  stage: playwright-tests
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
+  dependencies:
+    - lint-project
+  variables:
+    ENV: stage
+    REACT_APP_BASE_URL: http://localhost:5173
+    REACT_APP_API_URL: $REACT_APP_API_URL_STAGE
+    REACT_APP_GOOGLE_MAPS_KEY: $REACT_APP_GOOGLE_MAPS_KEY_STAGE
+  cache:
+    - <<: *global_cache_node_mods
+      when: on_success
+      policy: pull
+  rules:
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
+    - when: never
+  script:
+    - yarn install --frozen-lockfile --cache-folder .yarn-cache
+    - yarn start & # Start the application in the background
+    - sleep 30 # Wait for the application to start
+    - yarn playwright:install # Install Playwright chromium browser
+    - yarn playwright:test # Run Playwright tests
+  artifacts:
+    when: always
+    paths:
+      - results/playwright-results.xml
+      - playwright-report/
+      - test-results/
+    reports:
+      junit: results/playwright-results.xml
+
+vitest:
+  stage: test
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
+  cache:
+    - <<: *global_cache_node_mods
+      when: on_success
+      policy: pull-push
+  script:
+    - yarn install --frozen-lockfile --cache-folder .yarn-cache
+    - yarn vitest run --coverage --reporter junit --output-file results/vitest-[hash].xml
+  artifacts:
+    when: always
+    paths:
+      - results/vitest-*.xml
+    reports:
+      junit: results/vitest-*.xml
   rules:
     - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
     - when: never

@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useContext, useMemo, useState} from 'react';
 import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
@@ -13,6 +13,9 @@ import {CUSTOM_ERROR_TEXT, stripHtmlTags} from 'models/text-block';
 import * as Yup from 'yup';
 import RichTextEditor from 'components/RichTextEditor';
 import {dialogPaperStyles} from 'components/MixedPositions/MixedPositions.styles';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {Box} from '@mui/material';
+import {isHTML} from 'utils/text-block';
 import {NoItemSection} from '../NoItemSection';
 
 const validationSchema = Yup.object().shape({
@@ -30,6 +33,8 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
     t('Article updated successfully.'),
   );
+
+  const {fontStyles} = useContext(PdfStylesContext);
 
   const formik = useFormik<ArticleDescriptionFormModel>({
     initialValues: {
@@ -57,6 +62,22 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
     setOpenDialog(false);
   };
 
+  const displayHtml = useMemo(() => {
+    const desc = article.description || '';
+    if (!desc) return '';
+
+    if (isHTML(desc)) {
+      // sanitize and render real HTML
+      return DOMPurify.sanitize(desc);
+    }
+
+    // convert plain-text newlines into <br/>
+    return desc
+      .split(/\r?\n/)
+      .map((line) => DOMPurify.sanitize(line))
+      .join('<br/>');
+  }, [article.description]);
+
   return (
     <InfoCard
       containerStyles={{mb: '1.2rem'}}
@@ -64,11 +85,27 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
       header={<Typography variant="subtitle1">{t('Description')}</Typography>}>
-      {article.description && (
-        <Typography
-          variant="inherit"
-          dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(article.description),
+      {!!article.description && (
+        <Box
+          dangerouslySetInnerHTML={{__html: displayHtml}}
+          sx={{
+            '& *': {
+              fontFamily: fontStyles?.name
+                ? `${fontStyles.name} !important`
+                : 'Aventa',
+              textAlign: 'left',
+            },
+            '& p': {
+              marginTop: '0.3em',
+              marginBottom: '0.3em',
+              lineHeight: '1.3em',
+            },
+            '& ul,ol': {
+              margin: 0,
+            },
+            '& p:empty, p:has(> strong:only-child)': {
+              marginTop: '1.3em',
+            },
           }}
         />
       )}

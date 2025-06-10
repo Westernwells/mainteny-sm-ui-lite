@@ -416,10 +416,13 @@ export const serialize = (node: Descendant): string => {
   const children = node.children.map((n) => serialize(n)).join('');
 
   switch (node.type) {
-    case 'paragraph':
-      return pStyle
-        ? `<p style="${getStyleString(pStyle)}">${children}</p>`
-        : `<p>${children}</p>`;
+    case 'paragraph': {
+      const styleString = Object.keys(pStyle).length
+        ? ` style="${getStyleString(pStyle)}"`
+        : '';
+      const inner = children.trim() ? children : '&nbsp;';
+      return `<p${styleString}>${inner}</p>`;
+    }
     case 'numbered-list':
       return `<ol>${children}</ol>`;
     case 'bulleted-list':
@@ -637,8 +640,7 @@ export const generateTextIndent = (html: string) => {
 };
 
 export const normalizePdfInlineStyles = (html: string): string => {
-  // assume 1em = 12pt
-  const EM_IN_PT = 12;
+  const EM_IN_PX = 16;
 
   return html.replace(
     /<([a-z]+)([^>]*?)\sstyle="([^"]*?)"([^>]*?)>/gi,
@@ -648,50 +650,63 @@ export const normalizePdfInlineStyles = (html: string): string => {
       preAttrs: string,
       styleAttr: string,
       postAttrs: string,
-    ): string => {
-      // 1) Break the style string into key/value pairs
+    ) => {
+      // build styleMap
       const styleMap = styleAttr
         .split(/;\s*/)
-        .map((rule: string) => rule.trim())
-        .filter((rule: string) => rule.length > 0)
+        .map((r) => r.trim())
+        .filter((r) => !!r)
         .reduce<Record<string, string>>((acc, rule) => {
-          const [key, val] = rule.split(/\s*:\s*/);
-          if (key && val) {
-            acc[key.toLowerCase()] = val;
-          }
+          const [k, v] = rule.split(/\s*:\s*/);
+          if (k && v) acc[k.toLowerCase()] = v;
           return acc;
         }, {});
 
-      // 2) **Strip font-family completely** (don’t even consider it)
+      // drop font-family etc.
       delete styleMap['font-family'];
 
-      // 3) Build out only the props you want to keep
-      const props = (['padding-left', 'padding-right'] as const).reduce<
-        string[]
-      >((acc, cssProp) => {
-        const raw = styleMap[cssProp];
-        if (!raw) return acc;
+      const outProps: string[] = [];
 
-        const propName =
-          cssProp === 'padding-left' ? 'paddingLeft' : 'paddingRight';
+      // Explicitly handle text-align (and your paddings)
+      (['padding-left', 'padding-right', 'text-align'] as const).forEach(
+        (prop) => {
+          const raw = styleMap[prop];
+          if (!raw) return;
 
-        // em → pt
-        const emMatch = raw.match(/^([\d.]+)em$/);
-        if (emMatch) {
-          acc.push(`${propName}: ${parseFloat(emMatch[1]) * EM_IN_PT}pt`);
+          if (prop === 'text-align') {
+            // preserve “left”, “right”, “center”
+            outProps.push(`text-align: ${raw}`);
+            return;
+          }
+
+          // for padding-left / padding-right only: convert em → px or keep px
+          const em = raw.match(/^([\d.]+)em$/);
+          if (em) {
+            outProps.push(`${prop}: ${parseFloat(em[1]) * EM_IN_PX}px`);
+            return;
+          }
+          const px = raw.match(/^([\d.]+)px$/);
+          if (px) {
+            outProps.push(`${prop}: ${px[1]}px`);
+          }
+        },
+      );
+
+      // font-size logic remains unchanged
+      const fs = styleMap['font-size'];
+      if (fs) {
+        const em = fs.match(/^([\d.]+)em$/);
+        if (em) {
+          outProps.push(`font-size: ${parseFloat(em[1]) * EM_IN_PX}px`);
+        } else {
+          // px or whatever
+          outProps.push(`font-size: ${fs}`);
         }
+      }
 
-        // px → pt
-        const pxMatch = raw.match(/^([\d.]+)px$/);
-        if (pxMatch) {
-          acc.push(`${propName}: ${parseFloat(pxMatch[1])}pt`);
-        }
-
-        return acc;
-      }, []);
-
-      // 4) If nothing left, drop the entire style attribute
-      const styleString = props.length ? ` style="{${props.join(', ')}}"` : '';
+      const styleString = outProps.length
+        ? ` style="${outProps.join('; ')}"`
+        : '';
 
       return `<${tag}${preAttrs}${styleString}${postAttrs}>`;
     },
@@ -718,3 +733,6 @@ export const returnFirstParagraph = (value: string) => {
 
   return `<p>${firstString} ...</p>`; // encapsulate in single paragraph
 };
+
+export const ensureEmptyBlocksRender = (html: string): string =>
+  html.replace(/<div([^>]*)>\s*<\/div>/gi, '<div$1>&nbsp;</div>');

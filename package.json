@@ -25,7 +25,11 @@
     "cypress:e2e": "cypress run --config video=false --e2e",
     "cypress:component": "cypress run --config video=false --component",
     "cypress:run": "yarn cypress:e2e && yarn cypress:component",
-    "cypress:split-e2e": "cypress run --config video=false --e2e --env split=true"
+    "cypress:split-e2e": "cypress run --config video=false --e2e --env split=true",
+    "vitest:run": "vitest run --coverage --reporter junit --output-file results/vitest-[hash].xml",
+    "playwright:test": "playwright test",
+    "playwright:test:ui": "playwright test --ui",
+    "playwright:install": "playwright install chromium"
   },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.5.2",
@@ -141,12 +145,14 @@
   "devDependencies": {
     "@cypress/code-coverage": "^3.13.2",
     "@cypress/react18": "^2.0.1",
+    "@playwright/test": "^1.52.0",
     "@testing-library/cypress": "^10.0.2",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/escape-html": "^1.0.4",
     "@types/google-map-react": "^2.1.5",
+    "@types/node": "^22.15.21",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.1",
     "@types/react-helmet": "^6.1.5",
