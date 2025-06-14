@@ -269,7 +269,7 @@ deploy-release:
   rules:
     - if: "$CI_COMMIT_REF_NAME == 'main'"
       variables:
-        ENV: stage
+        ENV: release
         STACK: release
         IMAGE_ENV: release
         CACHE_PATH: /*
