@@ -119,7 +119,7 @@ const DashboardMetrics = ({quotationStatistics, filters}: Props) => {
               currentStatisticsCounts.statusesAmount.total /
                 10 ** currentCurrency.fractionDigits,
               {
-                currencySymbol: currentCurrency.symbol,
+                currency: currentCurrency.code,
               },
             )}
             icon={<DataFileBarsCash fontSize="2rem" style={iconStyles} />}
@@ -145,7 +145,7 @@ const DashboardMetrics = ({quotationStatistics, filters}: Props) => {
               currentStatisticsCounts.statusesAmount.accepted /
                 10 ** currentCurrency.fractionDigits,
               {
-                currencySymbol: currentCurrency.symbol,
+                currency: currentCurrency.code,
               },
             )}
             icon={<CashPaymentCoins fontSize="2rem" style={iconStyles} />}
@@ -171,7 +171,7 @@ const DashboardMetrics = ({quotationStatistics, filters}: Props) => {
               currentStatisticsCounts.statusesAmount.pending /
                 10 ** currentCurrency.fractionDigits,
               {
-                currencySymbol: currentCurrency.symbol,
+                currency: currentCurrency.code,
               },
             )}
             icon={<TimeClockHand fontSize="2rem" style={iconStyles} />}

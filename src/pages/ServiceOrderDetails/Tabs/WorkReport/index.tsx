@@ -542,7 +542,12 @@ export const WorkReport = ({serviceOrder}: Props) => {
       const body = {
         technicianId: report?.technicianId,
         description: values.description,
-        articles: formatServiceOrderArticles(articles, currentCurrency),
+        articles: formatServiceOrderArticles(
+          articles?.map((item) =>
+            serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
+          ),
+          currentCurrency,
+        ),
         serviceTime: calculateTotalBillableHours([values.workTimeRecord!]),
         travelTime: calculateTotalBillableHours([values.travelTimeRecord!]),
         onlyShowTotalTime: values.onlyShowTotalTime,
