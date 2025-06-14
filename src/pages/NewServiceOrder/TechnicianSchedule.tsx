@@ -85,7 +85,7 @@ export const TechnicianSchedule = ({
   const [lookupTechnician, setLookupTechnician] = useState<{
     [key: string]: EmployeesView[];
   }>({});
-  const defaultVisibleItemsSize = 2;
+  const defaultVisibleItemsSize = 10;
   const [showAll, setShowAll] = useState(false);
   const [visibleItems, setVisibleItems] = useState(defaultVisibleItemsSize);
   useEffect(() => {
