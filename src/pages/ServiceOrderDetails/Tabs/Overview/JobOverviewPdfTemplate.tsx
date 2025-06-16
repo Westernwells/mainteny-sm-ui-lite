@@ -459,7 +459,6 @@ const JobOverviewPdfTemplate = React.memo(
             translate={translate}
             footerInfo={footerInfo}
             footerPath={footerPath}
-            isQuotationJobConfirmation={!!quotation?.externalId}
             fontStyles={fontStyles}
             primaryColor={primaryColor}
             secondaryColor={secondaryColor}
