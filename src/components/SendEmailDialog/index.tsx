@@ -514,6 +514,7 @@ export const SendEmailDialog = ({
               onSignatureSelect={(signature?: EmailSignature) => {
                 onSignatureSelect?.(signature);
               }}
+              updateHtml={(h) => setValue('content', h)}
             />
             {!isFileSizeFormValid && (
               <FormHelperText error>
