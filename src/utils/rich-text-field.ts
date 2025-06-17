@@ -420,7 +420,11 @@ export const serialize = (node: Descendant): string => {
       const styleString = Object.keys(pStyle).length
         ? ` style="${getStyleString(pStyle)}"`
         : '';
-      const inner = children.trim() ? children : '&nbsp;';
+      const realText = Text.isText(node)
+        ? node.text
+        : node.children.map((n) => (Text.isText(n) ? n.text : '')).join('');
+
+      const inner = realText.trim() === '' ? '&nbsp;' : children;
       return `<p${styleString}>${inner}</p>`;
     }
     case 'numbered-list':
@@ -736,3 +740,18 @@ export const returnFirstParagraph = (value: string) => {
 
 export const ensureEmptyBlocksRender = (html: string): string =>
   html.replace(/<div([^>]*)>\s*<\/div>/gi, '<div$1>&nbsp;</div>');
+
+export const ensureEmptyParagraphs = (html: string): string =>
+  html.replace(/<p([^>]*)>([\s\S]*?)<\/p>/gi, (_match, attrs, content) => {
+    // 1) strip only empty inline tags inside this paragraph
+    const stripped = content.replace(
+      /<(strong|em|u|span)[^>]*>\s*<\/\1>/gi,
+      '',
+    );
+    // 2) if after stripping there’s nothing (or only &nbsp;), inject a <br/>
+    if (/^\s*(?:&nbsp;)?\s*$/i.test(stripped)) {
+      return `<p${attrs}><br/></p>`;
+    }
+    // 3) otherwise leave the paragraph’s (stripped) content as-is
+    return `<p${attrs}>${stripped}</p>`;
+  });
