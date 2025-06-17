@@ -4,9 +4,12 @@ import {
   modifyHTMLFontSizeForPDFRendering,
   generateTextIndent,
   flattenTableHtml,
+  serialize,
+  ensureEmptyParagraphs,
 } from 'utils/rich-text-field';
 import {describe, it, expect} from 'vitest';
 import {collapseNBSPParagraphs} from 'utils/text-block';
+import {Descendant} from 'slate';
 import {sampleRawHtml} from './mocks/richTextField';
 
 describe('normalizePdfInlineStyles', () => {
@@ -314,5 +317,77 @@ describe('collapseNBSPParagraphs()', () => {
     // The only <p> should still exist but be collapsed:
     const p = container.querySelector('p')!;
     expect(p.style.lineHeight).toBe('0');
+  });
+});
+
+describe('serialize()', () => {
+  it('outputs <p>&nbsp;</p> for a completely empty paragraph', () => {
+    const node: Descendant = {
+      type: 'paragraph',
+      children: [{text: ''}],
+    };
+    expect(serialize(node)).toBe('<p>&nbsp;</p>');
+  });
+
+  it('renders a paragraph with plain text', () => {
+    const node: Descendant = {
+      type: 'paragraph',
+      children: [{text: 'Hello Slate!'}],
+    };
+    expect(serialize(node)).toBe('<p>Hello Slate!</p>');
+  });
+
+  it('preserves inline formatting (bold / italic / underline)', () => {
+    const node: Descendant = {
+      type: 'paragraph',
+      children: [
+        {text: 'A '},
+        {text: 'B', bold: true},
+        {text: ' C', italic: true},
+        {text: ' D', underlined: true},
+      ],
+    };
+    const html = serialize(node);
+    expect(html).toContain('<strong>B</strong>');
+    expect(html).toContain('<em> C</em>');
+    expect(html).toContain('<u> D</u>');
+  });
+});
+
+describe('ensureEmptyParagraphs()', () => {
+  it('strips out <strong></strong> and replaces with <br/> in a <p>', () => {
+    const input = `<p><strong></strong></p>`;
+    const output = ensureEmptyParagraphs(input);
+    expect(output).toBe('<p><br/></p>');
+  });
+
+  it('converts <p>&nbsp;</p> into <p><br/></p>', () => {
+    const input = `<p>&nbsp;</p>`;
+    const output = ensureEmptyParagraphs(input);
+    expect(output).toBe('<p><br/></p>');
+  });
+
+  it('collapses multiple empty inline tags before br injection', () => {
+    const input = `<p><strong></strong><em></em><u></u></p>`;
+    const output = ensureEmptyParagraphs(input);
+    expect(output).toBe('<p><br/></p>');
+  });
+
+  it('leaves paragraphs with real text untouched', () => {
+    const input = `<p>Hello <strong>world</strong></p>`;
+    const output = ensureEmptyParagraphs(input);
+    expect(output).toBe(input);
+  });
+
+  it('only affects <p> tags, not other elements', () => {
+    const input = `<div><strong></strong></div>`;
+    const output = ensureEmptyParagraphs(input);
+    expect(output).toBe(input);
+  });
+
+  it('preserves attributes on <p> when injecting <br/>', () => {
+    const input = `<p class="foo">&nbsp;</p>`;
+    const output = ensureEmptyParagraphs(input);
+    expect(output).toBe('<p class="foo"><br/></p>');
   });
 });

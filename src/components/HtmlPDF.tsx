@@ -6,6 +6,7 @@ import {
   modifyHTMLFontSizeForPDFRendering,
   normalizePdfInlineStyles,
   ensureEmptyBlocksRender,
+  ensureEmptyParagraphs,
 } from 'utils/rich-text-field';
 import {ContextProps} from 'context/PdfStylesProvider';
 
@@ -32,8 +33,10 @@ export const HtmlPDF = ({
   // 3) normalize only the paddings
   const normalized = normalizePdfInlineStyles(indented);
 
+  const textWithEmptyParagraphs = ensureEmptyParagraphs(normalized);
+
   // 4) bump font-sizes
-  const sized = modifyHTMLFontSizeForPDFRendering(normalized);
+  const sized = modifyHTMLFontSizeForPDFRendering(textWithEmptyParagraphs);
 
   // 5) ensure empty blocks render
   const ensured = ensureEmptyBlocksRender(sized);

@@ -3298,10 +3298,16 @@
   "Copy link": "Kopiraj link",
   "Move to": "Premesti u",
   "Connected to": "Povezano sa",
-  "Service order": "Servisni nalog",
+  "Service order": "Narudžbina za uslugu",
   "Select type": "Izaberite tip",
   "Delete task": "Obriši zadatak",
   "You are about to delete {{taskName}} task.": "Upravo ćete obrisati zadatak {{taskName}}.",
   "Task deleted": "Zadatak je obrisan",
-  "Create task": "Napravi zadatak"
+  "Create task": "Napravi zadatak",
+  "Delete this file?": "Izbrisati ovu datoteku?",
+  "You are about to delete <bold>{{fileName}}</bold> file from your attachments.": "Upravo ćete obrisati datoteku <bold>{{fileName}}<bold> iz vaših priloga.",
+  "Attachment was updated successfully.": "Prilog je uspešno ažuriran.",
+  "Attachment added successfully": "Prilog je uspešno dodat",
+  "Attachment was deleted": "Prilog je obrisan",
+  "Tasks": "Zadaci"
 }

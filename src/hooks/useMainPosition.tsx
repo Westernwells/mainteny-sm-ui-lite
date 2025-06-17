@@ -1507,7 +1507,8 @@ const useMainPosition = <
                 customInput={TextField}
                 decimalScale={2}
                 fixedDecimalScale
-                thousandSeparator
+                decimalSeparator={getDecimalSeparator(selectedLng)}
+                thousandSeparator={getThousandsSeparator(selectedLng)}
                 size="small"
                 InputProps={{
                   startAdornment: (
