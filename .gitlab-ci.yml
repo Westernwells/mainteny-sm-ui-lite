@@ -41,8 +41,9 @@ variables:
     DISTRIBUTION_ID: E24VZD1QKFHU18
   script:
     - echo "Deploying environment ${ENV}"
+    - DATE=$(date +"%Y_%m_%d")
     - aws s3 cp ./build/ s3://mainteny-deployments/sm/${ENV}/current/ --recursive
-    - aws s3 cp ./build/ s3://mainteny-deployments/sm/${ENV}/${CI_COMMIT_SHORT_SHA}/ --recursive
+    - aws s3 cp ./build/ s3://mainteny-deployments/sm/${ENV}/${DATE}_${CI_COMMIT_SHORT_SHA}/ --recursive
     - aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID} --paths "$CACHE_PATH"
     - >-
       curl -X POST
