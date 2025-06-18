@@ -1,10 +1,10 @@
-import {useCallback, useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import Grid from '@mui/material/Grid';
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {InvoiceFormData} from 'models/invoice';
-import {UseFormReturn} from 'react-hook-form';
+import {Controller, UseFormReturn} from 'react-hook-form';
 
 export const EditCustomerForm = ({
   formMethods,
@@ -15,20 +15,22 @@ export const EditCustomerForm = ({
   address: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
   customerName?: string;
 }) => {
-  const {getValues, register, setValue} = formMethods;
+  const {getValues, register, setValue, control} = formMethods;
   const value = getValues(address);
+  const didInit = useRef(false);
 
-  const statesByCountry = useCallback(
-    (country?: string) => getStatesByCountry(country ?? ''),
-    [value?.component?.country],
-  );
-
-  // populate name field with customer name by default if not set
   useEffect(() => {
-    if (!value?.component?.name && customerName) {
-      setValue(`${address}.component.name`, customerName);
+    if (didInit.current) return;
+    didInit.current = true;
+
+    const fieldName = `${address}.component.name` as const;
+    const currentName = getValues(fieldName);
+
+    // only if it's truly unset (null or undefined), not just empty-string…
+    if ((currentName === null || currentName === undefined) && customerName) {
+      setValue(fieldName, customerName);
     }
-  }, [customerName, address, value?.component?.name]);
+  }, [address, customerName, getValues, setValue]);
 
   return (
     <Grid container spacing={3}>
@@ -78,29 +80,46 @@ export const EditCustomerForm = ({
         />
       </Grid>
       <Grid item md={3}>
-        <FormSelect
-          labelId={`${address}.component.country`}
-          label="Country"
-          options={countriesOptions}
-          selectProps={{
-            id: 'component.country',
-            multiple: false,
-            ...register(`${address}.component.country`),
-          }}
-          isCompanyTranslation
+        <Controller
+          name={`${address}.component.country`}
+          control={control}
+          defaultValue={value?.component?.country || ''}
+          render={({field}) => (
+            <FormSelect
+              labelId={`${address}.component.country`}
+              label="Country"
+              options={countriesOptions}
+              selectProps={{
+                ...field,
+                multiple: false,
+                id: `${address}.component.country`,
+              }}
+              isCompanyTranslation
+            />
+          )}
         />
       </Grid>
+
       <Grid item md={3}>
-        <FormSelect
-          labelId={`${address}.component.state`}
-          label="State/Province/Region"
-          options={statesByCountry(value?.component?.country)}
-          selectProps={{
-            id: 'component.state',
-            multiple: false,
-            ...register(`${address}.component.state`),
-          }}
-          isCompanyTranslation
+        <Controller
+          name={`${address}.component.state`}
+          control={control}
+          defaultValue={value?.component?.state || ''}
+          render={({field}) => (
+            <FormSelect
+              labelId={`${address}.component.state`}
+              label="State/Province/Region"
+              options={getStatesByCountry(
+                getValues(`${address}.component.country`) || '',
+              )}
+              selectProps={{
+                ...field,
+                multiple: false,
+                id: `${address}.component.state`,
+              }}
+              isCompanyTranslation
+            />
+          )}
         />
       </Grid>
 

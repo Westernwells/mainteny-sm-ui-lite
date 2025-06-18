@@ -1,6 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {Box} from '@mui/material';
-import NewDropZone, {FileWithPreview} from 'components/MyDropZone/NewDropZone';
+import NewDropZone, {
+  BIG_SCREEN_WIDTH,
+  FOOTER_BIG_SCREEN_DROPZONE_HEIGHT,
+  FOOTER_SMALL_SCREEN_DROPZONE_HEIGHT,
+  FileWithPreview,
+  HEADER_BIG_SCREEN_DROPZONE_HEIGHT,
+  HEADER_SMALL_SCREEN_DROPZONE_HEIGHT,
+  SMALL_SCREEN_WIDTH,
+} from 'components/MyDropZone/NewDropZone';
 import PdfSkeleton from 'assets/images/PdfSkeleton.svg';
 import PdfBigSkeleton from 'assets/images/PdfBigSkeleton.svg';
 import {t} from 'i18next';
@@ -20,14 +28,9 @@ import {ClientDataRecord} from 'models/client-storage';
 import {HeaderFooterInfoData} from 'models/misc';
 import {fetchFile} from 'utils/utils';
 
-const BIG_SCREEN_WIDTH: number = 1038;
-const BIG_SCREEN_DROPZONE_HEIGHT: number = 151;
-
-const SMALL_SCREEN_WIDTH: number = 684;
-const SMALL_SCREEN_DROPZONE_HEIGHT: number = 100;
-
 const PDF_SCREEN_WIDTH: number = 595;
-const PDF_SCREEN_DROPZONE_HEIGHT: number = 86;
+const HEADER_PDF_SCREEN_DROPZONE_HEIGHT: number = 125;
+const FOOTER_PDF_SCREEN_DROPZONE_HEIGHT: number = 86;
 
 type Position = {x: number; y: number};
 type Dimensions = {width: number; height: number};
@@ -88,23 +91,32 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
 
   const initializeDimensions = (storageData?: ClientDataRecord) => {
     const scaleX = SMALL_SCREEN_WIDTH / PDF_SCREEN_WIDTH;
-    const scaleY = SMALL_SCREEN_DROPZONE_HEIGHT / PDF_SCREEN_DROPZONE_HEIGHT;
+    const topScaleY =
+      HEADER_SMALL_SCREEN_DROPZONE_HEIGHT / HEADER_PDF_SCREEN_DROPZONE_HEIGHT;
+    const bottomScaleY =
+      FOOTER_SMALL_SCREEN_DROPZONE_HEIGHT / FOOTER_PDF_SCREEN_DROPZONE_HEIGHT;
 
     try {
       const {header, footer} = JSON.parse(storageData?.value || '{}');
       if (header) {
-        setHeaderPosition({x: header.posX * scaleX, y: header.posY * scaleY});
+        setHeaderPosition({
+          x: header.posX * scaleX,
+          y: header.posY * topScaleY,
+        });
         setHeaderDimensions({
           width: header.width * scaleX,
-          height: header.height * scaleY,
+          height: header.height * topScaleY,
         });
       }
 
       if (footer) {
-        setFooterPosition({x: footer.posX * scaleX, y: footer.posY * scaleY});
+        setFooterPosition({
+          x: footer.posX * scaleX,
+          y: footer.posY * bottomScaleY,
+        });
         setFooterDimensions({
           width: footer.width * scaleX,
-          height: footer.height * scaleY,
+          height: footer.height * bottomScaleY,
         });
       }
     } catch (error) {
@@ -116,9 +128,16 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
     file: FileWithPreview,
     dimensions: Dimensions,
     position: Position,
+    isHeader?: boolean,
   ) => {
     const widthScale = PDF_SCREEN_WIDTH / BIG_SCREEN_WIDTH;
-    const heightScale = PDF_SCREEN_DROPZONE_HEIGHT / BIG_SCREEN_DROPZONE_HEIGHT;
+    const heightScale =
+      (isHeader
+        ? HEADER_PDF_SCREEN_DROPZONE_HEIGHT
+        : FOOTER_PDF_SCREEN_DROPZONE_HEIGHT) /
+      (isHeader
+        ? HEADER_BIG_SCREEN_DROPZONE_HEIGHT
+        : FOOTER_BIG_SCREEN_DROPZONE_HEIGHT);
 
     return {
       path: uploadPath.concat('/').concat(file.name),
@@ -174,10 +193,10 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
 
     const dataToSave: PdfTemplateData = {
       header: headerFile
-        ? getFileData(headerFile, headerDimensions, headerPosition)
+        ? getFileData(headerFile, headerDimensions, headerPosition, true)
         : undefined,
       footer: footerFile
-        ? getFileData(footerFile, footerDimensions, footerPosition)
+        ? getFileData(footerFile, footerDimensions, footerPosition, false)
         : undefined,
     };
 
@@ -255,7 +274,12 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
 
       const widthScale = BIG_SCREEN_WIDTH / SMALL_SCREEN_WIDTH;
       const heightScale =
-        BIG_SCREEN_DROPZONE_HEIGHT / SMALL_SCREEN_DROPZONE_HEIGHT;
+        (isFooter
+          ? FOOTER_BIG_SCREEN_DROPZONE_HEIGHT
+          : HEADER_BIG_SCREEN_DROPZONE_HEIGHT) /
+        (isFooter
+          ? FOOTER_SMALL_SCREEN_DROPZONE_HEIGHT
+          : HEADER_SMALL_SCREEN_DROPZONE_HEIGHT);
 
       if (isFooter) {
         await handleFileUpdates(
@@ -329,8 +353,11 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
       setIsInitialized(false);
     } else if (!isInitialized) {
       const widthScale = BIG_SCREEN_WIDTH / SMALL_SCREEN_WIDTH;
-      const heightScale =
-        BIG_SCREEN_DROPZONE_HEIGHT / SMALL_SCREEN_DROPZONE_HEIGHT;
+      const headerHeightScale =
+        HEADER_BIG_SCREEN_DROPZONE_HEIGHT / HEADER_SMALL_SCREEN_DROPZONE_HEIGHT;
+
+      const footerHeightScale =
+        FOOTER_BIG_SCREEN_DROPZONE_HEIGHT / FOOTER_SMALL_SCREEN_DROPZONE_HEIGHT;
 
       const initializeFiles = async () => {
         try {
@@ -345,7 +372,7 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
               setHeaderPosition,
               setHeaderDimensions,
               widthScale,
-              heightScale,
+              headerHeightScale,
             );
           }
 
@@ -360,7 +387,7 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
               setFooterPosition,
               setFooterDimensions,
               widthScale,
-              heightScale,
+              footerHeightScale,
             );
           }
           setIsInitialized(true);
@@ -443,6 +470,7 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
           setFile={setFile}
           showHandles={showHandles}
           setShowHandles={setShowHandles}
+          isFooter={isFooter}
         />
       </Box>
     );
@@ -484,7 +512,7 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
             }}>
             {renderDropBox(
               headerUrl[headerInfo?.path],
-              100,
+              HEADER_SMALL_SCREEN_DROPZONE_HEIGHT,
               headerDimensions,
               headerPosition,
               setHeaderPosition,
@@ -497,12 +525,13 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
 
           <Box
             sx={{
-              margin: '0 2em 0em 4.5em',
+              margin: '0 auto',
               textAlign: 'center',
-              maxWidth: '573px',
+              maxWidth: '556px',
               height: '570px',
+              marginTop: '-5em',
             }}>
-            <img alt="Skeleton" src={PdfSkeleton} />
+            <img alt="Skeleton" src={PdfSkeleton} style={{scale: 1.02}} />
           </Box>
 
           <Box
@@ -516,7 +545,7 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
             }}>
             {renderDropBox(
               footerUrl[footerInfo?.path],
-              100,
+              FOOTER_SMALL_SCREEN_DROPZONE_HEIGHT,
               footerDimensions,
               footerPosition,
               setFooterPosition,
@@ -538,7 +567,7 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
           }}>
           {renderDropBox(
             headerFile?.preview || headerUrl[headerInfo?.path] || null,
-            151,
+            HEADER_BIG_SCREEN_DROPZONE_HEIGHT,
             headerDimensions,
             headerPosition,
             setHeaderPosition,
@@ -570,12 +599,17 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
           </Box>
           <Box
             sx={{
-              margin: '0 2em 0em 6.5em',
+              margin: '0 auto',
               textAlign: 'center',
-              maxWidth: '870px',
+              maxWidth: '830px',
               height: '770px',
+              marginTop: '-5em',
             }}>
-            <img alt="Big Skeleton" src={PdfBigSkeleton} />
+            <img
+              alt="Big Skeleton"
+              src={PdfBigSkeleton}
+              style={{scale: 1.02}}
+            />
           </Box>
           <Box
             sx={{
@@ -600,7 +634,7 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
           </Box>
           {renderDropBox(
             footerFile?.preview || footerUrl[footerInfo?.path] || null,
-            151,
+            FOOTER_BIG_SCREEN_DROPZONE_HEIGHT,
             footerDimensions,
             footerPosition,
             setFooterPosition,

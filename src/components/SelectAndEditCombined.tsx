@@ -169,6 +169,7 @@ export const SelectAndEditCombined = ({
         title={modalHeader}
         onCancel={onCloseDialog}
         onSave={onSaveAddress}
+        disableSaveBtn={!getValues?.()[addressType]?.component?.name}
         dialogProps={{
           maxWidth: 'md',
           open: isModalOpen || false,

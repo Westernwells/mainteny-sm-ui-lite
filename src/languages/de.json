@@ -2693,13 +2693,13 @@
   "Include start time": "Startzeit auf PDF anzeigen",
   "Include hours": "Stunden auf PDF anzeigen",
   "INVOICE FORMAT": "RECHUNGSFORMAT",
-  "BUYER REFERENCE": "KUNDENREFERENZ",
+  "BUYER REFERENCE": "LEITWEG-ID",
   "PDF": "PDF",
   "Xinvoice (XML)": "X-Rechnung (XML)",
   "PDF & Xinvoice (XML)": "PDF & X-Rechnung (XML)",
-  "Buyer reference": "Kundenreferenz",
+  "Buyer reference": "Leitweg-ID",
   "Invoice format": "Rechnungsformat",
-  "Buyer reference is defined by the customer.": "Kundenreferenz wird von Ihrem Kunden definiert. ",
+  "Buyer reference is defined by the customer.": "Die Leitweg-ID erhalten Sie von Ihrem Kunden. ",
   "PDF Documents downloaded successfully!": "PDF Dokumente erfolgreich heruntergeladen!",
   "Bold": "Fett",
   "Italic": "Kursiv",
@@ -3296,5 +3296,7 @@
   "Attachment was updated successfully.": "Anhang wurde erfolgreich aktualisiert.",
   "Attachment added successfully": "Anhang wurde erfolgreich hinzugefügt.",
   "Attachment was deleted": "Anhang wurde gelöscht",
-  "Tasks": "Aufgaben"
+  "Tasks": "Aufgaben",
+  "Enter folder name...": "Ordner bennen...",
+  "{{numberOfFiles}} files": "{{numberOfFiles}} Anhänge"
 }

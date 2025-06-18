@@ -9,11 +9,13 @@ import './NewDropZone.css';
 import {DraggableEvent} from 'react-draggable';
 import {theme} from 'theme';
 
-const BIG_SCREEN_WIDTH: number = 1038;
-const BIG_SCREEN_DROPZONE_HEIGHT: number = 151;
+export const BIG_SCREEN_WIDTH: number = 1038;
+export const HEADER_BIG_SCREEN_DROPZONE_HEIGHT: number = 230;
+export const FOOTER_BIG_SCREEN_DROPZONE_HEIGHT: number = 140;
 
-const SMALL_SCREEN_WIDTH: number = 684;
-const SMALL_SCREEN_DROPZONE_HEIGHT: number = 100;
+export const SMALL_SCREEN_WIDTH: number = 684;
+export const HEADER_SMALL_SCREEN_DROPZONE_HEIGHT: number = 155;
+export const FOOTER_SMALL_SCREEN_DROPZONE_HEIGHT: number = 100;
 
 export interface FileWithPreview extends File {
   preview: string;
@@ -38,6 +40,7 @@ interface Props {
   setFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>;
   showHandles: boolean;
   setShowHandles: React.Dispatch<React.SetStateAction<boolean>>;
+  isFooter?: boolean;
 }
 
 const NewDropZone: React.FC<Props> = ({
@@ -54,6 +57,7 @@ const NewDropZone: React.FC<Props> = ({
   setFile,
   showHandles,
   setShowHandles,
+  isFooter,
 }) => {
   const {t} = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -108,7 +112,10 @@ const NewDropZone: React.FC<Props> = ({
 
   const handleDragStop: DraggableEventHandler = (e, data) => {
     const maxX = BIG_SCREEN_WIDTH - dimensions.width;
-    const maxY = BIG_SCREEN_DROPZONE_HEIGHT - dimensions.height;
+    const maxY =
+      (isFooter
+        ? FOOTER_BIG_SCREEN_DROPZONE_HEIGHT
+        : HEADER_BIG_SCREEN_DROPZONE_HEIGHT) - dimensions.height;
     const newX = Math.max(0, Math.min(data.x, maxX));
     const newY = Math.max(0, Math.min(data.y, maxY));
     setPosition({x: newX, y: newY});
@@ -124,7 +131,10 @@ const NewDropZone: React.FC<Props> = ({
     const newWidth = ref.offsetWidth;
     const newHeight = ref.offsetHeight;
     const maxX = BIG_SCREEN_WIDTH - newWidth;
-    const maxY = BIG_SCREEN_DROPZONE_HEIGHT - newHeight;
+    const maxY =
+      (isFooter
+        ? FOOTER_BIG_SCREEN_DROPZONE_HEIGHT
+        : HEADER_BIG_SCREEN_DROPZONE_HEIGHT) - newHeight;
 
     const newX = Math.max(0, Math.min(newPosition.x, maxX));
     const newY = Math.max(0, Math.min(newPosition.y, maxY));
@@ -167,9 +177,14 @@ const NewDropZone: React.FC<Props> = ({
       ref={containerRef}
       sx={{
         position: 'relative',
-        height: showBigger
-          ? `${BIG_SCREEN_DROPZONE_HEIGHT}px`
-          : `${SMALL_SCREEN_DROPZONE_HEIGHT}px`,
+        height:
+          showBigger && isFooter
+            ? `${FOOTER_BIG_SCREEN_DROPZONE_HEIGHT}px`
+            : showBigger && !isFooter
+            ? `${HEADER_BIG_SCREEN_DROPZONE_HEIGHT}px`
+            : !showBigger && isFooter
+            ? `${FOOTER_SMALL_SCREEN_DROPZONE_HEIGHT}px`
+            : `${HEADER_SMALL_SCREEN_DROPZONE_HEIGHT}px`,
         maxWidth: showBigger
           ? `${BIG_SCREEN_WIDTH}px`
           : `${SMALL_SCREEN_WIDTH}px`,
@@ -188,9 +203,14 @@ const NewDropZone: React.FC<Props> = ({
             p: '2rem',
             cursor: 'pointer',
             borderRadius: '4px',
-            height: showBigger
-              ? `${BIG_SCREEN_DROPZONE_HEIGHT}px`
-              : `${SMALL_SCREEN_DROPZONE_HEIGHT}px`,
+            height:
+              showBigger && isFooter
+                ? `${FOOTER_BIG_SCREEN_DROPZONE_HEIGHT}px`
+                : showBigger && !isFooter
+                ? `${HEADER_BIG_SCREEN_DROPZONE_HEIGHT}px`
+                : !showBigger && isFooter
+                ? `${FOOTER_SMALL_SCREEN_DROPZONE_HEIGHT}px`
+                : `${HEADER_SMALL_SCREEN_DROPZONE_HEIGHT}px`,
             width: showBigger
               ? `${BIG_SCREEN_WIDTH}px`
               : `${SMALL_SCREEN_WIDTH}px`,
@@ -251,7 +271,11 @@ const NewDropZone: React.FC<Props> = ({
             position={{x: position.x, y: position.y}}
             size={{width: dimensions.width, height: dimensions.height}}
             maxWidth={BIG_SCREEN_WIDTH}
-            maxHeight={BIG_SCREEN_DROPZONE_HEIGHT}
+            maxHeight={
+              isFooter
+                ? FOOTER_BIG_SCREEN_DROPZONE_HEIGHT
+                : HEADER_BIG_SCREEN_DROPZONE_HEIGHT
+            }
             bounds="parent"
             enableResizing={{
               right: true,
@@ -279,7 +303,9 @@ const NewDropZone: React.FC<Props> = ({
                 width: dimensions.width,
                 height: dimensions.height,
                 objectFit: 'contain',
-                maxHeight: `${BIG_SCREEN_DROPZONE_HEIGHT}px`,
+                maxHeight: isFooter
+                  ? `${FOOTER_BIG_SCREEN_DROPZONE_HEIGHT}px`
+                  : `${HEADER_BIG_SCREEN_DROPZONE_HEIGHT}px`,
                 position: 'absolute',
               }}
               crossOrigin="anonymous"
