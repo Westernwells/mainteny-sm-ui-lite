@@ -592,8 +592,8 @@ export const InvoiceForm = ({
           ? new Date(invoice?.additionalInfo.deliveryStartDate)
           : undefined,
       deliveryEndDate:
-        !isNewInvoice && invoice?.additionalInfo.deliveryStartDate
-          ? new Date(invoice?.additionalInfo.deliveryStartDate)
+        !isNewInvoice && invoice?.additionalInfo.deliveryEndDate
+          ? new Date(invoice?.additionalInfo.deliveryEndDate)
           : undefined,
       discount: !isNewInvoice
         ? getDiscoutObj(invoice?.additionalInfo?.discount)
