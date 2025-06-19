@@ -78,6 +78,7 @@ import {
   EditableServiceOrderSubArticleRecord,
 } from 'models/service-order';
 import {formatQuantity} from 'utils/pdfTemplates';
+import {resolveVatFromBackend} from 'utils/utils';
 
 interface SubPositionProps<
   TForm extends {
@@ -1462,7 +1463,15 @@ const useSubPosition = <
           />
         ) : (
           <Typography sx={{paddingRight: '12px', fontSize: '14px'}}>
-            {`${subItem.unitAmount.percentageVat ?? 0}%`}
+            {(() => {
+              const {percentageVat} = resolveVatFromBackend(
+                subItem.unitAmount?.vatId,
+                subItem.unitAmount?.percentageVat,
+                subItem.unitAmount?.vatName,
+                taxRates ?? [],
+              );
+              return `${percentageVat}%`;
+            })()}
           </Typography>
         )}
       </TableCell>

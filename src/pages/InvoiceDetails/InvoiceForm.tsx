@@ -70,6 +70,7 @@ import {
 import {PropertyOwnerView} from 'models/propertyManager';
 import {AddressComponent, AddressRecord, Language} from 'models/misc';
 import {
+  applyVatToItems,
   formatAddressFullname,
   formatSearchParams,
   getUniqueId,
@@ -98,7 +99,7 @@ import {ReactComponent as HeaderIllustration} from 'assets/illustrations/invoice
 import {ReactComponent as FooterIllustration} from 'assets/illustrations/invoice/footer.svg';
 import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pin.svg';
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
-import {ContractPaymentTermView, ContractTermView} from 'models/contract';
+import {ContractTermView} from 'models/contract';
 import {ArticleType, ArticleView} from 'models/article';
 import {T} from 'utils/i18n-utils';
 import {ServiceCompanyType} from 'models/service-company';
@@ -173,7 +174,6 @@ import {
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import {
-  centsToMoney,
   createQrData,
   moneyToCents,
   QRCurrencyCode,
@@ -1317,6 +1317,17 @@ export const InvoiceForm = ({
           )}`;
           setValue('moreInfo', newNotes);
         }
+
+        // Update the positions with the vat from customer if available
+        if (newCustomer?.additionalInfo?.vat) {
+          const current = getValues('items') as EditableInvoiceItem[];
+          const patched = applyVatToItems(
+            current,
+            newCustomer.additionalInfo.vat,
+            currentCurrency.code,
+          );
+          setValue('items', patched, {shouldDirty: true});
+        }
       }
     } else {
       handleRemoveCustomer();
@@ -1450,6 +1461,7 @@ export const InvoiceForm = ({
       currentCurrency,
       watchedDiscount,
       watchedPayment,
+      taxRates,
     );
 
     const invoiceAmountDetail = await calculateInvoiceAmount({
@@ -2137,6 +2149,7 @@ export const InvoiceForm = ({
           currentCurrency,
           currentValues.discount,
           currentValues?.payment,
+          taxRates,
         );
 
         const detail = await calculateInvoiceAmount({
@@ -2156,6 +2169,7 @@ export const InvoiceForm = ({
       pageState,
       invoiceType,
       isDuplicate,
+      taxRates,
     ],
   );
 

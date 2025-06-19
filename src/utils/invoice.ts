@@ -54,8 +54,8 @@ import {
   PropertyOwnerView,
 } from 'models/propertyManager';
 import {ServiceCompanyItem} from 'models/service-company';
-import {VatView} from 'models/vat';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
+import {VatView} from '../models/vat';
 import {
   aggregatedAmountToMoney,
   centsToMoney,
@@ -64,7 +64,11 @@ import {
   formatCurrency,
   moneyToCents,
 } from './currency';
-import {dateToString, getAmountFromPercentage} from './utils';
+import {
+  dateToString,
+  getAmountFromPercentage,
+  resolveVatFromBackend,
+} from './utils';
 import {formatDate} from './datetime';
 import {getJobTypeGivenName} from './service-order-utils';
 
@@ -825,67 +829,168 @@ export const buildInvoicePayload = (
   currentCurrency: Currency,
   discount?: Discount,
   payment?: Payment<Money>,
+  taxRates?: VatView[],
 ) => ({
   currency: currentCurrency.code,
-  items: items.map((item) => ({
-    id: undefined,
-    article: {
+  items: items.map((item) => {
+    const {percentageVat, vatName} = resolveVatFromBackend(
+      item.unitAmount?.vatId,
+      item.unitAmount?.percentageVat,
+      item.unitAmount?.vatName,
+      taxRates,
+    );
+
+    const {percentageVat: purchaseVat, vatName: purchaseVatName} =
+      resolveVatFromBackend(
+        item.article?.unitPurchaseAmount?.vatId,
+        item.article?.unitPurchaseAmount?.percentageVat,
+        item.article?.unitPurchaseAmount?.vatName,
+        taxRates,
+      );
+
+    const {percentageVat: sellingVat, vatName: sellingVatName} =
+      resolveVatFromBackend(
+        item.article?.unitSellingAmount?.vatId,
+        item.article?.unitSellingAmount?.percentageVat,
+        item.article?.unitSellingAmount?.vatName,
+        taxRates,
+      );
+
+    return {
       id: undefined,
-      name: item.article?.name,
-      externalId: item.article?.externalId,
-      type: item.article?.type,
-      unit: item.article?.unit,
-      unitSellingAmount: item.article?.unitSellingAmount,
-      unitPurchaseAmount: item.article?.unitPurchaseAmount,
-      costPackage: item.article?.costPackage,
-    },
-    name: item.name,
-    description: item.description,
-    unitAmount: {
-      currency: item.unitAmount?.currency || currentCurrency.code,
-      netAmount: Number(item.unitAmount?.netAmount) || 0,
-      percentageVat: item.unitAmount?.percentageVat || 0,
-      vatId: item.unitAmount?.vatId || '',
-      vatName: item.unitAmount?.vatName || '',
-    },
-    quantity: Number.isNaN(Number(item.quantity)) ? 0 : Number(item.quantity),
-    discount:
-      item.discount?.type === DiscountType.AMOUNT
-        ? {
-            type: DiscountType.AMOUNT,
-            amount: {
-              ...item.discount?.amount,
-              value: (item.discount?.amount?.value ?? 0) * 100,
-              currency: item.discount?.amount?.currency || currentCurrency.code,
-            },
-          }
-        : {
-            type: DiscountType.PERCENTAGE,
-            percentage: item.discount?.percentage || 0,
-          },
-    subItemsConfig: item.subItemsConfig,
-    subItems: item?.subItems?.map((sub) => ({
       article: {
         id: undefined,
-        name: sub.article?.name,
-        externalId: sub.article?.externalId,
-        type: sub.article?.type,
-        unit: sub.article?.unit,
-        unitSellingAmount: sub.article?.unitSellingAmount,
-        unitPurchaseAmount: sub.article?.unitPurchaseAmount,
-        costPackage: sub.article?.costPackage,
+        name: item.article?.name,
+        externalId: item.article?.externalId,
+        type: item.article?.type,
+        unit: item.article?.unit,
+        unitSellingAmount: {
+          ...item.article?.unitSellingAmount,
+          currency:
+            item.article?.unitSellingAmount?.currency || currentCurrency.code,
+          percentageVat: sellingVat,
+          vatName: sellingVatName,
+        },
+        unitPurchaseAmount: {
+          ...item.article?.unitPurchaseAmount,
+          currency:
+            item.article?.unitPurchaseAmount?.currency || currentCurrency.code,
+          percentageVat: purchaseVat,
+          vatName: purchaseVatName,
+        },
+        costPackage: item.article?.costPackage,
       },
-      id: undefined,
-      name: sub.name,
-      unitPurchaseAmount: sub.unitPurchaseAmount,
-      unitAmount: sub.unitAmount,
-      quantity: Number.isNaN(Number(sub.quantity)) ? 0 : Number(sub.quantity),
-      description: sub.description,
-      userSeqNumber: sub.userSeqNumber,
-    })),
-    userSeqNumber: item.userSeqNumber,
-    payment: item.payment ?? undefined,
-  })),
+      name: item.name,
+      description: item.description,
+      unitAmount: {
+        currency: item.unitAmount?.currency || currentCurrency.code,
+        netAmount: Number(item.unitAmount?.netAmount) || 0,
+        percentageVat,
+        vatId: item.unitAmount?.vatId || '',
+        vatName,
+      },
+      quantity: Number.isNaN(Number(item.quantity)) ? 0 : Number(item.quantity),
+      discount:
+        item.discount?.type === DiscountType.AMOUNT
+          ? {
+              type: DiscountType.AMOUNT,
+              amount: {
+                ...item.discount?.amount,
+                value: (item.discount?.amount?.value ?? 0) * 100,
+                currency:
+                  item.discount?.amount?.currency || currentCurrency.code,
+              },
+            }
+          : {
+              type: DiscountType.PERCENTAGE,
+              percentage: item.discount?.percentage || 0,
+            },
+      subItemsConfig: item.subItemsConfig,
+      subItems: item?.subItems?.map((sub) => {
+        const {percentageVat: subPercentageVat, vatName: subVatName} =
+          resolveVatFromBackend(
+            sub.unitAmount?.vatId,
+            sub.unitAmount?.percentageVat,
+            sub.unitAmount?.vatName,
+            taxRates,
+          );
+
+        const {
+          percentageVat: subArticlePurchaseVat,
+          vatName: subArticlePurchaseVatName,
+        } = resolveVatFromBackend(
+          sub.article?.unitPurchaseAmount?.vatId,
+          sub.article?.unitPurchaseAmount?.percentageVat,
+          sub.article?.unitPurchaseAmount?.vatName,
+          taxRates,
+        );
+
+        const {percentageVat: subPurchaseVat, vatName: subPurchaseVatName} =
+          resolveVatFromBackend(
+            sub?.unitPurchaseAmount?.vatId,
+            sub?.unitPurchaseAmount?.percentageVat,
+            sub?.unitPurchaseAmount?.vatName,
+            taxRates,
+          );
+
+        const {percentageVat: subSellingVat, vatName: subSellingVatName} =
+          resolveVatFromBackend(
+            sub.article?.unitSellingAmount?.vatId,
+            sub.article?.unitSellingAmount?.percentageVat,
+            sub.article?.unitSellingAmount?.vatName,
+            taxRates,
+          );
+
+        return {
+          article: {
+            id: undefined,
+            name: sub.article?.name,
+            externalId: sub.article?.externalId,
+            type: sub.article?.type,
+            unit: sub.article?.unit,
+            unitSellingAmount: {
+              ...sub.article?.unitSellingAmount,
+              currency:
+                sub.article?.unitSellingAmount?.currency ||
+                currentCurrency.code,
+              percentageVat: subSellingVat,
+              vatName: subSellingVatName,
+            },
+            unitPurchaseAmount: {
+              ...sub.article?.unitPurchaseAmount,
+              currency:
+                sub.article?.unitPurchaseAmount?.currency ||
+                currentCurrency.code,
+              percentageVat: subArticlePurchaseVat,
+              vatName: subArticlePurchaseVatName,
+            },
+            costPackage: sub.article?.costPackage,
+          },
+          id: undefined,
+          name: sub.name,
+          unitPurchaseAmount: {
+            ...sub.unitPurchaseAmount,
+            currency: sub?.unitPurchaseAmount?.currency || currentCurrency.code,
+            percentageVat: subPurchaseVat,
+            vatName: subPurchaseVatName,
+          },
+          unitAmount: {
+            ...sub.unitAmount,
+            currency: sub.unitAmount?.currency || currentCurrency.code,
+            percentageVat: subPercentageVat,
+            vatName: subVatName,
+          },
+          quantity: Number.isNaN(Number(sub.quantity))
+            ? 0
+            : Number(sub.quantity),
+          description: sub.description,
+          userSeqNumber: sub.userSeqNumber,
+        };
+      }),
+      userSeqNumber: item.userSeqNumber,
+      payment: item.payment ?? undefined,
+    };
+  }),
   globalDiscount:
     discount?.type === DiscountType.AMOUNT
       ? {
@@ -930,10 +1035,35 @@ export const invoiceItemToInvoiceItemRecord = (
   taxRates?: VatView[],
   subItemsMap: Record<string, InvoiceSubItemRecord[]> = {},
 ): InvoiceItemRecord => {
-  const taxRate =
-    taxRates?.find((rate) => rate.id === invoiceItem.unitAmount.vatId) ||
-    taxRates?.find(
-      (rate) => rate.percentage === invoiceItem.unitAmount.percentageVat,
+  const {percentageVat, vatName} = resolveVatFromBackend(
+    invoiceItem.unitAmount?.vatId,
+    invoiceItem.unitAmount?.percentageVat,
+    invoiceItem.unitAmount?.vatName,
+    taxRates,
+  );
+
+  const {percentageVat: purchaseVat, vatName: purchaseVatName} =
+    resolveVatFromBackend(
+      invoiceItem.unitPurchaseAmount?.vatId,
+      invoiceItem.unitPurchaseAmount?.percentageVat,
+      invoiceItem.unitPurchaseAmount?.vatName,
+      taxRates,
+    );
+
+  const {percentageVat: articleSellingVat, vatName: articleSellingVatName} =
+    resolveVatFromBackend(
+      invoiceItem.article?.unitSellingAmount?.vatId,
+      invoiceItem.article?.unitSellingAmount?.percentageVat,
+      invoiceItem.article?.unitSellingAmount?.vatName,
+      taxRates,
+    );
+
+  const {percentageVat: articlePurchaseVat, vatName: articlePurchaseVatName} =
+    resolveVatFromBackend(
+      invoiceItem.article?.unitPurchaseAmount?.vatId,
+      invoiceItem.article?.unitPurchaseAmount?.percentageVat,
+      invoiceItem.article?.unitPurchaseAmount?.vatName,
+      taxRates,
     );
 
   const isCreditNote = invoiceType === InvoiceType.CREDIT_NOTE;
@@ -941,17 +1071,18 @@ export const invoiceItemToInvoiceItemRecord = (
 
   const unitAmount = {
     netAmount: negate(invoiceItem.unitAmount.netAmount),
-    percentageVat:
-      invoiceItem.unitAmount.percentageVat || taxRate?.percentage || 0,
+    percentageVat,
     currency: invoiceItem.unitAmount.currency || currentCurrency.code,
-    vatId: invoiceItem.unitAmount.vatId || taxRate?.id || '',
-    vatName: invoiceItem.unitAmount.vatName || taxRate?.name || '',
+    vatId: invoiceItem.unitAmount.vatId,
+    vatName,
   };
 
   const unitPurchaseAmount = invoiceItem.unitPurchaseAmount
     ? {
         ...invoiceItem.unitPurchaseAmount,
         netAmount: negate(invoiceItem.unitPurchaseAmount.netAmount),
+        percentageVat: purchaseVat,
+        vatName: purchaseVatName,
       }
     : undefined;
 
@@ -979,7 +1110,25 @@ export const invoiceItemToInvoiceItemRecord = (
 
   const record: EditableInvoiceItem = {
     id: invoiceItem.id,
-    article: invoiceItem.article,
+    article: {
+      ...invoiceItem.article,
+      unitSellingAmount: {
+        ...invoiceItem.article?.unitSellingAmount,
+        currency:
+          invoiceItem.article?.unitSellingAmount?.currency ||
+          currentCurrency.code,
+        percentageVat: articleSellingVat,
+        vatName: articleSellingVatName,
+      },
+      unitPurchaseAmount: {
+        ...invoiceItem.article?.unitPurchaseAmount,
+        currency:
+          invoiceItem.article?.unitPurchaseAmount?.currency ||
+          currentCurrency.code,
+        percentageVat: articlePurchaseVat,
+        vatName: articlePurchaseVatName,
+      },
+    },
     name: invoiceItem.name,
     description: invoiceItem.description,
     quantity: invoiceItem.quantity,
@@ -1008,25 +1157,88 @@ export const invoiceItemToInvoiceItemRecord = (
 
     return {
       ...record,
-      subItems: subItems.map((subItem) => ({
-        parentId: invoiceItem.id,
-        id: subItem?.id || '',
-        article: subItem.article,
-        name: subItem.name,
-        description: subItem.description,
-        quantity: subItem.quantity,
-        unitAmount: {
-          ...subItem.unitAmount,
-          netAmount: negate(subItem.unitAmount?.netAmount),
-        },
-        unitPurchaseAmount: subItem.unitPurchaseAmount
-          ? {
-              ...subItem.unitPurchaseAmount,
-              netAmount: negate(subItem.unitPurchaseAmount?.netAmount),
-            }
-          : undefined,
-        userSeqNumber: subItem.userSeqNumber,
-      })),
+      subItems: subItems.map((subItem) => {
+        const {percentageVat: subVat, vatName: subVatName} =
+          resolveVatFromBackend(
+            subItem.unitAmount?.vatId,
+            subItem.unitAmount?.percentageVat,
+            subItem.unitAmount?.vatName,
+            taxRates,
+          );
+
+        const {percentageVat: subPurchaseVat, vatName: subPurchaseVatName} =
+          resolveVatFromBackend(
+            subItem.unitPurchaseAmount?.vatId,
+            subItem.unitPurchaseAmount?.percentageVat,
+            subItem.unitPurchaseAmount?.vatName,
+            taxRates,
+          );
+
+        const {
+          percentageVat: subArticleSellingVat,
+          vatName: subArticleSellingVatName,
+        } = resolveVatFromBackend(
+          subItem.article?.unitSellingAmount?.vatId,
+          subItem.article?.unitSellingAmount?.percentageVat,
+          subItem.article?.unitSellingAmount?.vatName,
+          taxRates,
+        );
+
+        const {
+          percentageVat: subArticlePurchaseVat,
+          vatName: subArticlePurchaseVatName,
+        } = resolveVatFromBackend(
+          subItem.article?.unitPurchaseAmount?.vatId,
+          subItem.article?.unitPurchaseAmount?.percentageVat,
+          subItem.article?.unitPurchaseAmount?.vatName,
+          taxRates,
+        );
+
+        return {
+          parentId: invoiceItem.id,
+          id: subItem?.id || '',
+          article: {
+            ...subItem.article,
+            unitSellingAmount: {
+              ...subItem.article?.unitSellingAmount,
+              currency:
+                subItem.article?.unitSellingAmount?.currency ||
+                currentCurrency.code,
+              percentageVat: subArticleSellingVat,
+              vatName: subArticleSellingVatName,
+            },
+            unitPurchaseAmount: {
+              ...subItem.article?.unitPurchaseAmount,
+              currency:
+                subItem.article?.unitPurchaseAmount?.currency ||
+                currentCurrency.code,
+              percentageVat: subArticlePurchaseVat,
+              vatName: subArticlePurchaseVatName,
+            },
+          },
+          name: subItem.name,
+          description: subItem.description,
+          quantity: subItem.quantity,
+          unitAmount: {
+            ...subItem.unitAmount,
+            netAmount: negate(subItem.unitAmount?.netAmount),
+            currency: subItem.unitAmount?.currency || currentCurrency.code,
+            percentageVat: subVat,
+            vatName: subVatName,
+          },
+          unitPurchaseAmount: subItem.unitPurchaseAmount
+            ? {
+                ...subItem.unitPurchaseAmount,
+                netAmount: negate(subItem.unitPurchaseAmount?.netAmount),
+                currency:
+                  subItem.unitPurchaseAmount?.currency || currentCurrency.code,
+                percentageVat: subPurchaseVat,
+                vatName: subPurchaseVatName,
+              }
+            : undefined,
+          userSeqNumber: subItem.userSeqNumber,
+        };
+      }),
       subItemsConfig: {
         subItemsVisible:
           invoiceItem.additionalInfo?.subItemsConfig?.subItemsVisible || false,
@@ -1045,27 +1257,75 @@ export const articleViewToItem = (
   taxRates?: VatView[],
   subItemsMap: Record<string, InvoiceSubItemRecord[]> = {},
 ): InvoiceItemRecord => {
-  const taxRate =
-    taxRates?.find((rate) => rate.id === articleView.unitAmount.vatId) ||
-    taxRates?.find(
-      (rate) => rate.percentage === articleView.unitAmount.percentageVat,
+  const {percentageVat, vatName} = resolveVatFromBackend(
+    articleView.unitAmount?.vatId,
+    articleView.unitAmount?.percentageVat,
+    articleView.unitAmount?.vatName,
+    taxRates,
+  );
+
+  const {percentageVat: purchaseVat, vatName: purchaseVatName} =
+    resolveVatFromBackend(
+      articleView.unitPurchaseAmount?.vatId,
+      articleView.unitPurchaseAmount?.percentageVat,
+      articleView.unitPurchaseAmount?.vatName,
+      taxRates,
+    );
+
+  const {percentageVat: articleSellingVat, vatName: articleSellingVatName} =
+    resolveVatFromBackend(
+      articleView.article?.unitSellingAmount?.vatId,
+      articleView.article?.unitSellingAmount?.percentageVat,
+      articleView.article?.unitSellingAmount?.vatName,
+      taxRates,
+    );
+
+  const {percentageVat: articlePurchaseVat, vatName: articlePurchaseVatName} =
+    resolveVatFromBackend(
+      articleView.article?.unitPurchaseAmount?.vatId,
+      articleView.article?.unitPurchaseAmount?.percentageVat,
+      articleView.article?.unitPurchaseAmount?.vatName,
+      taxRates,
     );
 
   const record: InvoiceItemRecord = {
     id: articleView.id,
-    article: articleView.article,
+    article: {
+      ...articleView.article,
+      unitSellingAmount: {
+        ...articleView.article?.unitSellingAmount,
+        currency:
+          articleView.article?.unitSellingAmount?.currency ||
+          currentCurrency.code,
+        percentageVat: articleSellingVat,
+        vatName: articleSellingVatName,
+      },
+      unitPurchaseAmount: {
+        ...articleView.article?.unitPurchaseAmount,
+        currency:
+          articleView.article?.unitPurchaseAmount?.currency ||
+          currentCurrency.code,
+        percentageVat: articlePurchaseVat,
+        vatName: articlePurchaseVatName,
+      },
+    },
     name: articleView.name,
     description: articleView.description,
     quantity: articleView.quantity,
     unitAmount: {
       netAmount: articleView.unitAmount.netAmount || 0,
-      percentageVat:
-        articleView.unitAmount.percentageVat || taxRate?.percentage || 0,
+      percentageVat,
       currency: articleView.unitAmount.currency || currentCurrency.code,
-      vatId: articleView.unitAmount.vatId || taxRate?.id || '',
-      vatName: articleView.unitAmount.vatName || taxRate?.name || '',
+      vatId: articleView.unitAmount.vatId || '',
+      vatName,
     },
-    unitPurchaseAmount: articleView.unitPurchaseAmount,
+    unitPurchaseAmount: {
+      ...articleView.unitPurchaseAmount,
+      currency:
+        articleView.unitPurchaseAmount?.currency || currentCurrency.code,
+      percentageVat: purchaseVat,
+      vatName: purchaseVatName,
+    },
     discount: getDiscoutObj(articleView.additionalInfo?.discount),
     userSeqNumber: articleView?.additionalInfo?.userSeqNumber,
   };
@@ -1088,17 +1348,86 @@ export const articleViewToItem = (
 
     return {
       ...record,
-      subItems: subItems.map((subItem) => ({
-        parentId: articleView.id,
-        id: subItem?.id || '',
-        article: subItem.article,
-        name: subItem.name,
-        description: subItem.description,
-        quantity: subItem.quantity,
-        unitAmount: subItem.unitAmount,
-        unitPurchaseAmount: subItem.unitPurchaseAmount,
-        userSeqNumber: subItem.userSeqNumber,
-      })),
+      subItems: subItems.map((subItem) => {
+        const {percentageVat: subVat, vatName: subVatName} =
+          resolveVatFromBackend(
+            subItem.unitAmount?.vatId,
+            subItem.unitAmount?.percentageVat,
+            subItem.unitAmount?.vatName,
+            taxRates,
+          );
+
+        const {percentageVat: subPurchaseVat, vatName: subPurchaseVatName} =
+          resolveVatFromBackend(
+            subItem.unitPurchaseAmount?.vatId,
+            subItem.unitPurchaseAmount?.percentageVat,
+            subItem.unitPurchaseAmount?.vatName,
+            taxRates,
+          );
+
+        const {
+          percentageVat: subArticleSellingVat,
+          vatName: subArticleSellingVatName,
+        } = resolveVatFromBackend(
+          subItem.article?.unitSellingAmount?.vatId,
+          subItem.article?.unitSellingAmount?.percentageVat,
+          subItem.article?.unitSellingAmount?.vatName,
+          taxRates,
+        );
+
+        const {
+          percentageVat: subArticlePurchaseVat,
+          vatName: subArticlePurchaseVatName,
+        } = resolveVatFromBackend(
+          subItem.article?.unitPurchaseAmount?.vatId,
+          subItem.article?.unitPurchaseAmount?.percentageVat,
+          subItem.article?.unitPurchaseAmount?.vatName,
+          taxRates,
+        );
+
+        return {
+          parentId: articleView.id,
+          id: subItem?.id || '',
+          article: {
+            ...subItem.article,
+            unitSellingAmount: {
+              ...subItem.article?.unitSellingAmount,
+              currency:
+                subItem.article?.unitSellingAmount?.currency ||
+                currentCurrency.code,
+              percentageVat: subArticleSellingVat,
+              vatName: subArticleSellingVatName,
+            },
+            unitPurchaseAmount: {
+              ...subItem.article?.unitPurchaseAmount,
+              currency:
+                subItem.article?.unitPurchaseAmount?.currency ||
+                currentCurrency.code,
+              percentageVat: subArticlePurchaseVat,
+              vatName: subArticlePurchaseVatName,
+            },
+          },
+          name: subItem.name,
+          description: subItem.description,
+          quantity: subItem.quantity,
+          unitAmount: {
+            ...subItem.unitAmount,
+            currency: subItem.unitAmount?.currency || currentCurrency.code,
+            percentageVat: subVat,
+            vatName: subVatName,
+          },
+          unitPurchaseAmount: subItem.unitPurchaseAmount
+            ? {
+                ...subItem.unitPurchaseAmount,
+                currency:
+                  subItem.unitPurchaseAmount?.currency || currentCurrency.code,
+                percentageVat: subPurchaseVat,
+                vatName: subPurchaseVatName,
+              }
+            : undefined,
+          userSeqNumber: subItem.userSeqNumber,
+        };
+      }),
       subItemsConfig: {
         subItemsVisible:
           articleView.additionalInfo?.subArticlesConfig?.subItemsVisible ||

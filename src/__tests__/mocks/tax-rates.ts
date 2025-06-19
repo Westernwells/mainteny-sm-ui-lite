@@ -1,6 +1,6 @@
 import {VatView} from 'models/vat';
 
-export const taxRatesOne: Partial<VatView>[] = [
+export const taxRatesOne: VatView[] = [
   {
     id: '3c4a5e70-a256-4744-b52d-b92105d4d122',
     name: '19%',

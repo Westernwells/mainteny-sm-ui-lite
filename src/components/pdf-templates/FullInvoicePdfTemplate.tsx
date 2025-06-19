@@ -292,7 +292,7 @@ const FullInvoicePdfTemplate = ({
                 fontStyles={fontStyles}
               />
             )}
-
+            <View minPresenceAhead={86} />
             {invoiceItems.length > 0 && (
               <ArticleSection
                 invoice={invoice}

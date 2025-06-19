@@ -110,6 +110,7 @@ import {invoiceItemToInvoiceItemRecord, isXMLNeeded} from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
 import FinalInvoicePdfTemplate from 'components/pdf-templates/invoice-previews/FinalInvoicePdfTemplate';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 
 interface Props {
   invoice: InvoiceView;
@@ -190,7 +191,6 @@ export const Actions = ({
 
   // Combine jobTypes and the filtered oldJobTypes
   const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -235,6 +235,11 @@ export const Actions = ({
       return t(key, options);
     },
     [company?.language],
+  );
+
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    invoice.description,
   );
 
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceView | null>(
@@ -640,12 +645,6 @@ export const Actions = ({
     return {blob, blobURL};
   };
 
-  useEffect(() => {
-    if (reportToUpdate) {
-      setReport(reportToUpdate);
-    }
-  }, [reportToUpdate]);
-
   const handleClick = async (event: any) => {
     setAnchorEl(event.currentTarget);
     setSelectedInvoice(invoice);
@@ -1025,18 +1024,6 @@ export const Actions = ({
     [user, currentCurrency, qrCurrency],
   );
 
-  useEffect(() => {
-    if (qrError) {
-      const errorMessage = getQrErrorMessage(qrError);
-      if (errorMessage) {
-        enqueueSnackbar(t(`${errorMessage}`), {
-          variant: 'error',
-        });
-        setQrError(null);
-      }
-    }
-  }, [qrError]);
-
   const paymentTerm = invoice?.additionalInfo?.paymentTerm;
   const hasPaymentTerm = typeof paymentTerm?.id === 'string';
   const paymentTermDueDays = paymentTerm?.data?.dueDays || 0;
@@ -1203,19 +1190,6 @@ export const Actions = ({
     onResend: handleOpenSendInvoiceModal,
     onPayment: handleOpenPaymentDialog,
   });
-
-  useEffectAfterMount(() => {
-    (async () => {
-      if (companyNextNumber?.value) {
-        try {
-          setIsLoadingFiles(true);
-          await refetchPDFs(companyNextNumber.value);
-        } finally {
-          setIsLoadingFiles(false);
-        }
-      }
-    })();
-  }, [companyNextNumber?.value]);
 
   const handlePrint = async (
     invoiceToPrint: InvoiceView,
@@ -1559,6 +1533,37 @@ export const Actions = ({
     }
   };
 
+  useEffect(() => {
+    if (qrError) {
+      const errorMessage = getQrErrorMessage(qrError);
+      if (errorMessage) {
+        enqueueSnackbar(t(`${errorMessage}`), {
+          variant: 'error',
+        });
+        setQrError(null);
+      }
+    }
+  }, [qrError]);
+
+  useEffect(() => {
+    if (reportToUpdate) {
+      setReport(reportToUpdate);
+    }
+  }, [reportToUpdate]);
+
+  useEffectAfterMount(() => {
+    (async () => {
+      if (companyNextNumber?.value) {
+        try {
+          setIsLoadingFiles(true);
+          await refetchPDFs(companyNextNumber.value);
+        } finally {
+          setIsLoadingFiles(false);
+        }
+      }
+    })();
+  }, [companyNextNumber?.value]);
+
   return (
     <Box
       sx={{
@@ -1668,7 +1673,7 @@ export const Actions = ({
             invoice.propertyOwner?.contact.email
           }
           subject={generateEmailSubject()}
-          content={invoice.description}
+          content={emailBody}
           activeSignature={activeSignature}
           onSignatureSelect={(signature) => setActiveSignature(signature)}
         />

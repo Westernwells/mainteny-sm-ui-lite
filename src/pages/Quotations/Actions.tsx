@@ -45,6 +45,8 @@ import {companyLanguageContextMap} from 'utils/language';
 import {downloadFile as utilDownloadFile} from 'utils/download';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {useVats} from 'hooks/reactQuery/useVats';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 
 interface Props {
   quotation: QuotationView;
@@ -57,6 +59,7 @@ type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
 const Actions = ({quotation}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
+  const {data: taxRates} = useVats();
   const currentCurrency = useCurrentCurrency();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isRejectedDialogOpen, setIsRejectedDialogOpen] = useState(false);
@@ -77,6 +80,11 @@ const Actions = ({quotation}: Props) => {
 
   const {fontStyles, primaryColor, secondaryColor} =
     useContext(PdfStylesContext);
+
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    quotation.description,
+  );
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
 
@@ -159,7 +167,7 @@ const Actions = ({quotation}: Props) => {
   const transformedQuotationItems = useMemo(
     () =>
       quotation?.items.map((item) =>
-        quotationItemToQuotationItemRecord(item, subItemsMap),
+        quotationItemToQuotationItemRecord(item, taxRates, subItemsMap),
       ) || [],
     [quotation?.items, subItemsMap],
   );
@@ -491,7 +499,7 @@ const Actions = ({quotation}: Props) => {
           quotation?.elevator?.propertyOwner?.contact.email
         }
         subject={stripHtmlTags(quotation.subject)}
-        content={quotation.description}
+        content={emailBody}
         existingFiles={existingFiles}
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);

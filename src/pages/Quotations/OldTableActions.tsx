@@ -60,6 +60,8 @@ import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {companyLanguageContextMap} from 'utils/language';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {useVats} from 'hooks/reactQuery/useVats';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 
 interface Props {
   quotation: QuotationView;
@@ -74,6 +76,7 @@ const OldTableActions = ({quotation}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {user} = useUserSession();
+  const {data: taxRates} = useVats();
   const currentCurrency = useCurrentCurrency();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isRejectedDialogOpen, setIsRejectedDialogOpen] = useState(false);
@@ -97,6 +100,11 @@ const OldTableActions = ({quotation}: Props) => {
 
   const {fontStyles, primaryColor, secondaryColor} =
     useContext(PdfStylesContext);
+
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    quotation.description,
+  );
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
 
@@ -185,7 +193,7 @@ const OldTableActions = ({quotation}: Props) => {
   const transformedQuotationItems = useMemo(
     () =>
       quotation?.items.map((item) =>
-        quotationItemToQuotationItemRecord(item, subItemsMap),
+        quotationItemToQuotationItemRecord(item, taxRates, subItemsMap),
       ) || [],
     [quotation?.items, subItemsMap],
   );
@@ -293,28 +301,6 @@ const OldTableActions = ({quotation}: Props) => {
       refetchDownloadUrl();
     }
   };
-
-  useEffect(() => {
-    if (filePathToDownload && actionType === 'PRINT') {
-      onPrintQuotation(filePathToDownload);
-      setFilePathToDownload('');
-      setActionType('');
-    }
-  }, [filePathToDownload, actionType]);
-
-  useEffect(() => {
-    if (downloadUrl?.[filePathToDownload] && actionType === 'DOWNLOAD') {
-      downloadFile();
-      setFilePathToDownload('');
-    }
-
-    if (quotation.status !== QuotationStatus.DRAFT && actionType === 'PRINT') {
-      setFilePathToDownload(downloadUrl?.[quotation.additionalInfo.pdfPath!]!);
-    }
-    if (quotation.status === QuotationStatus.DRAFT && actionType === 'PRINT') {
-      generateBlobUrl();
-    }
-  }, [downloadUrl, actionType]);
 
   const getExistingFiles = async (
     fileDownloadUrl:
@@ -451,6 +437,28 @@ const OldTableActions = ({quotation}: Props) => {
 
     return defaultActions;
   })();
+
+  useEffect(() => {
+    if (filePathToDownload && actionType === 'PRINT') {
+      onPrintQuotation(filePathToDownload);
+      setFilePathToDownload('');
+      setActionType('');
+    }
+  }, [filePathToDownload, actionType]);
+
+  useEffect(() => {
+    if (downloadUrl?.[filePathToDownload] && actionType === 'DOWNLOAD') {
+      downloadFile();
+      setFilePathToDownload('');
+    }
+
+    if (quotation.status !== QuotationStatus.DRAFT && actionType === 'PRINT') {
+      setFilePathToDownload(downloadUrl?.[quotation.additionalInfo.pdfPath!]!);
+    }
+    if (quotation.status === QuotationStatus.DRAFT && actionType === 'PRINT') {
+      generateBlobUrl();
+    }
+  }, [downloadUrl, actionType]);
 
   return (
     <Box>
@@ -591,7 +599,7 @@ const OldTableActions = ({quotation}: Props) => {
           quotation?.elevator?.propertyOwner?.contact.email
         }
         subject={stripHtmlTags(quotation.subject)}
-        content={quotation.description}
+        content={emailBody}
         existingFiles={existingFiles}
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);

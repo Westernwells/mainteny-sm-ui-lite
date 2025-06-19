@@ -84,6 +84,7 @@ import HdrAutoOutlinedIcon from '@mui/icons-material/HdrAutoOutlined';
 import ConfirmRemoveSubItemsDialog from 'components/MixedPositions/ConfirmRemoveSubItemsDialog';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {formatQuantity} from 'utils/pdfTemplates';
+import {resolveVatFromBackend} from 'utils/utils';
 import {
   fetchArticleSubAssociations,
   useCreateArticle,
@@ -1757,7 +1758,15 @@ const useMainPosition = <
         ) : (
           <Typography
             sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
-            {`${watchedItem?.unitAmount?.percentageVat ?? 0}%`}
+            {(() => {
+              const {percentageVat} = resolveVatFromBackend(
+                watchedItem?.unitAmount?.vatId,
+                watchedItem?.unitAmount?.percentageVat,
+                watchedItem?.unitAmount?.vatName,
+                taxRates ?? [],
+              );
+              return `${percentageVat}%`;
+            })()}
           </Typography>
         )}
       </TableCell>

@@ -78,7 +78,6 @@ const PositionTable = ({
 }: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
-  const didMountRef = useRef(false);
 
   const {data: taxRates} = useVats();
 
@@ -128,7 +127,8 @@ const PositionTable = ({
     name: 'description',
   });
 
-  const {data: customerData} = useGetCustomer(watch('propertyOwnerId'));
+  const selectedCustomerId = useWatch({control, name: 'propertyOwnerId'});
+  const {data: customerData} = useGetCustomer(selectedCustomerId);
 
   const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
@@ -525,83 +525,6 @@ const PositionTable = ({
       handleAddNewPosition();
     }
   }, [resumeCheckDone, resumeDialogOpen, quotation, watchedItems.length]);
-
-  // Use Effect to update the new position when it does not have a name yet and customer is changed.
-  useEffect(() => {
-    if (!customerData?.additionalInfo?.vat) return;
-
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-      return;
-    }
-
-    const customerVat = customerData.additionalInfo.vat;
-    const currencyCode = currentCurrency?.code ?? 'EUR';
-
-    const customerVatProps = {
-      percentageVat: customerVat.percentage,
-      vatId: customerVat.id,
-      vatName: customerVat.name,
-      currency: currencyCode,
-    };
-
-    const updatedItems = watchedItems.map((item) => {
-      const isItemEmpty = !item.name?.trim();
-
-      const updatedSubItems: EditableQuotationSubItemRecord[] =
-        item.subItems?.map((subItem) => {
-          const isSubItemEmpty = !subItem.name?.trim();
-          if (!isSubItemEmpty) return subItem;
-
-          return {
-            ...subItem,
-            unitAmount: {
-              ...subItem.unitAmount,
-              ...customerVatProps,
-            },
-            unitPurchaseAmount: {
-              ...subItem.unitPurchaseAmount,
-              ...customerVatProps,
-            },
-          };
-        }) ?? [];
-
-      if (!isItemEmpty) {
-        return {
-          ...item,
-          subItems: updatedSubItems,
-        };
-      }
-
-      return {
-        ...item,
-        unitAmount: {
-          ...item.unitAmount,
-          ...customerVatProps,
-        },
-        unitPurchaseAmount: {
-          ...item.unitPurchaseAmount,
-          ...customerVatProps,
-        },
-        article: {
-          ...item.article,
-          unitSellingAmount: {
-            ...item.article?.unitSellingAmount,
-            ...customerVatProps,
-          },
-          unitPurchaseAmount: {
-            ...item.article?.unitPurchaseAmount,
-            ...customerVatProps,
-          },
-        },
-        subItems: updatedSubItems,
-      };
-    });
-
-    updatedItems.forEach((updatedItem, index) => {
-      update(index, updatedItem);
-    });
-  }, [customerData?.additionalInfo?.vat?.id]);
 
   return (
     <>

@@ -132,6 +132,7 @@ import {
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
 import FinalInvoicePdfTemplate from 'components/pdf-templates/invoice-previews/FinalInvoicePdfTemplate';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -337,6 +338,10 @@ export const ViewInvoice = ({
     });
 
   const {mutateAsync: updateInvoiceAsync} = useUpdateInvoice();
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    invoice.description,
+  );
 
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice.serviceOrder?.id,
@@ -1742,7 +1747,7 @@ export const ViewInvoice = ({
           invoice.propertyOwner?.contact.email
         }
         subject={generateEmailSubject()}
-        content={invoice.description}
+        content={emailBody}
         existingFiles={existingFiles}
         isLoadingFiles={isLoadingFiles}
         callback={async (emailRecord) => {

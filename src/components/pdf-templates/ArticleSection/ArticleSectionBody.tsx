@@ -59,7 +59,7 @@ export const ArticleSectionBody = ({
 
         return (
           <View key={`${mainPosition.id}-${index}`}>
-            <View style={styles.tableRow} wrap={false}>
+            <View style={styles.tableRow}>
               <View style={styles.col6Left}>
                 <Text>
                   {insertNewlines(mainPosition.userSeqNumber || '') ||
