@@ -34,7 +34,7 @@ const getStyles = ({boldFontStyle, primaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
     contentBody: {
       marginTop: 6,
-      marginBottom: 16,
+      paddingBottom: 16,
       color: primaryColor,
     },
     notesSection: {
@@ -193,7 +193,7 @@ const FinalInvoicePdfTemplate = ({
                 fontStyles={fontStyles}
               />
             )}
-
+            <View minPresenceAhead={86} />
             {invoice?.additionalInfo.showArticleSection &&
               invoiceItems.length > 0 && (
                 <ArticleSection

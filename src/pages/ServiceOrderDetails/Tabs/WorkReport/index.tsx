@@ -86,6 +86,7 @@ import {Confirm} from 'components/Confirm';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {useCurrentCurrency} from 'utils/currency';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -596,6 +597,11 @@ export const WorkReport = ({serviceOrder}: Props) => {
     validationSchema,
   });
 
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    formik.values.description || '',
+  );
+
   const [openTextBlockDialog, setOpenTextBlockDialog] =
     useState<boolean>(false);
   const [activeSubDialog, setActiveSubDialog] = useState<
@@ -1033,7 +1039,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
           serviceOrder.elevator.propertyOwner?.contact.email
         }
         subject=""
-        content={formik.values.description}
+        content={emailBody}
         callback={(emailRecord) => onSubmitHandler(emailRecord)}
         activeSignature={activeSignature}
         onSignatureSelect={(signature) => setActiveSignature(signature)}

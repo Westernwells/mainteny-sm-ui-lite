@@ -13,7 +13,7 @@ const getStyles = ({primaryColor, secondaryColor}: PdfConfigurationStyles) =>
     tableHead: {
       display: 'flex',
       flexDirection: 'row',
-      paddingVertical: 2,
+      paddingBottom: 2,
     },
     tableHeading: {
       color: primaryColor,

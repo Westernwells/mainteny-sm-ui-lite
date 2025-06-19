@@ -6,6 +6,7 @@ import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {get} from 'lodash';
 import {TFunction} from 'i18next';
 import {
+  EditableInvoiceItem,
   FILE_DESCRIPTION_PREFIXES,
   InvoiceStatistics,
   InvoiceStatus,
@@ -13,6 +14,9 @@ import {
 } from 'models/invoice';
 
 import {ElevatorDataSchemaItem} from 'models/elevator';
+import {Theme} from '@mui/system';
+import {VatView} from 'models/vat';
+import {EditableQuotationItem} from 'models/quotation';
 import {
   Address,
   AddressRecord,
@@ -892,3 +896,79 @@ export const calculatePercentChange = (
   const change = ((newValue - oldValue) / oldValue) * 100;
   return parseFloat(change.toFixed(2));
 };
+
+export const resolveStatusInputChipColor = (
+  theme: Theme,
+  color: string,
+): string => {
+  if (color.startsWith('#')) return color;
+  if (color.includes('.')) {
+    const [key, subkey] = color.split('.');
+    return theme.palette[key]?.[subkey] ?? theme.palette.grey[500];
+  }
+  return theme.palette[color]?.main ?? theme.palette.grey[500];
+};
+
+export const resolveVatFromBackend = (
+  vatId: string | undefined,
+  backendPercentage: number | undefined,
+  backendName: string | undefined,
+  taxRates?: VatView[],
+): {percentageVat?: number; vatName: string} => {
+  const taxRate = taxRates?.find((v) => v.id === vatId);
+
+  if (!taxRate) {
+    return {
+      percentageVat: backendPercentage ?? 0,
+      vatName: backendName || '',
+    };
+  }
+
+  if (taxRate.percentage !== backendPercentage) {
+    return {
+      percentageVat: taxRate.percentage,
+      vatName: taxRate.name,
+    };
+  }
+
+  return {
+    percentageVat: backendPercentage ?? 0,
+    vatName: backendName || '',
+  };
+};
+
+export const applyVatToItems = (
+  items: (EditableInvoiceItem | EditableQuotationItem)[],
+  vat: VatView,
+  currency: string,
+) =>
+  items.map((item) => {
+    const basePatch = {
+      vatId: vat.id,
+      vatName: vat.name,
+      percentageVat: vat.percentage,
+      currency,
+    };
+
+    const patchedSubItems = item.subItems?.map((sub) => ({
+      ...sub,
+      unitAmount: {...sub.unitAmount, ...basePatch},
+      unitPurchaseAmount: {...sub.unitPurchaseAmount, ...basePatch},
+    }));
+
+    return {
+      ...item,
+      unitAmount: {...item.unitAmount, ...basePatch},
+      unitPurchaseAmount: {...item.unitPurchaseAmount, ...basePatch},
+      article: {
+        ...item.article,
+        unitSellingAmount: item.article?.unitSellingAmount
+          ? {...item.article.unitSellingAmount, ...basePatch}
+          : undefined,
+        unitPurchaseAmount: item.article?.unitPurchaseAmount
+          ? {...item.article.unitPurchaseAmount, ...basePatch}
+          : undefined,
+      },
+      subItems: patchedSubItems,
+    };
+  });

@@ -14,15 +14,10 @@ export const getStyles = ({
       width: '100%',
       display: 'flex',
     },
-    tableHead: {
-      display: 'flex',
-      flexDirection: 'row',
-      paddingVertical: 4,
-    },
     tableRow: {
       flexDirection: 'row',
       fontSize: 10,
-      marginVertical: 4,
+      marginTop: 4,
       width: '100%',
       display: 'flex',
       flexWrap: 'wrap',
@@ -32,7 +27,7 @@ export const getStyles = ({
       color: primaryColor,
       paddingLeft: 30,
       paddingRight: 5,
-      marginVertical: 3,
+      marginVertical: 2,
       width: '94%',
     },
     col6Left: {

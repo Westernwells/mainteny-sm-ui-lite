@@ -343,15 +343,17 @@ const QuotationPdfTemplate = React.memo(
                   html={quotation?.description || ''}
                   rootStyle={{
                     marginTop: 6,
+                    paddingBottom: 16,
                     body: fontStyles.regular,
                   }}
                   fontStyles={fontStyles}
                 />
               )}
-
+              <View minPresenceAhead={86} />
               {quotationItems.length && (
                 <View
                   style={{
+                    marginTop: 16,
                     paddingRight: 5,
                   }}>
                   <View style={styles.table}>

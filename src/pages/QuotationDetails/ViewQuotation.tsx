@@ -70,6 +70,8 @@ import {ClientReportForPDFConfig} from 'models/client-storage';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {useVats} from 'hooks/reactQuery/useVats';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -120,6 +122,7 @@ export const ViewQuotation = ({
   const theme = useTheme();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
+  const {data: taxRates} = useVats();
   const navigate = useNavigate();
   const {search} = useLocation();
 
@@ -137,6 +140,11 @@ export const ViewQuotation = ({
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    quotation.description,
+  );
 
   const {mutate: deleteQuotation} = useDeleteQuotation();
 
@@ -283,7 +291,7 @@ export const ViewQuotation = ({
   const transformedQuotationItems = useMemo(
     () =>
       quotation?.items.map((item) =>
-        quotationItemToQuotationItemRecord(item, subItemsMap),
+        quotationItemToQuotationItemRecord(item, taxRates, subItemsMap),
       ) || [],
     [quotation?.items, subItemsMap],
   );
@@ -830,7 +838,7 @@ export const ViewQuotation = ({
           quotation?.elevator?.propertyOwner?.contact.email
         }
         subject={stripHtmlTags(quotation.subject)}
-        content={quotation.description}
+        content={emailBody}
         existingFiles={existingFiles}
         isLoadingFiles={isLoadingFiles}
         callback={async (emailRecord) => {

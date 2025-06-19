@@ -87,7 +87,7 @@ const getStyles = ({
     },
     contentBody: {
       marginTop: 6,
-      marginBottom: 16,
+      paddingBottom: 16,
       color: primaryColor,
     },
     notesSection: {
@@ -276,7 +276,7 @@ const PartialInvoicePdfTemplate = ({
                 fontStyles={fontStyles}
               />
             )}
-
+            <View minPresenceAhead={86} />
             {invoice?.additionalInfo.showArticleSection &&
               invoiceItems.length && (
                 <ArticleSection

@@ -76,7 +76,7 @@ export const getStyles = ({
     tableHead: {
       display: 'flex',
       flexDirection: 'row',
-      paddingVertical: 4,
+      paddingTop: 3,
     },
     tableHeading: {
       color: primaryColor,

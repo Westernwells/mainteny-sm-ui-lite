@@ -80,6 +80,7 @@ import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature} from 'models/employee';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
 import AddChecklistDialog from './AddChecklistDialog';
@@ -141,6 +142,11 @@ export const CheckList = ({serviceOrder}: Props) => {
   const [activeSignature, setActiveSignature] = useState<
     EmailSignature | undefined
   >();
+
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    serviceOrder.description,
+  );
 
   const {data: signatureUrls = {}} = useDownloadUrl(
     activeSignature?.content?.images || [],
@@ -884,7 +890,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                           .billingEmail ||
                         serviceOrder.elevator.propertyOwner?.contact.email
                       }
-                      content={serviceOrder.description}
+                      content={emailBody}
                       existingFiles={existingFiles}
                       isLoadingFiles={isLoadingFiles}
                       callback={async (emailRecord) => {

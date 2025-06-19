@@ -486,7 +486,7 @@ const PdfUpfrontPaymentSection = ({
             html={replacedPaymentTerms}
             rootStyle={{
               marginTop: 6,
-              marginBottom: 16,
+              paddingBottom: 16,
             }}
             fontStyles={fontStyles}
           />

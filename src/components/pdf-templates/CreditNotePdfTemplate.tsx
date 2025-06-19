@@ -41,7 +41,7 @@ const getStyles = ({boldFontStyle, primaryColor}: PdfConfigurationStyles) =>
     },
     contentBody: {
       marginTop: 6,
-      marginBottom: 16,
+      paddingBottom: 16,
       color: primaryColor,
     },
     paymentTermsSection: {
@@ -259,7 +259,7 @@ const CreditNotePdfTemplate = ({
                 fontStyles={fontStyles}
               />
             )}
-
+            <View minPresenceAhead={86} />
             {invoiceItems.length > 0 && (
               <ArticleSection
                 invoice={invoice}

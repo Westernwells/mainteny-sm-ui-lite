@@ -91,7 +91,6 @@ const getStyles = ({
       height: 86,
       position: 'absolute',
       bottom: 0,
-      paddingTop: 5,
       paddingLeft: 57,
       paddingRight: 35,
     },

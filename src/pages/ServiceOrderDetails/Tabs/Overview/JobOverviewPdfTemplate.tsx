@@ -402,15 +402,16 @@ const JobOverviewPdfTemplate = React.memo(
                   html={serviceOrder?.description || ''}
                   rootStyle={{
                     marginTop: 6,
-                    marginBottom: 16,
+                    paddingBottom: 16,
                   }}
                   fontStyles={fontStyles}
                 />
               )}
-
+              <View minPresenceAhead={86} />
               {serviceOrderItems.length && (
                 <View
                   style={{
+                    marginTop: 16,
                     paddingRight: 5,
                   }}>
                   <View style={styles.table}>

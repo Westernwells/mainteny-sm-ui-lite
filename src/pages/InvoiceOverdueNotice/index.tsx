@@ -54,6 +54,7 @@ import RichTextField from 'components/RichTextField';
 import DialogPdfPreview from 'components/pdf-templates/DialogPdfPreview';
 import {Dialog} from 'components/Dialog';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 import InvoiceOverduePdfPreview from './InvoiceOverduePdfPreview';
 
 const validationSchema = Yup.object().shape({
@@ -214,6 +215,11 @@ export const InvoiceOverdueNotice = () => {
     enableReinitialize: true,
     onSubmit: () => {},
   });
+
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    formik.values.description,
+  );
 
   const factor = currencyFactor({
     currency: invoice?.totalAmount.currency ?? '',
@@ -707,7 +713,7 @@ export const InvoiceOverdueNotice = () => {
           invoice?.propertyOwner?.contact.email
         }
         subject={formik.values.subject}
-        content={formik.values.description}
+        content={emailBody}
         callback={(values) => onSubmitHandler(values)}
         existingFiles={existingFiles}
         isLoadingFiles={isLoadingFiles}

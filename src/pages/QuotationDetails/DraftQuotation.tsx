@@ -45,6 +45,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import {
+  applyVatToItems,
   formatAddressFullname,
   formatSearchParams,
   getUserFullName,
@@ -351,7 +352,7 @@ export const DraftQuotation = ({
     notes: quotation?.additionalInfo.notes || '',
     items:
       quotation?.items.map((item) =>
-        quotationItemToQuotationItemRecord(item, subItemsMap),
+        quotationItemToQuotationItemRecord(item, taxRates, subItemsMap),
       ) || [],
     serviceCompanyId:
       quotation?.serviceCompany.id || user?.userAccount.serviceCompany.id || '',
@@ -428,6 +429,7 @@ export const DraftQuotation = ({
           currentItems,
           currentCurrency,
           currentValues.discount,
+          taxRates,
           'edit',
         );
 
@@ -440,7 +442,14 @@ export const DraftQuotation = ({
         Sentry.captureException(error);
       }
     }, 300),
-    [calculateQuotationAmount, currentCurrency, setValue, getValues, pageState],
+    [
+      calculateQuotationAmount,
+      currentCurrency,
+      setValue,
+      getValues,
+      pageState,
+      taxRates,
+    ],
   );
 
   useEffect(() => {
@@ -540,7 +549,7 @@ export const DraftQuotation = ({
     setValue(
       'items',
       quotationData.items.map((item) =>
-        quotationItemToQuotationItemRecord(item, subItemsMap),
+        quotationItemToQuotationItemRecord(item, taxRates, subItemsMap),
       ),
     );
 
@@ -634,6 +643,17 @@ export const DraftQuotation = ({
       skipInitialCustomerSelect.current = false;
     } else {
       appendCustomerLegalNote(row);
+
+      // Update the positions with the vat from customer if available
+      if (row?.additionalInfo?.vat) {
+        const current = getValues('items') as EditableQuotationItem[];
+        const patched = applyVatToItems(
+          current,
+          row.additionalInfo.vat,
+          currentCurrency.code,
+        );
+        setValue('items', patched, {shouldDirty: true});
+      }
     }
 
     const emptyAddressState = {fullName: null};
@@ -976,6 +996,7 @@ export const DraftQuotation = ({
     setPageState('FRESH_NEW');
     reset();
     setOpenResumeProgressDialog(false);
+    skipInitialCustomerSelect.current = false;
   };
 
   const onCancel = () => {

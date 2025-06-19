@@ -42,6 +42,7 @@ import CustomSnackbar from 'components/CustomSnackbar';
 import {getInvoicePDFStatuses, validateDueDate} from 'utils/invoice-utils';
 import useTheme from '@mui/material/styles/useTheme';
 import {CANCEL_ACTION} from 'models/status';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 import {Tooltip} from '../utils/utils';
 
 interface Props {
@@ -79,6 +80,11 @@ export const Actions = ({
     pdfPathToDownload ? [pdfPathToDownload] : [],
   );
 
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    invoice.description,
+  );
+
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
   const {mutateAsync: cancelInvoice} = useCancelInvoice({
     action: CANCEL_ACTION.CANCEL,
@@ -86,13 +92,6 @@ export const Actions = ({
 
   const {isPDFsGenerated, isInvoicePDFGenerated} =
     getInvoicePDFStatuses(invoice);
-
-  useEffect(() => {
-    if (downloadUrls?.[pdfPathToDownload]) {
-      window.open(downloadUrls?.[pdfPathToDownload], '_blank');
-      setPdfPathToDownload('');
-    }
-  }, [downloadUrls]);
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -352,6 +351,13 @@ export const Actions = ({
     });
   };
 
+  useEffect(() => {
+    if (downloadUrls?.[pdfPathToDownload]) {
+      window.open(downloadUrls?.[pdfPathToDownload], '_blank');
+      setPdfPathToDownload('');
+    }
+  }, [downloadUrls]);
+
   return (
     <Box>
       {isInvoiceList && action}
@@ -418,7 +424,7 @@ export const Actions = ({
           invoice.propertyOwner?.contact.email
         }
         subject={generateEmailSubject()}
-        content={invoice.description}
+        content={emailBody}
       />
 
       <Confirm
