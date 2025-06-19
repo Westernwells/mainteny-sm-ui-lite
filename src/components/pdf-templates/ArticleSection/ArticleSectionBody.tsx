@@ -147,7 +147,7 @@ export const ArticleSectionBody = ({
             </View>
 
             <View>
-              {!!mainPosition.description?.trim() && (
+              {!!stripHtmlTags(mainPosition.description || '')?.trim() && (
                 <HtmlPDF
                   html={mainPosition.description || '-'}
                   rootStyle={{
@@ -282,7 +282,7 @@ export const ArticleSectionBody = ({
                       </View>
                     </View>
 
-                    {subItem.description?.trim() && (
+                    {!!stripHtmlTags(subItem.description || '')?.trim() && (
                       <View>
                         <HtmlPDF
                           html={subItem.description || '-'}

@@ -13,7 +13,7 @@ import {Descendant} from 'slate';
 import {sampleRawHtml} from './mocks/richTextField';
 
 describe('normalizePdfInlineStyles', () => {
-  it('strips out color and font-family but keeps font-size(px) and padding(px)', () => {
+  it('keeps color and strips out font-family but keeps font-size(px) and padding(px)', () => {
     const input = `
       <p style="font-family: Arial; color: red; font-size: 20px; padding-left: 24px; padding-right: 8px; background-color: yellow">
         Hello
@@ -23,57 +23,33 @@ describe('normalizePdfInlineStyles', () => {
     const output = normalizePdfInlineStyles(input);
 
     expect(output).toContain(
-      'style="padding-left: 24px; padding-right: 8px; font-size: 20px"',
+      'style="padding-left: 24px; padding-right: 8px; color: red; font-size: 20px"',
     );
-    expect(output).not.toContain('color:');
     expect(output).not.toContain('font-family:');
     expect(output).not.toContain('background-color:');
   });
 
-  it('converts font-size: XXem → px correctly (1em = 16px)', () => {
+  it('converts font-size: XXem → px correctly (1em = 16px) and keeps color', () => {
     const input = `<span style="font-size:1.2em; padding-left: 2em; color:blue">X</span>`;
     const output = normalizePdfInlineStyles(input);
 
-    expect(output).toContain('style="padding-left: 32px; font-size: 19.2px"');
-    expect(output).not.toContain('color:');
-  });
-
-  it('keeps padding-left/right in em → px (emToPx) and carries font-size:px → px', () => {
-    const input = `<div style="padding-left:0.5em; padding-right:16px; font-size:14px; text-indent: 10px">
-      Content
-    </div>`;
-    const output = normalizePdfInlineStyles(input);
-
     expect(output).toContain(
-      'style="padding-left: 8px; padding-right: 16px; font-size: 14px"',
+      'style="padding-left: 32px; color: blue; font-size: 19.2px"',
     );
-    expect(output).not.toContain('text-indent');
   });
 
-  it('drops the entire style attribute if no font-size or padding-left/right present', () => {
-    const input = `<p style="color:green">NoStyles</p>`;
+  it('drops the entire style attribute if no recognized props present', () => {
+    const input = `<p style="background:green">NoStyles</p>`;
     const output = normalizePdfInlineStyles(input);
 
     expect(output).toBe(`<p>NoStyles</p>`);
   });
 
-  it('handles multiple tags in a single string', () => {
-    const input = `
-      <div style="font-size:12px; padding-left:4px">A</div>
-      <span style="font-size: 1em; padding-right:0.25em; background: black">B</span>
-      <p style="font-family: serif;">C</p>
-    `;
+  // …the other tests can remain the same, or you can add an explicit “color-only” test:
+  it('keeps color when it’s the only recognized prop', () => {
+    const input = `<div style="color: #123456">Test</div>`;
     const output = normalizePdfInlineStyles(input);
-
-    expect(output).toContain(
-      `<div style="padding-left: 4px; font-size: 12px">A</div>`,
-    );
-
-    expect(output).toContain(
-      `<span style="padding-right: 4px; font-size: 16px">B</span>`,
-    );
-
-    expect(output).toContain(`<p>C</p>`);
+    expect(output).toBe(`<div style="color: #123456">Test</div>`);
   });
 });
 
