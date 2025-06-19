@@ -672,29 +672,34 @@ export const normalizePdfInlineStyles = (html: string): string => {
       const outProps: string[] = [];
 
       // Explicitly handle text-align (and your paddings)
-      (['padding-left', 'padding-right', 'text-align'] as const).forEach(
-        (prop) => {
-          const raw = styleMap[prop];
-          if (!raw) return;
+      (
+        ['padding-left', 'padding-right', 'text-align', 'color'] as const
+      ).forEach((prop) => {
+        const raw = styleMap[prop];
+        if (!raw) return;
 
-          if (prop === 'text-align') {
-            // preserve “left”, “right”, “center”
-            outProps.push(`text-align: ${raw}`);
-            return;
-          }
+        if (prop === 'text-align') {
+          // preserve “left”, “right”, “center”
+          outProps.push(`text-align: ${raw}`);
+          return;
+        }
 
-          // for padding-left / padding-right only: convert em → px or keep px
-          const em = raw.match(/^([\d.]+)em$/);
-          if (em) {
-            outProps.push(`${prop}: ${parseFloat(em[1]) * EM_IN_PX}px`);
-            return;
-          }
-          const px = raw.match(/^([\d.]+)px$/);
-          if (px) {
-            outProps.push(`${prop}: ${px[1]}px`);
-          }
-        },
-      );
+        if (prop === 'color') {
+          outProps.push(`color: ${raw}`);
+          return;
+        }
+
+        // for padding-left / padding-right only: convert em → px or keep px
+        const em = raw.match(/^([\d.]+)em$/);
+        if (em) {
+          outProps.push(`${prop}: ${parseFloat(em[1]) * EM_IN_PX}px`);
+          return;
+        }
+        const px = raw.match(/^([\d.]+)px$/);
+        if (px) {
+          outProps.push(`${prop}: ${px[1]}px`);
+        }
+      });
 
       // font-size logic remains unchanged
       const fs = styleMap['font-size'];
