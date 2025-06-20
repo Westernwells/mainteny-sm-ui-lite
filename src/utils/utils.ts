@@ -17,6 +17,8 @@ import {ElevatorDataSchemaItem} from 'models/elevator';
 import {Theme} from '@mui/system';
 import {VatView} from 'models/vat';
 import {EditableQuotationItem} from 'models/quotation';
+import {MONTH_NUMBER_TO_NAME} from 'models/jobFrequency';
+import {ContractServiceFormElevator, ContractTimeUnit} from 'models/contract';
 import {
   Address,
   AddressRecord,
@@ -761,6 +763,44 @@ export const getTechnicalFieldCategory = (
   }
 
   return name;
+};
+
+export const generateMonthDropdownFromElevatorJobFrequency = (
+  elevators: ContractServiceFormElevator[],
+  t: TFunction<'translation'>,
+) => {
+  let allMonthsSet = new Set<number>();
+
+  elevators.forEach((elevator) => {
+    if (elevator.orderGenerationJob?.timeUnit !== ContractTimeUnit.MONTHLY) {
+      allMonthsSet = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+      return;
+    }
+
+    elevator.orderGenerationJob?.timeNumbers.forEach((month) => {
+      allMonthsSet.add(month);
+    });
+  });
+
+  const months = [...allMonthsSet];
+
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1; // 1-based
+  const currentYear = now.getFullYear();
+
+  const sorted = months.sort((a, b) => {
+    const aMonthDiff = (a - currentMonth + 12) % 12;
+    const bMonthDiff = (b - currentMonth + 12) % 12;
+    return aMonthDiff - bMonthDiff;
+  });
+
+  return sorted.map((month) => {
+    const year = month < currentMonth ? currentYear + 1 : currentYear;
+    return {
+      label: `${t(MONTH_NUMBER_TO_NAME[month])} ${year}`,
+      value: month,
+    };
+  });
 };
 
 export const escapeDotInString = (str: string): string =>

@@ -111,6 +111,12 @@ export enum YearlyContractTimeUnit {
   QUADRIENNIALLY = 'Every 4 years',
 }
 
+export enum ContractServiceDeliveryType {
+  PAST = 'PAST',
+  CURRENT = 'CURRENT',
+  FUTURE = 'FUTURE',
+}
+
 export interface ContractNameTypes {
   name: string;
   type: ContractTypes;
@@ -276,6 +282,7 @@ export interface UpdateContractComponents {
   name: string;
   elevators: ContractComponentElevator[];
   costPackage?: CostPackage;
+  serviceDeliveryType?: ContractServiceDeliveryType;
 }
 
 export interface ContractElevatorView {
@@ -527,6 +534,7 @@ export interface ContractServiceForm {
   isAutomaticJobCycle?: boolean;
   yearlyPrice?: number;
   orderType?: string;
+  serviceDeliveryType?: ContractServiceDeliveryType;
 }
 
 export interface ContractServiceFormElevator {
@@ -555,6 +563,7 @@ export interface ExtendedContractComponentRecord {
   costPackage: CostPackage;
   isAutomaticJobCycle: boolean;
   orderType?: ServiceOrderType;
+  serviceDeliveryType?: ContractServiceDeliveryType;
 }
 
 export interface ContractComponentRecord {
@@ -568,6 +577,7 @@ export interface ContractComponentRecord {
   costType: ArticleType;
   costPackage?: CostPackage;
   orderType?: string | null;
+  serviceDeliveryType?: ContractServiceDeliveryType;
 }
 
 export interface ContractComponentView {
@@ -586,6 +596,7 @@ export interface ContractComponentAdditionalInfo {
   elevators: ContractComponentElevator[];
   orderType?: string;
   yearlyPrice?: number;
+  serviceDeliveryType?: ContractServiceDeliveryType;
 }
 
 export interface ContractServiceForm {
@@ -656,6 +667,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
       costPackage,
       groupNumber,
       orderType,
+      serviceDeliveryType,
     } = extendedContractRecord;
 
     const convertedElevators: ContractComponentElevator[] = elevators
@@ -674,6 +686,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
       costType,
       costPackage,
       orderType,
+      serviceDeliveryType,
     };
 
     return contractComponentRecord;
@@ -827,6 +840,21 @@ export const monthNames = [
   'Oct',
   'Nov',
   'Dec',
+];
+
+export const SERVICE_DELIVERY_TYPES = [
+  {
+    label: 'Before invoice generation',
+    value: 'PAST',
+  },
+  {
+    label: 'During invoice generation',
+    value: 'CURRENT',
+  },
+  {
+    label: 'After invoice generation',
+    value: 'FUTURE',
+  },
 ];
 
 export enum ContractTimeUnitYearView {
