@@ -195,6 +195,7 @@ export const Services = ({contractDetails}: Props) => {
       isAutomaticJobCycle: !!row?.additionalInfo?.firstOrderDate,
       elevators: allItems,
       orderType: row?.additionalInfo?.orderType,
+      serviceDeliveryType: row?.additionalInfo.serviceDeliveryType,
     });
   };
 
