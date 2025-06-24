@@ -399,6 +399,9 @@ export const MutationService = ({
     generateMonthDropdownFromElevatorJobFrequency(
       formikContractServiceComponent.values.elevators ?? [],
       t,
+      {
+        firstOrderDate: formikContractServiceComponent.values.firstOrderDate!,
+      },
     );
 
   const shouldDisableSaveBtn = () => {

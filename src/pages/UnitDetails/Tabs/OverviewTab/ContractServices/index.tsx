@@ -10,6 +10,7 @@ import {Table, TableCellProps, useMediaQuery} from '@mui/material';
 import {
   calculateContractInvoicePriceTotal,
   ContractComponentView,
+  ContractServiceDeliveryType,
   ContractServiceForm,
   ContractSimpleView,
   ContractStatus,
@@ -161,7 +162,8 @@ const ContractServices = ({
       },
       isAutomaticJobCycle: false,
       elevators: [],
-    };
+      serviceDeliveryType: ContractServiceDeliveryType.CURRENT,
+    } as ContractServiceForm;
   }, [isEditForm, currentService, uuid, elevatorResource]);
 
   const formikContractServiceComponent = useFormik<ContractServiceForm>({
@@ -245,7 +247,9 @@ const ContractServices = ({
       isAutomaticJobCycle: !!row?.additionalInfo?.firstOrderDate,
       elevators: allItems,
       orderType: row?.additionalInfo?.orderType,
-      serviceDeliveryType: row.additionalInfo.serviceDeliveryType,
+      serviceDeliveryType:
+        row.additionalInfo.serviceDeliveryType ??
+        ContractServiceDeliveryType.CURRENT,
     });
   };
 

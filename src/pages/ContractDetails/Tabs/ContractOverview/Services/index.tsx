@@ -9,6 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import {TableCellProps, useMediaQuery} from '@mui/material';
 import {
   ContractComponentView,
+  ContractServiceDeliveryType,
   ContractServiceForm,
   ContractView,
 } from 'models/contract';
@@ -151,7 +152,8 @@ export const Services = ({contractDetails}: Props) => {
       costPackage: defaultCostPackage,
       isAutomaticJobCycle: false,
       elevators: [],
-    };
+      serviceDeliveryType: ContractServiceDeliveryType.CURRENT,
+    } as ContractServiceForm;
   }, [isEditForm, currentService, uuid, elevatorResource]);
 
   const formikContractServiceComponent = useFormik<ContractServiceForm>({
@@ -195,7 +197,9 @@ export const Services = ({contractDetails}: Props) => {
       isAutomaticJobCycle: !!row?.additionalInfo?.firstOrderDate,
       elevators: allItems,
       orderType: row?.additionalInfo?.orderType,
-      serviceDeliveryType: row?.additionalInfo.serviceDeliveryType,
+      serviceDeliveryType:
+        row?.additionalInfo.serviceDeliveryType ??
+        ContractServiceDeliveryType.CURRENT,
     });
   };
 

@@ -7,6 +7,7 @@ import {
   ContractTimeUnit,
   ContractServiceForm,
   ExtendedContractComponentRecord,
+  ContractServiceDeliveryType,
 } from 'models/contract';
 import {theme} from 'theme';
 import {FormikProps, useFormik} from 'formik';
@@ -59,6 +60,7 @@ export const NewContractServices = ({
       materialPercentage: 0,
     },
     isAutomaticJobCycle: false,
+    serviceDeliveryType: ContractServiceDeliveryType.CURRENT,
     elevators:
       data
         ?.map((item) => item.data)

@@ -52,6 +52,11 @@ const PdfUnitAddress = ({
     primaryColor,
     secondaryColor,
   });
+  const hasParsedComponents =
+    address?.component?.street ||
+    address?.component?.street2 ||
+    address?.component?.postalCode ||
+    address?.component?.city;
 
   if (!address?.fullName) return null;
 
@@ -67,16 +72,22 @@ const PdfUnitAddress = ({
         }}>
         {!!building && <Text>{building}</Text>}
 
-        {!!address.component?.street && <Text>{address.component.street}</Text>}
-
-        {!!address.component?.street2 && (
-          <Text>{address.component.street2}</Text>
-        )}
-
-        {!!(address.component?.postalCode || address.component?.city) && (
-          <Text>
-            {address.component?.postalCode} {address.component?.city}
-          </Text>
+        {hasParsedComponents ? (
+          <>
+            {!!address?.component?.street && (
+              <Text>{address?.component?.street}</Text>
+            )}
+            {!!address?.component?.street2 && (
+              <Text>{address?.component?.street2}</Text>
+            )}
+            {!!(address?.component?.postalCode || address?.component?.city) && (
+              <Text>
+                {address.component.postalCode} {address.component.city}
+              </Text>
+            )}
+          </>
+        ) : (
+          <Text>{address?.fullName}</Text>
         )}
       </View>
     </View>
