@@ -93,6 +93,7 @@ const getStyles = ({
       bottom: 0,
       paddingLeft: 57,
       paddingRight: 35,
+      paddingTop: 5,
     },
     footerContent: {
       marginRight: 10,
