@@ -426,6 +426,7 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
           width: showBigger
             ? `${BIG_SCREEN_WIDTH}px`
             : `${SMALL_SCREEN_WIDTH}px`,
+          marginTop: isFooter && !showBigger ? '0.3em' : '0em',
         }}
         onClick={() =>
           handleImageClick(
@@ -527,11 +528,11 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
             sx={{
               margin: '0 auto',
               textAlign: 'center',
-              maxWidth: '556px',
+              maxWidth: '560px',
               height: '570px',
               marginTop: '-5em',
             }}>
-            <img alt="Skeleton" src={PdfSkeleton} style={{scale: 1.02}} />
+            <img alt="Skeleton" src={PdfSkeleton} width={582} />
           </Box>
 
           <Box
@@ -601,15 +602,12 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
             sx={{
               margin: '0 auto',
               textAlign: 'center',
-              maxWidth: '830px',
+              maxWidth: '855px',
               height: '770px',
               marginTop: '-5em',
+              marginRight: '5.5em',
             }}>
-            <img
-              alt="Big Skeleton"
-              src={PdfBigSkeleton}
-              style={{scale: 1.02}}
-            />
+            <img alt="Big Skeleton" src={PdfBigSkeleton} width={885} />
           </Box>
           <Box
             sx={{

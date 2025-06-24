@@ -254,7 +254,7 @@ const NewDropZone: React.FC<Props> = ({
         <Box
           sx={{
             background: file ? '#00D1FF14' : theme.palette.inputBackground.main,
-            border: '2px dashed #00D1FF14',
+            border: '1px dashed #00D1FF14',
             height: '100%',
             maxWidth: '100%',
             width: '100%',
