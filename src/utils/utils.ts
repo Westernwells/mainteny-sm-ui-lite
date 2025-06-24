@@ -768,39 +768,52 @@ export const getTechnicalFieldCategory = (
 export const generateMonthDropdownFromElevatorJobFrequency = (
   elevators: ContractServiceFormElevator[],
   t: TFunction<'translation'>,
+  extraData?: {firstOrderDate?: string | Date},
 ) => {
-  let allMonthsSet = new Set<number>();
+  const {firstOrderDate} = extraData ?? {};
+
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getFullYear();
+
+  const monthYearMap = new Map<number, number>(); // Map<month, year>
 
   elevators.forEach((elevator) => {
     if (elevator.orderGenerationJob?.timeUnit !== ContractTimeUnit.MONTHLY) {
-      allMonthsSet = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+      for (let m = 1; m <= 12; m += 1) {
+        const y = m <= currentMonth ? currentYear + 1 : currentYear;
+        monthYearMap.set(m, y);
+      }
       return;
     }
 
     elevator.orderGenerationJob?.timeNumbers.forEach((month) => {
-      allMonthsSet.add(month);
+      const year = month <= currentMonth ? currentYear + 1 : currentYear;
+      monthYearMap.set(month, year);
     });
   });
 
-  const months = [...allMonthsSet];
+  if (firstOrderDate) {
+    const date = new Date(firstOrderDate);
+    const orderMonth = date.getMonth() + 1;
+    const orderYear = date.getFullYear();
 
-  const now = new Date();
-  const currentMonth = now.getMonth() + 1; // 1-based
-  const currentYear = now.getFullYear();
+    // Overwrite existing year with firstOrderDate's year
+    monthYearMap.set(orderMonth, orderYear);
+  }
 
-  const sorted = months.sort((a, b) => {
-    const aMonthDiff = (a - currentMonth + 12) % 12;
-    const bMonthDiff = (b - currentMonth + 12) % 12;
-    return aMonthDiff - bMonthDiff;
-  });
+  const monthYearArray = Array.from(monthYearMap.entries())
+    .map(([month, year]) => ({month, year}))
+    .sort((a, b) => {
+      const aDate = new Date(a.year, a.month - 1);
+      const bDate = new Date(b.year, b.month - 1);
+      return aDate.getTime() - bDate.getTime();
+    });
 
-  return sorted.map((month) => {
-    const year = month < currentMonth ? currentYear + 1 : currentYear;
-    return {
-      label: `${t(MONTH_NUMBER_TO_NAME[month])} ${year}`,
-      value: month,
-    };
-  });
+  return monthYearArray.map(({month, year}) => ({
+    label: `${t(MONTH_NUMBER_TO_NAME[month])} ${year}`,
+    value: month,
+  }));
 };
 
 export const escapeDotInString = (str: string): string =>
