@@ -852,17 +852,17 @@ const Invoices = ({elevatorId, customerId, elevatorExternalId}: Props) => {
   };
 
   const handleFilterReset = () => {
-    setValue('number', undefined);
-    setValue('customer', undefined);
-    setValue('customerId', undefined);
-    setValue('contractId', undefined);
-    setValue('unitId', undefined);
-    setValue('jobNumber', undefined);
-    setValue('orderNumber', undefined);
-    setValue('jobTypes', []);
-    setValue('grossAmountMin', undefined);
-    setValue('grossAmountMax', undefined);
-    setValue('hasComment', undefined);
+    setSelectedInvoiceNumber(undefined);
+    setSelectedCustomer(undefined);
+    setSelectedCustomerId(undefined);
+    setSelectedContract(undefined);
+    setSelectedUnitId(undefined);
+    setSelectedJobNumber(undefined);
+    setSelectedOrderNumber(undefined);
+    setSelectedJobTypes([]);
+    setGrossAmountMin(undefined);
+    setGrossAmountMax(undefined);
+    setIsWithNote(undefined);
   };
 
   const appliedFilterNumber = useMemo(

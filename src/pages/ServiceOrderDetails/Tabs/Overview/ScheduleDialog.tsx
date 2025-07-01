@@ -18,7 +18,7 @@ import {Switch} from 'components/Switch';
 import Box from '@mui/material/Box';
 import {TimePicker} from 'components/TimePicker';
 import {Button} from 'components/Button';
-import {EmployeesSimpleView} from 'models/employee';
+import {ServiceOrderEmployeeView} from 'models/employee';
 import DatePickerRange from 'components/DatePickerRange';
 import {DateRange} from '@mui/x-date-pickers-pro';
 import {
@@ -32,6 +32,7 @@ import {queryKeys} from 'reactQuery/constants';
 import {useQueryClient} from 'react-query';
 import {useQueryServiceCompanyEmployees} from 'hooks/reactQuery/useEmployee';
 import isValid from 'date-fns/isValid';
+import {convertEmployeesToServiceOrderEmployees} from 'utils/service-order-utils';
 import {DatePicker} from '../../../../components/DatePicker';
 import {FormInput} from '../../../../components/form/FormInput';
 import {ScheduleForm} from '../../models';
@@ -49,7 +50,7 @@ interface Props {
   open?: boolean;
   onClose: () => void;
   title?: string;
-  defaultTechnicians?: EmployeesSimpleView[] | null;
+  defaultTechnicians?: ServiceOrderEmployeeView[] | null;
   defaultStartDate?: Date | null;
   defaultEndDate?: Date | null;
   defaultDueDate?: Date | null;
@@ -298,8 +299,13 @@ export const ScheduleDialog = ({
               id="combo-box-demo"
               sx={{mt: '0.5em'}}
               noOptionsText={t('No options')}
-              options={techniciansResource.data}
-              onChange={(_event: any, newValues: EmployeesSimpleView[]) => {
+              options={convertEmployeesToServiceOrderEmployees(
+                techniciansResource.data,
+              )}
+              onChange={(
+                _event: any,
+                newValues: ServiceOrderEmployeeView[],
+              ) => {
                 setValue(
                   'technicianIds',
                   newValues.map((value) => value.id),
@@ -308,7 +314,7 @@ export const ScheduleDialog = ({
               getOptionLabel={(option) =>
                 `${option.userAccount.firstName} ${option.userAccount.lastName}`
               }
-              defaultValue={defaultTechnicians || []}
+              defaultValue={defaultTechnicians ?? undefined}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               renderOption={(props, option, {selected}) => (
                 <li {...props}>

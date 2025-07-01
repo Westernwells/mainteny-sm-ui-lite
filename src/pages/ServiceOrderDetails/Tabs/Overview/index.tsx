@@ -164,13 +164,14 @@ export const Overview = ({serviceOrder}: Props) => {
           onClose={() => setOpenDialog(false)}
           defaultTechnicians={getDefaultTechnician(serviceOrder)}
           defaultStartDate={
-            serviceOrder.schedules.length
-              ? new Date(serviceOrder.schedules[0].startTime)
+            serviceOrder.schedules.length &&
+            serviceOrder.schedules[0]?.startTime
+              ? new Date(serviceOrder.schedules[0]?.startTime)
               : null
           }
           defaultEndDate={
-            serviceOrder.schedules.length
-              ? new Date(serviceOrder.schedules[0].endTime)
+            serviceOrder.schedules.length && serviceOrder.schedules[0]?.endTime
+              ? new Date(serviceOrder.schedules[0]?.endTime)
               : null
           }
           defaultDueDate={

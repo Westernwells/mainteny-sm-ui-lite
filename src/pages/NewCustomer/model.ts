@@ -1,4 +1,4 @@
-import {Address, AddressRecord, Contact} from 'models/misc';
+import {Address, AddressRecord, PersonalContact} from 'models/misc';
 import {Priority} from 'models/service-order';
 import {convertToText} from 'utils/utils';
 
@@ -50,7 +50,7 @@ export type CustomerContactPersonFormModel = {
     firstName: string;
     lastName: string;
     photoUrl: string;
-    contact: Contact;
+    contact: PersonalContact;
     serviceCompanyId: string;
     category?: string;
     title?: string;

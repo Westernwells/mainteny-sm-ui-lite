@@ -440,6 +440,8 @@ export const AttachDocument: FC<Props> = ({
               'image/gif',
               'image/webp',
               'image/svg+xml',
+              'application/vnd.ms-outlook',
+              'image/tiff',
             ]}
           />
         </Dialog>

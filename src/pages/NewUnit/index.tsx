@@ -9,7 +9,10 @@ import {
   ElevatorView,
 } from 'models/elevator';
 import {AddressRecord, Priority} from 'models/misc';
-import {PropertyOwnerView} from 'models/propertyManager';
+import {
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from 'models/propertyManager';
 import {
   AppointmentFormModel,
   CustomerFormModel,
@@ -71,7 +74,9 @@ export const NewUnit = () => {
     useState<CustomerFormModel>({
       propertyOwnerId: customerIdFromQueryString || '',
     });
-  const [customer, setCustomer] = useState<PropertyOwnerView>();
+  const [customer, setCustomer] = useState<
+    PropertyOwnerView | PropertyOwnerSimpleView
+  >();
 
   const {mutateAsync: addNewUnit, isLoading: isSubmitting} = useAddElevator(
     'Unit created successfully',

@@ -80,8 +80,8 @@ export const createPurchaseInvoiceSearchQuery = ({
 }: PurchaseInvoiceSearchParameters) => {
   const elements = [
     search && search,
-    supplierId && `[sup:externalid:*${supplierId}*]`,
-    supplierName && `[sup:name:*${supplierName}*]`,
+    supplierId && `[sup.externalid:*${supplierId}*]`,
+    supplierName && `[sup.name:*${supplierName}*]`,
     subject && `[subject:*${subject}*]`,
     purchaseInvoiceNumber && `[externalid:*${purchaseInvoiceNumber}*]`,
   ];

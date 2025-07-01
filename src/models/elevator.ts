@@ -17,6 +17,7 @@ import {ContractSimpleView, ContractStatus} from './contract';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {
   PropertyContactPersonSimpleView,
+  PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from './propertyManager';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
@@ -154,7 +155,7 @@ export interface ElevatorAdditionalInfo {
   keyLocation: string;
   lastInspectionDate?: string;
   manufacturer: string;
-  numberOfStops: 5;
+  numberOfStops: number;
   parking: string;
   pictures: FileResource[];
   propertySegment: string;
@@ -178,6 +179,7 @@ export interface ElevatorAdditionalInfo {
   nextInspectionDate?: string;
   billingAddress?: AddressRecord;
   beneficiaryAddress?: AddressRecord;
+  emergencyManufacturer?: string;
 }
 
 export interface ElevatorMaintainerRecord {
@@ -228,7 +230,7 @@ export enum ElevatorTimeRuleType {
 
 export interface ElevatorTimeRuleView {
   id: string;
-  elevator_id: string;
+  elevatorId: string;
   type: ElevatorTimeRuleType;
   data: string;
 }
@@ -262,21 +264,29 @@ export interface ElevatorView {
 
 export interface ElevatorSimpleView {
   id: string;
-  propertyOwner: PropertyOwnerView;
-  properties?: ElevatorProperty[];
-  number: string;
+  number?: string;
+  externalId?: string;
+  serialNumber: string;
   model: string;
   type: string;
   capacity: string;
   category: ElevatorCategory;
+  timeRules?: ElevatorTimeRuleView[];
+  technicianNumber?: number;
   address: Address;
-  lastVisitDate: string;
-  serviceTime: number;
+  propertyOwner: PropertyOwnerSimpleView;
+  site?: {
+    id: string;
+    name: string;
+    meta: Meta;
+  };
+  lastVisitDate?: string;
+  nextVisitDate?: string;
+  serviceTime?: number;
   status: ElevatorStatus;
   labels: string[];
   additionalInfo: ElevatorAdditionalInfo;
   meta: Meta;
-  externalId?: string;
 }
 
 export interface ElevatorAssignmentSimpleView {

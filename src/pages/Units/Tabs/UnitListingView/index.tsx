@@ -816,20 +816,20 @@ export const UnitListingView = () => {
   };
 
   const handleFilterReset = () => {
-    setValue('address', '');
-    setValue('distance', undefined);
-    setValue('lastInspectionStart', undefined);
-    setValue('lastInspectionEnd', undefined);
-    setValue('nextInspectionStart', undefined);
-    setValue('nextInspectionEnd', undefined);
-    setValue('technician', undefined);
-    setValue('unitNumber', undefined);
-    setValue('fabricNumber', undefined);
-    setValue('modelNumber', undefined);
-    setValue('unitCategory', undefined);
-    setValue('hasActiveContract', undefined);
-    setValue('hasTodos', undefined);
-    setValue('customer', undefined);
+    setSelectedAddress(undefined);
+    setSelectedDistance(undefined);
+    setSelectedLastInspectionStart(undefined);
+    setSelectedLastInspectionEnd(undefined);
+    setSelectedNextInspectionStart(undefined);
+    setSelectedNextInspectionEnd(undefined);
+    setSelectedTechnicianId(undefined);
+    setSelectedUnitNumber(undefined);
+    setSelectedFabricNumber(undefined);
+    setSelectedModelNumber(undefined);
+    setSelectedUnitCategory(undefined);
+    setHasActiveContract(undefined);
+    setHasTodos(undefined);
+    setSelectedCustomer(undefined);
   };
 
   const handleFilterApply: SubmitHandler<UnitFilterForm> = (data) => {

@@ -1,11 +1,13 @@
 import {useForm} from 'react-hook-form';
 import {useEffect} from 'react';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
 import {AppointmentFormModel} from 'models/unitForm';
 import {parseTimeRulesData} from 'utils/elevator-utils';
 import {titleCase} from 'utils/utils';
 
-export const useAppointmentPreferences = (elevator: ElevatorView) => {
+export const useAppointmentPreferences = (
+  elevator: ElevatorView | ElevatorSimpleView,
+) => {
   const parsedTimeRulesData = parseTimeRulesData(elevator.timeRules);
 
   const getDefaultValues = () => ({

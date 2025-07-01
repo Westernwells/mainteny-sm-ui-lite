@@ -415,15 +415,15 @@ const ArticleList = () => {
   };
 
   const handleFilterReset = () => {
-    setValue('unit', undefined);
-    setValue('sellingPriceMin', undefined);
-    setValue('sellingPriceMax', undefined);
-    setValue('buyingPriceMin', undefined);
-    setValue('buyingPriceMax', undefined);
-    setValue('vatPercentage', undefined);
-    setValue('storageLocation', '');
-    setValue('category', '');
-    setValue('manufacturer', '');
+    setSelectedUnit(undefined);
+    setSellingPriceMin(undefined);
+    setSellingPriceMax(undefined);
+    setBuyingPriceMin(undefined);
+    setBuyingPriceMax(undefined);
+    setVat(undefined);
+    setStorageLocation(undefined);
+    setCategory(undefined);
+    setManufacturer(undefined);
   };
 
   const appliedFilterNumber = useMemo(

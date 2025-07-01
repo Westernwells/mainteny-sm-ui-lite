@@ -572,7 +572,13 @@ const ServicesForm = ({
         </Grid>
         <Grid item xs={3}>
           <DatePicker
-            defaultDate={formikContractServiceComponent.values.firstInvoiceDate}
+            defaultDate={
+              formikContractServiceComponent.values.firstInvoiceDate
+                ? new Date(
+                    formikContractServiceComponent.values.firstInvoiceDate,
+                  )
+                : null
+            }
             getSelectedDate={(newValue) => {
               if (newValue)
                 formikContractServiceComponent.setFieldValue(
@@ -709,7 +715,11 @@ const ServicesForm = ({
                 label={`${t('First job creation')}*`}
                 size="small"
                 value={getMonthNumberFromDate(
-                  formikContractServiceComponent.values.firstOrderDate,
+                  formikContractServiceComponent.values.firstOrderDate
+                    ? new Date(
+                        formikContractServiceComponent.values.firstOrderDate,
+                      )
+                    : null,
                 )}
                 sx={{
                   '& .MuiOutlinedInput-notchedOutline': {

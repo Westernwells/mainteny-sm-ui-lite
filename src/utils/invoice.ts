@@ -584,7 +584,7 @@ export const createSearchQuery = ({
   if (search) elements.push(search);
   if (orderNumber) elements.push(`[purchaseorder:*${orderNumber}*]`);
   if (invoiceNumber) elements.push(`[externalid:*${invoiceNumber}*]`);
-  if (jobNumber) elements.push(`[so:externalid:*${jobNumber}*]`);
+  if (jobNumber) elements.push(`[so.externalid:*${jobNumber}*]`);
 
   return elements.length ? elements.join(' ') : undefined;
 };
@@ -605,18 +605,19 @@ export function transformPropertyOwnerViewToSimpleView(
   propertyOwner?: PropertyOwnerView,
 ): PropertyOwnerSimpleView {
   return {
-    additionalInfo: propertyOwner?.additionalInfo!,
-    billingAddress: propertyOwner?.billingAddress,
-    beneficiaryAddress: propertyOwner?.beneficiaryAddress,
-    otherAddress: propertyOwner?.otherAddress,
-    contact: propertyOwner?.contact!,
     id: propertyOwner?.id!,
-    labels: propertyOwner?.labels || [],
-    meta: propertyOwner?.meta!,
     name: propertyOwner?.name || '',
-    serviceCompanyId: propertyOwner?.serviceCompany?.id ?? '',
-    externalId: propertyOwner?.externalId || '',
     number: propertyOwner?.number,
+    externalId: propertyOwner?.externalId || '',
+    serviceCompanyId: propertyOwner?.serviceCompany?.id ?? '',
+    otherAddress: propertyOwner?.otherAddress,
+    beneficiaryAddress: propertyOwner?.beneficiaryAddress,
+    billingAddress: propertyOwner?.billingAddress,
+    businessAddress: propertyOwner?.businessAddress,
+    postalAddress: propertyOwner?.postalAddress,
+    contact: propertyOwner?.contact!,
+    additionalInfo: propertyOwner?.additionalInfo!,
+    meta: propertyOwner?.meta!,
   };
 }
 

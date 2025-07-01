@@ -482,14 +482,14 @@ export const Quotations = () => {
   };
 
   const handleFilterReset = () => {
-    setValue('number', '');
-    setValue('customer', undefined);
-    setValue('customerId', undefined);
-    setValue('unitId', undefined);
-    setValue('jobNumber', undefined);
-    setValue('netAmountMin', undefined);
-    setValue('netAmountMax', undefined);
-    setValue('hasComment', undefined);
+    setSelectedQuotationNumber(undefined);
+    setSelectedCustomer(undefined);
+    setSelectedCustomerId(undefined);
+    setSelectedUnitId(undefined);
+    setSelectedJobNumber(undefined);
+    setNetAmountMin(undefined);
+    setNetAmountMax(undefined);
+    setHasComment(undefined);
   };
 
   const appliedFilterNumber = useMemo(

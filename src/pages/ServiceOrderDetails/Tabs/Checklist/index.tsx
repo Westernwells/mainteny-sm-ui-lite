@@ -74,7 +74,7 @@ import {
   IMAGE_SIZE_IN_MB,
 } from 'utils/constants';
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
-import {UserAccount} from 'models/user';
+import {UserAccountSimpleView} from 'models/user';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature} from 'models/employee';
@@ -189,7 +189,7 @@ export const CheckList = ({serviceOrder}: Props) => {
           acc[item.id] = item.technician.userAccount;
         }
         return acc;
-      }, {} as {[key: string]: UserAccount}) ?? {};
+      }, {} as {[key: string]: UserAccountSimpleView}) ?? {};
 
     return candidateTechnicianById;
   }, [serviceOrder]);

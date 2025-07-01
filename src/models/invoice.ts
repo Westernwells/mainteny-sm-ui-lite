@@ -19,7 +19,11 @@ import {
 } from './misc';
 import {PropertyOwnerSimpleView} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
-import {ServiceOrderType, ServiceOrderView} from './service-order';
+import {
+  ServiceOrderType,
+  ServiceOrderView,
+  ServiceOrderViewArticleInfoRecord,
+} from './service-order';
 import {Order} from './pagination';
 import {CANCEL_ACTION} from 'models/status';
 import {
@@ -107,10 +111,10 @@ export interface InvoiceItemView {
   id: string;
   invoiceId?: string;
   articleId?: string;
-  article?: ArticleView;
+  article?: ServiceOrderViewArticleInfoRecord;
   name: string;
-  unitAmount: MultiVatsAmount;
   unitPurchaseAmount?: MultiVatsAmount;
+  unitAmount: MultiVatsAmount;
   quantity: number;
   description: string;
   additionalInfo?: InvoiceItemAdditionalInfo;

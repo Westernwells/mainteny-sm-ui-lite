@@ -45,6 +45,11 @@ html::-webkit-scrollbar {
   }
 }
 
+/* iPad Desktop Mode Overrides */
+.ipad-desktop-mode {
+  /* Add any specific CSS overrides when in iPad desktop mode */
+}
+
 @font-face {
   font-family: 'Aventa';
   src: local('Aventa'),

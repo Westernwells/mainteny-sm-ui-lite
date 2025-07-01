@@ -19,7 +19,7 @@ import {Confirm} from 'components/Confirm';
 import {useDisassociateChecklistToServiceOrder} from 'hooks/reactQuery/useChecklists';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {theme as MuiTheme} from 'theme';
-import {UserAccount} from 'models/user';
+import {UserAccountSimpleView} from 'models/user';
 import {OrderChecklistItemCard} from '../OrderChecklistItemCard';
 import {NoChecklist} from '../NoChecklist';
 
@@ -29,7 +29,7 @@ interface Props {
   selectedChecklist?: ServiceOrderCheckListView;
   onSelect: (newChecklist: ServiceOrderCheckListView) => void;
   serviceOrder: ServiceOrderView;
-  serviceOrderTechnicianById: {[key: string]: UserAccount};
+  serviceOrderTechnicianById: {[key: string]: UserAccountSimpleView};
   onEditPress: (newChecklist: ServiceOrderCheckListView) => void;
   isEditing: boolean;
 }

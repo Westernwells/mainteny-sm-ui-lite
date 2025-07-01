@@ -1007,16 +1007,16 @@ export const ServiceOrderList = ({menu}: Props) => {
   };
 
   const handleFilterReset = () => {
-    setValue('customer', undefined);
-    setValue('contract', undefined);
-    setValue('technician', undefined);
-    setValue('orderNumber', '');
-    setValue('orderTypes', []);
-    setValue('paymentStatus', []);
-    setValue('grossAmountMin', undefined);
-    setValue('grossAmountMax', undefined);
-    setValue('hasComment', undefined);
-    setValue('isAppointmentRequired', undefined);
+    setSelectedCustomer(undefined);
+    setSelectedContract(undefined);
+    setSelectedTechnicianId(undefined);
+    setSelectedOrderNumber(undefined);
+    setSelectedOrderTypes([]);
+    setSelectedPaymentStatus([]);
+    setGrossAmountMin(undefined);
+    setGrossAmountMax(undefined);
+    setIsWithNote(undefined);
+    setIsWithAppointmentRequired(undefined);
   };
 
   const handleExport = async () => {

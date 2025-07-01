@@ -1,7 +1,10 @@
 import {SyntheticEvent, useEffect, useMemo, useState} from 'react';
 import {TextFieldProps} from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import {PropertyOwnerView} from 'models/propertyManager';
+import {
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from 'models/propertyManager';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {createEmptyResource} from 'utils/paging';
 import {createNameSearchQuery} from 'utils/customer-utils';
@@ -9,9 +12,11 @@ import {t} from 'i18next';
 import {FormInput} from './form/FormInput';
 
 interface Props {
-  getCustomer?: (val: PropertyOwnerView | null) => void;
+  getCustomer?: (
+    val: PropertyOwnerView | PropertyOwnerSimpleView | null,
+  ) => void;
   getQuery?: (val: string) => void;
-  initialValue?: PropertyOwnerView | null;
+  initialValue?: PropertyOwnerView | PropertyOwnerSimpleView | null;
   textFieldProps?: TextFieldProps;
   disabled?: boolean;
   searchOnlyCustomerName?: boolean;
@@ -26,9 +31,9 @@ export const CustomerAutoComplete = ({
   searchOnlyCustomerName = false,
 }: Props) => {
   const [query, setQuery] = useState<string>(initialValue?.name || '');
-  const [customer, setCustomer] = useState<PropertyOwnerView | null>(
-    initialValue,
-  );
+  const [customer, setCustomer] = useState<
+    PropertyOwnerView | PropertyOwnerSimpleView | null
+  >(initialValue);
 
   const searchQuery = useMemo(() => {
     if (!query) return '';
@@ -91,9 +96,10 @@ export const CustomerAutoComplete = ({
       getOptionLabel={(option) => option.name}
       value={customer}
       inputValue={query}
-      onChange={(event: any, newValue: PropertyOwnerView | null) =>
-        setCustomer(newValue)
-      }
+      onChange={(
+        event: any,
+        newValue: PropertyOwnerView | PropertyOwnerSimpleView | null,
+      ) => setCustomer(newValue)}
       onInputChange={onInputChange}
       renderInput={(params) => (
         <FormInput

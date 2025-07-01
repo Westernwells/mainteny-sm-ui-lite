@@ -2,6 +2,7 @@ import {FileResource, FileResourceRecord} from './media';
 import {
   Amount,
   AmountRecord,
+  GenerationInfo,
   Meta,
   Money,
   MultiVatsAmount,
@@ -281,12 +282,7 @@ export interface ArticleRecord {
   unit: string;
   unitSellingAmount?: AmountRecord;
   costPackage?: CostPackage;
-  generationInfo?: {
-    contractId: string;
-    componentId: string;
-    elevatorId: string;
-    generationDate: Date;
-  };
+  generationInfo?: GenerationInfo;
 }
 
 // used in job details section

@@ -521,13 +521,12 @@ export interface ContractElevatorQueryParams {
 export interface ContractElevatorUpdate {
   removalDate: string | null;
 }
-
 export interface ContractServiceForm {
   id?: string;
   name: string;
   group?: string;
-  firstInvoiceDate?: Date | null;
-  firstOrderDate?: Date | null;
+  firstInvoiceDate?: Date | string | null;
+  firstOrderDate?: Date | string | null;
   costType: ArticleType;
   costPackage: CostPackage;
   elevators: ContractServiceFormElevator[];
@@ -535,6 +534,7 @@ export interface ContractServiceForm {
   yearlyPrice?: number;
   orderType?: string;
   serviceDeliveryType?: ContractServiceDeliveryType;
+  isChecked?: boolean;
 }
 
 export interface ContractServiceFormElevator {
@@ -590,28 +590,14 @@ export interface ContractComponentView {
 
 export interface ContractComponentAdditionalInfo {
   costType: ArticleType;
-  firstInvoiceDate?: Date | null;
-  firstOrderDate?: Date | null;
+  firstInvoiceDate?: string | null;
+  firstOrderDate?: string | null;
   costPackage?: CostPackage;
   elevators: ContractComponentElevator[];
   orderType?: string;
   yearlyPrice?: number;
   serviceDeliveryType?: ContractServiceDeliveryType;
 }
-
-export interface ContractServiceForm {
-  id?: string;
-  name: string;
-  group?: string;
-  firstInvoiceDate?: Date | null;
-  firstOrderDate?: Date | null;
-  costType: ArticleType;
-  costPackage: CostPackage;
-  elevators: ContractServiceFormElevator[];
-  isAutomaticJobCycle?: boolean;
-  isChecked?: boolean;
-}
-
 export interface ContractServiceFormElevator {
   elevatorId: string;
   invoiceJob?: JobTimeUnit;

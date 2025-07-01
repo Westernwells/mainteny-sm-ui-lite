@@ -53,7 +53,13 @@ type FileErrors = {
 function formatAcceptedFileType(items: string[]) {
   const result: {[key: string]: any} = {};
   items.forEach((item) => {
-    result[item] = [];
+    if (item === 'application/vnd.ms-outlook') {
+      result[item] = ['.msg'];
+    } else if (item === 'image/tiff') {
+      result[item] = ['.tiff', '.tif'];
+    } else {
+      result[item] = [];
+    }
   });
 
   return result;

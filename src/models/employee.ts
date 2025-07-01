@@ -1,6 +1,11 @@
 import {Address, AddressRecord, DataEditingScope, Meta} from './misc';
 import {ServiceOrderType} from './service-order';
-import {CreateUserAccountData, Role, UserAccountView} from './user';
+import {
+  CreateUserAccountData,
+  Role,
+  UserAccountSimpleView,
+  UserAccountView,
+} from './user';
 import {AvailabilityType} from './availability';
 import {Order} from './pagination';
 
@@ -18,7 +23,7 @@ export interface UserQueryParams {
 
 export interface EmployeeAdditionalInfo {
   leftVacationDays: number;
-  assignedServiceOrderTypes?: ServiceOrderType[];
+  assignedServiceOrderTypes?: string[];
   totalYearlyVacationDaysAllowed?: number;
 }
 
@@ -71,14 +76,29 @@ export interface EmployeeStatusView {
 }
 
 export interface EmployeesSimpleView {
-  additionalInfo: EmployeeAdditionalInfo;
-  address: Address;
   id: string;
-  isOnline: boolean;
-  meta: Meta;
-  userAccount: UserAccountView;
-  online: boolean;
+  number: string;
   externalId: string;
+  team: string;
+  address: Address;
+  userAccount: UserAccountSimpleView;
+  isOnline?: boolean;
+  additionalInfo: EmployeeAdditionalInfo;
+  meta: Meta;
+  online?: boolean;
+}
+
+export interface ServiceOrderEmployeeView {
+  id: string;
+  number: string;
+  externalId: string;
+  team: string;
+  address: Address;
+  userAccount: UserAccountSimpleView;
+  isOnline?: boolean;
+  additionalInfo: EmployeeAdditionalInfo;
+  meta: Meta;
+  online?: boolean;
 }
 
 export interface BasicEmployeeFormModel {

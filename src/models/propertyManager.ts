@@ -3,8 +3,8 @@ import {
   Address,
   AddressRecord,
   CompanyContact,
-  Contact,
   Meta,
+  PersonalContact,
   Priority,
 } from './misc';
 import {ServiceCompanySimpleView} from './service-company';
@@ -74,11 +74,12 @@ export interface PropertyOwnerView {
 export interface PropertyOwnerSimpleView {
   additionalInfo: PropertyOwnerAdditionalInfo;
   billingAddress?: Address;
+  businessAddress?: Address;
+  postalAddress?: Address;
   beneficiaryAddress?: Address;
   otherAddress?: Address;
-  contact: ContactPropertyOwner;
+  contact: CompanyContact;
   id: string;
-  labels: string[];
   meta: Meta;
   name: string;
   serviceCompanyId: string;
@@ -116,7 +117,7 @@ export interface QueryPropertyOwnersParams {
   orderBy?: PropertyOwnerOrderField;
 }
 
-export interface ContactPropertyOwner extends Contact {
+export interface ContactPropertyOwner extends PersonalContact {
   url: string;
 }
 

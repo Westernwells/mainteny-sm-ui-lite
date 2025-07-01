@@ -1,6 +1,10 @@
 import {addMinutes, differenceInMinutes} from 'date-fns';
 import _ from 'lodash';
-import {EmployeesSimpleView} from 'models/employee';
+import {
+  EmployeesSimpleView,
+  EmployeesView,
+  ServiceOrderEmployeeView,
+} from 'models/employee';
 import {StatusColor} from 'models/status';
 import {getAddressString} from 'utils/address';
 import {ArticleType} from 'models/article';
@@ -29,6 +33,7 @@ import {
 } from '../models/service-order';
 import {formatDate, toDate, toRestDateTime} from './datetime';
 import {moneyToCents} from './currency';
+import {convertUserAccountsToSimpleView} from './user';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
@@ -255,7 +260,7 @@ export const articleViewToArticleRecord = (
   articles: ServiceOrderArticleView[],
 ) =>
   articles.map((i) => ({
-    articleId: i.article.id,
+    articleId: i.article?.id,
     article: i.article,
     description: i.description,
     name: i.name,
@@ -385,7 +390,7 @@ export const aggregateServiceOrderRow = (
   orders.map((order) => ({
     serviceOrderData: order,
     id: order.id,
-    elevatorExternalId: order.elevator.externalId,
+    elevatorExternalId: order.elevator.externalId || '',
     number: order.number,
     type: order.type,
     address: getAddressString(order.elevator.address),
@@ -577,7 +582,7 @@ export const serviceOrderItemToServiceOrderItemRecord = (
 ): NewServiceOrderItemRecord => {
   const record: EditableServiceOrderItem = {
     id: serviceOrderItem.id,
-    article: {...serviceOrderItem.article, id: serviceOrderItem.article.id!},
+    article: {...serviceOrderItem.article, id: serviceOrderItem.article?.id!},
     name: serviceOrderItem.name,
     description: serviceOrderItem.description,
     quantity: serviceOrderItem.quantity,
@@ -839,4 +844,21 @@ export function formatServiceOrderArticles(
 
     return base;
   });
+}
+
+export function convertEmployeesToServiceOrderEmployees(
+  employees: EmployeesView[],
+): ServiceOrderEmployeeView[] {
+  return employees.map((employee) => ({
+    id: employee.id,
+    number: employee.number,
+    externalId: employee.externalId,
+    team: employee.team,
+    address: employee.address,
+    userAccount: convertUserAccountsToSimpleView(employee.userAccount),
+    isOnline: employee.isOnline,
+    additionalInfo: employee.additionalInfo,
+    meta: employee.meta,
+    online: employee.online,
+  }));
 }

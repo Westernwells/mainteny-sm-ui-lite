@@ -156,12 +156,13 @@ const Actions = ({serviceOrder}: Props) => {
           onClose={() => setOpenScheduleDialog(false)}
           defaultTechnicians={getDefaultTechnician(serviceOrder)}
           defaultStartDate={
-            serviceOrder.schedules.length
-              ? new Date(serviceOrder.schedules[0].startTime)
+            serviceOrder.schedules.length &&
+            serviceOrder.schedules[0]?.startTime
+              ? new Date(serviceOrder.schedules[0]?.startTime)
               : null
           }
           defaultEndDate={
-            serviceOrder.schedules.length
+            serviceOrder.schedules.length && serviceOrder.schedules[0]?.endTime
               ? new Date(serviceOrder.schedules[0].endTime)
               : null
           }

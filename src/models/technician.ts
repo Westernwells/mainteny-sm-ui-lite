@@ -15,7 +15,7 @@ export interface TechnicianTimeWindowRecord extends TimeWindowRecord {
 
 export interface TechnicianAdditionalInfo {
   leftVacationDays: number;
-  assignedServiceOrderTypes: ServiceOrderType[];
+  assignedServiceOrderTypes: string[];
 }
 
 export interface Technician {
@@ -39,7 +39,7 @@ export interface TechnicianUserView extends UserView {}
 
 export interface TechEventAdditionalInfo {
   leftVacationDays: number;
-  assignedServiceOrderTypes?: ServiceOrderType[];
+  assignedServiceOrderTypes?: string[];
 }
 
 export interface TechnicianView {

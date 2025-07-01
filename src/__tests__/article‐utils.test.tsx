@@ -1,4 +1,3 @@
-// __tests__/article-utils.test.ts
 import {describe, it, expect} from 'vitest';
 import type {EditableQuotationItem} from 'models/quotation';
 import type {VatView} from 'models/vat';

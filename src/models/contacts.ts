@@ -1,4 +1,4 @@
-import {Address, CompanyContact, Contact, Meta, Priority} from './misc';
+import {Address, CompanyContact, PersonalContact, Meta, Priority} from './misc';
 import {Role, UserAccountStatus, UserAccountView} from './user';
 import {Order} from './pagination';
 
@@ -42,7 +42,7 @@ interface ContactsMeta extends Meta {
 interface ContactsUserAccount extends UserAccountView {
   meta: ContactsMeta;
   category: string;
-  contact: Contact;
+  contact: PersonalContact;
   search: string;
   title: string;
 }
@@ -71,7 +71,7 @@ export interface ContactBody {
   };
   userAccount: {
     category: string;
-    contact: Contact;
+    contact: PersonalContact;
     firstName: string;
     lastName: string;
     photoUrl: string;

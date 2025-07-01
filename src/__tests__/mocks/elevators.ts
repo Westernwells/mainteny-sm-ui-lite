@@ -115,7 +115,7 @@ export const mockValidElevatorContracts: ContractSimpleView = {
       name: 'test',
       group: '',
       additionalInfo: {
-        firstInvoiceDate: new Date('2024-08-05'),
+        firstInvoiceDate: '2024-08-05',
         elevators: [
           {
             elevatorId: '4fd5afc6-af64-4f15-944e-996e3f15da4e',
@@ -345,7 +345,7 @@ export const mockElevator: ElevatorView = {
       type: ElevatorTimeRuleType.DAYS_OF_WEEK_AND_TIME_RANGE,
       data: JSON.stringify([{daysOfWeek: [], timeRange: {start: '', end: ''}}]),
       id: '',
-      elevator_id: '',
+      elevatorId: '',
     },
   ],
   labels: [],
