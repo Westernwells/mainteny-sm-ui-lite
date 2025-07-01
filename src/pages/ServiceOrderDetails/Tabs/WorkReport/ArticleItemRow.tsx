@@ -47,7 +47,8 @@ export const ArticleItemRow = ({
 
     setItems((prev) =>
       prev.map((item, itemIndex) =>
-        item.article.id === updatedArticleItem.article.id && itemIndex === index
+        item.article?.id === updatedArticleItem.article?.id &&
+        itemIndex === index
           ? updatedArticleItem
           : item,
       ),

@@ -129,9 +129,12 @@ export const Services = ({contractDetails}: Props) => {
         id: uuid,
         name: currentService?.name || '',
         group: currentService?.group || '',
-        firstInvoiceDate:
-          currentService?.additionalInfo?.firstInvoiceDate || null,
-        firstOrderDate: currentService?.additionalInfo?.firstOrderDate || null,
+        firstInvoiceDate: currentService?.additionalInfo?.firstInvoiceDate
+          ? new Date(currentService?.additionalInfo?.firstInvoiceDate)
+          : null,
+        firstOrderDate: currentService?.additionalInfo?.firstOrderDate
+          ? new Date(currentService?.additionalInfo?.firstOrderDate)
+          : null,
         costType: currentService?.additionalInfo?.costType || ArticleType.LABOR,
         costPackage:
           currentService?.additionalInfo?.costPackage || defaultCostPackage,
@@ -190,8 +193,8 @@ export const Services = ({contractDetails}: Props) => {
       id: row.id,
       name: row?.name,
       group: row?.group,
-      firstInvoiceDate: row?.additionalInfo?.firstInvoiceDate,
-      firstOrderDate: row?.additionalInfo?.firstOrderDate,
+      firstInvoiceDate: row.additionalInfo.firstInvoiceDate,
+      firstOrderDate: row.additionalInfo.firstOrderDate,
       costType: row?.additionalInfo?.costType,
       costPackage: row?.additionalInfo?.costPackage as CostPackage,
       isAutomaticJobCycle: !!row?.additionalInfo?.firstOrderDate,
@@ -361,12 +364,16 @@ export const Services = ({contractDetails}: Props) => {
                     <StatusChip
                       label={
                         getAutoJobStatus(
-                          row.additionalInfo.firstOrderDate as Date,
+                          row.additionalInfo.firstOrderDate
+                            ? new Date(row.additionalInfo.firstOrderDate)
+                            : null,
                         ).label
                       }
                       color={
                         getAutoJobStatus(
-                          row.additionalInfo.firstOrderDate as Date,
+                          row.additionalInfo.firstOrderDate
+                            ? new Date(row.additionalInfo.firstOrderDate)
+                            : null,
                         ).color
                       }
                       maxChars={8}

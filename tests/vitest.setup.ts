@@ -111,7 +111,16 @@ vi.mock('heic2any', () => ({
 
 vi.mock('hooks/reactQuery/useUserSession', () => ({
   useUserSession: () => ({
-    user: {userAccount: {serviceCompany: {id: 'fake-company-id'}}},
+    user: {
+      userAccount: {
+        serviceCompany: {
+          id: 'company-1',
+          settings: {invoiceQRCodeEnabled: false},
+          contact: {email: 'foo@bar.com'},
+        },
+      },
+      contact: {email: 'foo@bar.com'},
+    },
   }),
 }));
 

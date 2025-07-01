@@ -1,5 +1,4 @@
-import {Address, AddressRecord, Meta, Contact, Priority} from './misc';
-import {ServiceCompany, ServiceCompanySimpleView} from './service-company';
+import {Address, AddressRecord, Meta, PersonalContact, Priority} from './misc';
 import {UserAccount} from './user';
 
 export interface ClientAdditionalInfo {
@@ -10,7 +9,7 @@ export interface Client {
   id: string;
   name: string;
   address: Address;
-  contact: Contact;
+  contact: PersonalContact;
   additionalInfo: ClientAdditionalInfo;
   search: string;
   meta: Meta;
@@ -21,7 +20,7 @@ export interface ClientView {
   name: string;
   elevatorCount?: number;
   address: Address;
-  contact: Contact;
+  contact: PersonalContact;
   additionalInfo: ClientAdditionalInfo;
   meta: Meta;
 }
@@ -31,7 +30,7 @@ export interface ClientSimpleView {
   name: string;
   serviceCompanyId: string;
   address: Address;
-  contact: Contact;
+  contact: PersonalContact;
   labels: string[];
   additionalInfo: ClientAdditionalInfo;
   meta: Meta;
@@ -47,13 +46,13 @@ export interface ClientManager {
 export interface CreateClientRecord {
   name: string;
   address: AddressRecord;
-  contact: Contact;
+  contact: PersonalContact;
   priority: Priority;
 }
 
 export interface UpdateClientRecord {
   name: string;
   address: AddressRecord;
-  contact: Contact;
+  contact: PersonalContact;
   priority: Priority;
 }

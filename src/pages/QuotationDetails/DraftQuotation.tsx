@@ -30,7 +30,10 @@ import {
   QuotationView,
 } from 'models/quotation';
 import {ElevatorView} from 'models/elevator';
-import {PropertyOwnerView} from 'models/propertyManager';
+import {
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from 'models/propertyManager';
 import {Avatar, Grid, IconButton, InputAdornment, Tooltip} from '@mui/material';
 import {Button} from 'components/Button';
 import {FormLabel} from 'components/form/FormLabel';
@@ -223,9 +226,9 @@ export const DraftQuotation = ({
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [openCancelDialog, setOpenCancelDialog] = useState<boolean>(false);
 
-  const [customer, setCustomer] = useState<PropertyOwnerView | undefined>(
-    customerData || undefined,
-  );
+  const [customer, setCustomer] = useState<
+    PropertyOwnerView | PropertyOwnerSimpleView | undefined
+  >(customerData || undefined);
   const [unit, setUnit] = useState<ElevatorView | null>(elevator || null);
   const [externalIdUnique, setExternalIdUnique] = useState(true);
 
@@ -493,8 +496,8 @@ export const DraftQuotation = ({
     setValue('externalId', companyNextNumber?.value);
   };
 
-  const getFormattedPaymentTerms = (paymentTerm: ContractTermView) => {
-    const discountOptions = paymentTerm.data?.discountOptions
+  const getFormattedPaymentTerms = (paymentTerm?: ContractTermView) => {
+    const discountOptions = paymentTerm?.data?.discountOptions
       .map((d) => {
         const discountDays = d.discountDays || 0;
         const discountPercentage = d.discountPercent || 0;
@@ -516,8 +519,8 @@ export const DraftQuotation = ({
       .join('\n');
 
     return discountOptions
-      ? `${paymentTerm.term}\n${discountOptions}`
-      : paymentTerm.term;
+      ? `${paymentTerm?.term}\n${discountOptions}`
+      : paymentTerm?.term;
   };
 
   const initializeFormDataFromLocalStorage = () => {
@@ -621,7 +624,9 @@ export const DraftQuotation = ({
     );
   };
 
-  const appendCustomerLegalNote = (customerInfo: PropertyOwnerView) => {
+  const appendCustomerLegalNote = (
+    customerInfo: PropertyOwnerView | PropertyOwnerSimpleView,
+  ) => {
     const customerLegalNote = customerInfo?.additionalInfo?.vat?.legalNote;
 
     if (!customerLegalNote) return;
@@ -636,7 +641,9 @@ export const DraftQuotation = ({
     setValue('notes', newNotes);
   };
 
-  const handleSelectCustomer = (row: PropertyOwnerView) => {
+  const handleSelectCustomer = (
+    row: PropertyOwnerView | PropertyOwnerSimpleView,
+  ) => {
     setCustomer(row);
 
     if (skipInitialCustomerSelect.current) {
@@ -683,8 +690,15 @@ export const DraftQuotation = ({
     }
     setValue('propertyOwnerId', row.id);
 
-    if (formType === 'new' && row.paymentTerm && pageState === 'FRESH_NEW') {
-      setValue('paymentTerms', getFormattedPaymentTerms(row.paymentTerm));
+    if (
+      formType === 'new' &&
+      (row as PropertyOwnerView)?.paymentTerm &&
+      pageState === 'FRESH_NEW'
+    ) {
+      setValue(
+        'paymentTerms',
+        getFormattedPaymentTerms((row as PropertyOwnerView).paymentTerm),
+      );
     }
   };
 
@@ -716,7 +730,9 @@ export const DraftQuotation = ({
     setValue('elevatorId', null);
   }, [setValue]);
 
-  const handleCustomerChange = (value: PropertyOwnerView | null) => {
+  const handleCustomerChange = (
+    value: PropertyOwnerView | PropertyOwnerSimpleView | null,
+  ) => {
     if (value) {
       handleSelectCustomer(value);
     } else {
@@ -841,7 +857,7 @@ export const DraftQuotation = ({
       ),
       vats,
       unit,
-      customer,
+      customer as PropertyOwnerView,
       company,
     );
 

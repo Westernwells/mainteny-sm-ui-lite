@@ -4,7 +4,7 @@ import {ScheduledItemGroup} from './model';
 
 interface PositionOptions {
   scheduleItemGroup: ScheduledItemGroup;
-  startDateTime: string;
+  startDateTime?: string;
   viewDate: Date;
   rowKey: string;
   orderId: string;
@@ -13,8 +13,8 @@ interface PositionOptions {
 }
 
 interface WidthOptions {
-  startDateTime: string;
-  endDateTime: string;
+  startDateTime?: string;
+  endDateTime?: string;
   viewDate: Date;
   gridWidth: number;
   horizontalPosition: number;
@@ -28,7 +28,8 @@ export const getItemPosition = ({
   orderId,
   gridWidth,
 }: PositionOptions) => {
-  if (Object.keys(scheduleItemGroup).length) {
+  // Check if startDateTime is defined
+  if (startDateTime && Object.keys(scheduleItemGroup).length) {
     const startDateIsInPast = isBefore(
       startOfDay(new Date(startDateTime)),
       startOfDay(viewDate),
@@ -40,6 +41,7 @@ export const getItemPosition = ({
     const orderStartTime = getDateObject(startDateTime);
     const x =
       gridWidth * (differenceInMinutes(orderStartTime, morningTime) / 60);
+
     if (scheduleItemGroup[rowKey]) {
       const group = scheduleItemGroup[rowKey];
       const itemNestLevel = group[orderId];
@@ -58,6 +60,11 @@ export const getItemWidth = ({
   horizontalPosition,
 }: WidthOptions) => {
   const hoursInDay = 24;
+
+  if (!startDateTime || !endDateTime) {
+    return '0px'; // Return a default value when one or both of the times are missing
+  }
+
   const startDateIsInPast = isBefore(
     startOfDay(new Date(startDateTime)),
     startOfDay(viewDate),

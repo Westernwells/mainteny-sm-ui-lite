@@ -120,12 +120,12 @@ export interface Address extends AddressRecord {
   id: string;
 }
 
-export interface Contact {
+export interface PersonalContact {
   phone: string;
   email: string;
 }
 
-export interface CompanyContact extends Contact {
+export interface CompanyContact extends PersonalContact {
   url: string;
 }
 
@@ -429,4 +429,11 @@ export interface GoogleAddressComponent {
   long_name: string;
   short_name: string;
   types: string[];
+}
+
+export interface GenerationInfo {
+  contractId: string;
+  componentId: string;
+  elevatorId: string;
+  generationDate: string;
 }

@@ -384,12 +384,16 @@ const ContractServices = ({
                       <StatusChip
                         label={
                           getAutoJobStatus(
-                            row.additionalInfo.firstOrderDate as Date,
+                            row.additionalInfo.firstOrderDate
+                              ? new Date(row.additionalInfo.firstOrderDate)
+                              : null,
                           ).label
                         }
                         color={
                           getAutoJobStatus(
-                            row.additionalInfo.firstOrderDate as Date,
+                            row.additionalInfo.firstOrderDate
+                              ? new Date(row.additionalInfo.firstOrderDate)
+                              : null,
                           ).color
                         }
                         maxChars={8}

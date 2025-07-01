@@ -1106,16 +1106,18 @@ export const ViewInvoice = ({
 
   const doPrint = async () => {
     const PDFDownloadURLResponse = await refetchDownloadUrl();
-    const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
-
     const PDFDownloadURL =
       PDFDownloadURLResponse.data?.[invoice.additionalInfo?.pdfPath ?? ''];
+
+    const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
     const XMLDownloadURL =
       XMLDownloadURLResponse.data?.[invoice.additionalInfo.xmlPath!];
 
-    // Fetch XML file
-    const response = await fetch(XMLDownloadURL!);
-    const xmlText = await response.text();
+    let xmlText = '';
+    if (XMLDownloadURL) {
+      const response = await fetch(XMLDownloadURL);
+      xmlText = await response.text();
+    }
 
     printJS({
       printable: PDFDownloadURL,
@@ -1132,8 +1134,8 @@ export const ViewInvoice = ({
       },
     });
 
+    // clear state so that if they print again, it can re-trigger
     setActionType('');
-    setFilePathToDownload('');
   };
 
   const onPrintInvoice = async () => {

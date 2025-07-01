@@ -239,7 +239,6 @@ export const OrderInfoCard = ({
               <ServiceOrderTypeText
                 variant="subtitle1"
                 style={{ml: '0.5em'}}
-                capitalizeText
                 serviceOrderType={getJobTypeGivenName(
                   serviceOrderDetails.type,
                   allJobTypes,

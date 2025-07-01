@@ -5,7 +5,7 @@ import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import {ReactComponent as AlertInfoIcon} from 'assets/icons/AlertInfo.svg';
 import useTheme from '@mui/material/styles/useTheme';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import {Box, Typography} from '@mui/material';
@@ -13,7 +13,7 @@ import Link from '@mui/material/Link';
 
 interface Props {
   label: string;
-  elevator: ElevatorView;
+  elevator: ElevatorView | ElevatorSimpleView;
   daysOfWeek: string;
   openingHours: string;
 }

@@ -5,7 +5,10 @@ import {CustomerFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
 import {useEffect, useState} from 'react';
 import {PageCard} from 'components/PageCard';
-import {PropertyOwnerView} from 'models/propertyManager';
+import {
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from 'models/propertyManager';
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
 import {useTranslation} from 'react-i18next';
 
@@ -13,8 +16,8 @@ interface Props {
   getCustomerFormErrors?: (val: FormikErrors<CustomerFormModel>) => void;
   getCustomerFormValues?: (val: CustomerFormModel) => void;
   initialValues?: CustomerFormModel;
-  initialCustomer?: PropertyOwnerView;
-  getCustomer?: (val?: PropertyOwnerView) => void;
+  initialCustomer?: PropertyOwnerView | PropertyOwnerSimpleView;
+  getCustomer?: (val?: PropertyOwnerView | PropertyOwnerSimpleView) => void;
   shouldSetEmpty?: boolean;
 }
 

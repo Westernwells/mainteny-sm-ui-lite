@@ -16,6 +16,7 @@ import {
   Amount,
   AmountRecord,
   EmailRecord,
+  GenerationInfo,
   Meta,
   Money,
   MultiVatsAmount,
@@ -114,12 +115,7 @@ export interface QuotationItemArticleView {
   unitSellingAmount: Amount;
   unitPurchaseAmount?: Amount;
   costPackage?: CostPackage;
-  generationInfo?: {
-    contractId: string;
-    componentId: string;
-    elevatorId: string;
-    generationDate: Date;
-  };
+  generationInfo?: GenerationInfo;
 }
 
 export interface ArticleRecord {

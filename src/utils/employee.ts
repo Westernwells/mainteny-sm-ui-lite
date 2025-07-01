@@ -1,5 +1,5 @@
 import {TFunction} from 'i18next';
-import {ServiceOrderScheduleSimpleView} from 'models/service-order';
+import {ServiceOrderScheduleView} from 'models/service-order';
 import {UserView} from '../models/user';
 import {TechnicianEventPair} from '../models/technician';
 import {
@@ -64,7 +64,7 @@ export const getEventSubtype = (
 };
 
 export const getTechnicianName = (
-  technicianSchedule?: ServiceOrderScheduleSimpleView,
+  technicianSchedule?: ServiceOrderScheduleView,
   fetchedTechnician?: EmployeesView,
 ): string => {
   if (technicianSchedule) {

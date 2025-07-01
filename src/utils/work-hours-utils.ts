@@ -33,7 +33,7 @@ export const calculateTotalTimeStatistics = (
 };
 
 export const formatServiceName = (
-  name: WorkHoursType | ServiceOrderType | null | undefined,
+  name: WorkHoursType | ServiceOrderType | string | null | undefined,
 ) => {
   if (name === null) return '-';
   if (name === WorkHoursType.REGULAR || name === ServiceOrderType.REGULAR)

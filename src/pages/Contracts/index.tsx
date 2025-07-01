@@ -509,15 +509,15 @@ export const Contracts = () => {
   };
 
   const handleFilterReset = () => {
-    setValue('customer', undefined);
-    setValue('unitId', undefined);
-    setValue('serialNumber', undefined);
-    setValue('jobTypes', []);
-    setValue('netAmountMin', undefined);
-    setValue('netAmountMax', undefined);
-    setValue('numberOfUnitsMin', undefined);
-    setValue('numberOfUnitsMax', undefined);
-    setValue('triggerMonths', []);
+    setSelectedCustomer(undefined);
+    setSelectedUnitId(undefined);
+    setSelectedSerialNumber(undefined);
+    setSelectedJobTypes([]);
+    setNetAmountMin(undefined);
+    setNetAmountMax(undefined);
+    setNumberOfUnitsMin(undefined);
+    setNumberOfUnitsMax(undefined);
+    setSelectedTriggerMonths([]);
   };
 
   const appliedFilterNumber = useMemo(

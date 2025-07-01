@@ -321,7 +321,7 @@ const OPTION_TO_REST_DISTANCE_VALUES: Record<
 export const getDistanceFromOption = (distance: DISTANCE_FILTER) =>
   OPTION_TO_REST_DISTANCE_VALUES[distance];
 
-export const parseTimeRulesData = (timeRules: ElevatorTimeRuleView[]) => {
+export const parseTimeRulesData = (timeRules?: ElevatorTimeRuleView[]) => {
   const daysOfWeekAndTimeRangeTimeRule = timeRules?.find(
     (timeRule) =>
       timeRule.type === ElevatorTimeRuleType.DAYS_OF_WEEK_AND_TIME_RANGE,

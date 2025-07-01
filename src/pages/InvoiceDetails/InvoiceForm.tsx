@@ -67,7 +67,10 @@ import {
   ServiceOrderSubItemRecord,
   ServiceOrderView,
 } from 'models/service-order';
-import {PropertyOwnerView} from 'models/propertyManager';
+import {
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from 'models/propertyManager';
 import {AddressComponent, AddressRecord, Language} from 'models/misc';
 import {
   applyVatToItems,
@@ -1305,7 +1308,9 @@ export const InvoiceForm = ({
     }
   }, [getValues()]);
 
-  const handleCustomerChange = (newCustomer?: PropertyOwnerView | null) => {
+  const handleCustomerChange = (
+    newCustomer?: PropertyOwnerView | PropertyOwnerSimpleView | null,
+  ) => {
     if (newCustomer) {
       if (newCustomer.id !== watchedPropertyOwnerId) {
         handleRemoveCustomer();

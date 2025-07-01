@@ -1,4 +1,4 @@
-import {Address, Contact} from './misc';
+import {Address, PersonalContact} from './misc';
 import {ServiceOrderType} from './service-order';
 import {TechnicianSimpleView} from './technician';
 import {UserAccountSimpleView} from './user';
@@ -32,7 +32,7 @@ export interface PropertyOwnerNotificationView {
   id: string;
   name: string;
   address: Address;
-  contact: Contact;
+  contact: PersonalContact;
 }
 
 export interface ElevatorNotificationView {

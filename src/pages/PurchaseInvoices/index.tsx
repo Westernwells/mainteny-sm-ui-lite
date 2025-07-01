@@ -725,18 +725,31 @@ export const PurchaseInvoices = ({
   };
 
   const handleFilterReset = () => {
-    setValue('supplierId', '');
-    setValue('supplierName', '');
-    setValue('subject', '');
-    setValue('number', '');
-    setValue('subject', '');
     setResetDatePicker(true);
     setLocalDueDateFrom(null);
     setLocalDueDateTo(null);
-    setValue('netAmountMin', undefined);
-    setValue('netAmountMax', undefined);
-    setValue('hasAttachments', undefined);
-    setValue('purchaseInvoiceStatus', []);
+
+    setSupplierId(undefined);
+    setSupplierName(undefined);
+    setSubject(undefined);
+    setPurchaseInvoiceNumber(undefined);
+    setNetAmountMin(undefined);
+    setNetAmountMax(undefined);
+    setSelectedPurchaseInvoiceStatus([]);
+    setIsWithAttachments(undefined);
+
+    setAppliedFilters({
+      selectedPurchaseInvoiceStatus: [],
+      dueDateFrom: null,
+      dueDateTo: null,
+      purchaseInvoiceNumber: undefined,
+      supplierId: undefined,
+      supplierName: undefined,
+      subject: undefined,
+      netAmountMin: undefined,
+      netAmountMax: undefined,
+      isWithAttachments: undefined,
+    });
   };
 
   useEffect(() => {

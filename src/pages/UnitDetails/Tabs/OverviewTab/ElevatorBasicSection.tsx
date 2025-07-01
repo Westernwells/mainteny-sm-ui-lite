@@ -103,15 +103,15 @@ export const ElevatorBasicSection = ({
         </Box>
       ))}
 
-      {serviceOrder && (
+      {serviceOrder && serviceOrder?.schedules[0]?.startTime && (
         <CardAlert
           alertIcon={<CalendarTodayIcon />}
           message={`Upcoming visit in 
         ${formatDistance(
-          calculateNextVisitDate(serviceOrder.schedules[0].startTime),
+          calculateNextVisitDate(serviceOrder.schedules[0]?.startTime),
         )}
         (${formatDate(
-          calculateNextVisitDate(serviceOrder.schedules[0].startTime),
+          calculateNextVisitDate(serviceOrder.schedules[0]?.startTime),
         )})`}
         />
       )}

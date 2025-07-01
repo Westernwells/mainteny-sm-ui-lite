@@ -10,6 +10,7 @@ import {
   AmountRecord,
   EmailRecord,
   Fee,
+  GenerationInfo,
   JobStatus,
   Meta,
   MultiVatsAmount,
@@ -18,25 +19,19 @@ import {
 } from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
-import {EmployeesSimpleView, EmployeesView} from './employee';
-import {ArticleRecord, ArticleView} from './article';
-import {FileResource, FileResourceRecord} from './media';
 import {
-  AggregatedAmount,
-  Discount,
-  InvoiceItemPaymentRecord,
-  InvoiceSubItemsConfig,
-  InvoiceUnitAmountSource,
-} from './invoice';
+  EmployeesSimpleView,
+  EmployeesView,
+  ServiceOrderEmployeeView,
+} from './employee';
+import {ArticleType, ArticleView, CostPackage} from './article';
+import {FileResource, FileResourceRecord} from './media';
+import {AggregatedAmount, Discount, InvoiceItemPaymentRecord} from './invoice';
 import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
-import {PropertyOwnerView} from 'models/propertyManager';
+import {PropertyOwnerSimpleView} from 'models/propertyManager';
 import {CommentRecord} from './comment';
-import {
-  ArticleInfoRecord,
-  EditableQuotationSubItemRecord,
-  SubItemsConfig,
-} from './quotation';
+import {ArticleInfoRecord, SubItemsConfig} from './quotation';
 
 export enum Priority {
   A = 'A',
@@ -234,6 +229,15 @@ export enum JobScheduleType {
   FIXED = 'FIXED',
 }
 
+export enum JobScheduleSource {
+  NIGHTLY_SHUFFLE = 'NIGHTLY_SHUFFLE',
+  TECHNICIAN_REQUESTED = 'TECHNICIAN_REQUESTED',
+  ASSIGNMENT_PROCESS = 'ASSIGNMENT_PROCESS',
+  AUTO_RESCHEDULE = 'AUTO_RESCHEDULE',
+  MANUAL_ASSIGNMENT = 'MANUAL_ASSIGNMENT',
+  UNKNOWN = 'UNKNOWN',
+}
+
 export enum ChecklistStatus {
   INIT = 'INIT',
   COMPLETED = 'COMPLETED',
@@ -275,11 +279,11 @@ export interface ServiceOrderTimeSlot {
 }
 
 export interface ServiceOrderAdditionalInfo {
-  appointmentConfirmed: boolean;
+  appointmentConfirmed?: boolean;
   appointmentNotificationDueDate?: string;
-  appointmentNotificationRequired: boolean;
-  appointmentNotificationSent: boolean;
-  priority: Priority;
+  appointmentNotificationRequired?: boolean;
+  appointmentNotificationSent?: boolean;
+  priority?: Priority;
   checkListInfo?: {
     checkListId?: string;
     technicianSignature?: string;
@@ -288,9 +292,9 @@ export interface ServiceOrderAdditionalInfo {
     completedAt?: string;
     status?: ChecklistStatus;
   };
-  moreInformation: string;
-  quotationId: string;
-  workReportGenerated: boolean;
+  moreInformation?: string;
+  quotationId?: string;
+  workReportGenerated?: boolean;
   confirmationInfo?: ServiceOrderConfirmationInfo;
   purchaseOrderNumber?: string;
   callerInfo?: CallerInfo;
@@ -315,8 +319,12 @@ export interface ServiceOrderAdditionalInfo {
   pictures?: FileResource[];
   discount?: Discount;
   commentCount?: number;
-  totalAmount?: Amount;
+  totalAmount?: AggregatedAmount;
   lastActivityAt?: string;
+  candidateTechnician?: ServiceOrderEmployeeView;
+  candidateTechnicians?: EmployeesSimpleView[];
+  generationInfo?: GenerationInfo;
+  notificationChannels?: ContactChannel[];
 }
 
 export interface ServiceOrderConfirmationInfo {
@@ -330,12 +338,11 @@ export interface ServiceOrderView {
   number: string;
   externalId: string;
   articles: ServiceOrderArticleView[];
-  elevator: ElevatorView;
+  elevator: ElevatorSimpleView;
   contract?: ContractSimpleView;
   description: string;
   type: ServiceOrderType | string;
   status: ServiceOrderStatus;
-  lastVisitDate: string;
   expectedVisitDate: string;
   actualStartTime?: string;
   actualEndTime?: string;
@@ -343,7 +350,7 @@ export interface ServiceOrderView {
   travelEndTime?: string;
   dueDate: string;
   serviceTime?: number;
-  schedules: ServiceOrderScheduleSimpleView[];
+  schedules: ServiceOrderScheduleView[];
   labels: string[];
   search: string;
   meta: Meta;
@@ -351,6 +358,9 @@ export interface ServiceOrderView {
   additionalInfo: ServiceOrderAdditionalInfo;
   checkLists?: ServiceOrderCheckListInfo[];
   serviceCompany: ServiceCompanySimpleView;
+  sortableFields?: {
+    technicianNames: string;
+  };
 }
 
 export interface ServiceOrderSimpleView {
@@ -367,7 +377,7 @@ export interface ServiceOrderSimpleView {
   lastVisitDate: string;
   meta: Meta;
   number: string;
-  schedules: ServiceOrderScheduleSimpleView[];
+  schedules: ServiceOrderScheduleView[];
   search: string;
   serviceCompanyId: string;
   serviceTime?: number;
@@ -429,6 +439,17 @@ export interface ServiceOrderScheduleSimpleView {
   endTime: string;
   type: JobScheduleType;
   source: string;
+  createdAt: string;
+}
+
+export interface ServiceOrderScheduleView {
+  id: string;
+  serviceOrderId: string;
+  technician?: ServiceOrderEmployeeView;
+  startTime?: string;
+  endTime?: string;
+  type: JobScheduleType;
+  source: JobScheduleSource;
   createdAt: string;
 }
 
@@ -704,12 +725,24 @@ export interface ServiceOrderArticleView {
   name: string;
   description: string;
   serviceOrderId: string;
-  article: ArticleInfoRecord;
+  article?: ServiceOrderViewArticleInfoRecord;
   unitPurchaseAmount?: MultiVatsAmount;
   unitAmount: MultiVatsAmount;
   quantity: number;
   ownerType?: ServiceOrderArticleOwnerType;
   additionalInfo?: ServiceOrderArticleAdditionalInfo;
+}
+
+export interface ServiceOrderViewArticleInfoRecord {
+  id?: string;
+  name: string;
+  externalId?: string;
+  type: ArticleType;
+  unit: string;
+  unitPurchaseAmount?: Amount;
+  unitSellingAmount: Amount;
+  costPackage?: CostPackage;
+  generationInfo?: GenerationInfo;
 }
 
 export interface ServiceOrderItemRecord {
@@ -755,7 +788,7 @@ export type ServiceOrderTableRow = {
   fullAddress: string;
   dueDate: string;
   technicians: EmployeesSimpleView[];
-  propertyOwner: PropertyOwnerView;
+  propertyOwner: PropertyOwnerSimpleView;
   jobStatus: ServiceOrderStatus;
   paymentStatus:
     | ServiceOrderPaymentStatus
@@ -763,7 +796,7 @@ export type ServiceOrderTableRow = {
   hasNotes: boolean;
   lastActivityAt: string;
   hasSchedule: boolean;
-  scheduleDate: string;
+  scheduleDate?: string;
 };
 
 // used to indicate fields for the search parameter of service order endpoint

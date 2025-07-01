@@ -142,13 +142,19 @@ export const Schedule = ({
       const endTimesMap = new Map();
 
       items.forEach((currentItem) => {
-        const currentStartTime = new Date(currentItem.schedules[0].startTime);
-        const currentEndTime = new Date(currentItem.schedules[0].endTime);
+        const startTime = currentItem.schedules[0]?.startTime;
+        const endTime = currentItem.schedules[0]?.endTime;
+
+        // If startTime or endTime are undefined, we can either skip or set to a default value
+        if (!startTime || !endTime) return;
+
+        const currentStartTime = new Date(startTime);
+        const currentEndTime = new Date(endTime);
 
         let level = 1;
-        for (const [endTime] of endTimesMap) {
-          if (isBefore(currentStartTime, endTime)) {
-            level = Math.max(level, endTimesMap.get(endTime) + 1);
+        for (const [existingEndTime] of endTimesMap) {
+          if (isBefore(currentStartTime, existingEndTime)) {
+            level = Math.max(level, endTimesMap.get(existingEndTime) + 1);
           }
         }
 
