@@ -39,6 +39,12 @@ export const MarkCompletedDialog = ({
   const {mutate: completeServiceOrder} = useCompleteServiceOrder(
     'Service job completed',
   );
+
+  const hasExistingWorkReports = Boolean(
+    serviceOrderDetails.reports?.length &&
+      serviceOrderDetails.reports?.length > 0,
+  );
+
   const formik = useFormik<CompleteServiceOrder>({
     initialValues: {
       serviceTime:
@@ -51,7 +57,7 @@ export const MarkCompletedDialog = ({
     onSubmit: async (values: CompleteServiceOrder) => {
       await completeServiceOrder({
         serviceOrderId: serviceOrderDetails.id,
-        body: values,
+        body: hasExistingWorkReports ? {} : values,
       });
       onClose();
     },
@@ -68,52 +74,61 @@ export const MarkCompletedDialog = ({
         aria-describedby="alert-dialog-description">
         <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description" component="div">
-            <Grid container spacing={4}>
-              <Grid item xs={12}>
-                <FormInput
-                  fieldProps={{
-                    type: 'number',
-                    label: t('Duration (in minutes)'),
-                    name: 'serviceTime',
-                    value: formik.values.serviceTime,
-                    onBlur: formik.handleBlur,
-                    error: !!(
-                      formik.touched.serviceTime && formik.errors.serviceTime
-                    ),
-                    helperText:
-                      formik.touched.serviceTime && formik.errors.serviceTime
-                        ? formik.errors.serviceTime
-                        : '',
-                    onChange: formik.handleChange,
-                    required: true,
-                    margin: 'dense',
-                  }}
-                />
-              </Grid>
+          {hasExistingWorkReports && (
+            <Box>
+              <Typography>
+                {t('Are you sure you want to mark this job as completed?')}
+              </Typography>
+            </Box>
+          )}
+          {!hasExistingWorkReports && (
+            <DialogContentText id="alert-dialog-description" component="div">
+              <Grid container spacing={4}>
+                <Grid item xs={12}>
+                  <FormInput
+                    fieldProps={{
+                      type: 'number',
+                      label: t('Duration (in minutes)'),
+                      name: 'serviceTime',
+                      value: formik.values.serviceTime,
+                      onBlur: formik.handleBlur,
+                      error: !!(
+                        formik.touched.serviceTime && formik.errors.serviceTime
+                      ),
+                      helperText:
+                        formik.touched.serviceTime && formik.errors.serviceTime
+                          ? formik.errors.serviceTime
+                          : '',
+                      onChange: formik.handleChange,
+                      required: true,
+                      margin: 'dense',
+                    }}
+                  />
+                </Grid>
 
-              <Grid item xs={12}>
-                <FormInput
-                  fieldProps={{
-                    label: t('Description'),
-                    name: 'description',
-                    value: formik.values.description,
-                    onBlur: formik.handleBlur,
-                    error: !!(
-                      formik.touched.description && formik.errors.description
-                    ),
-                    helperText:
-                      formik.touched.description && formik.errors.description
-                        ? formik.errors.description
-                        : '',
-                    onChange: formik.handleChange,
-                    multiline: true,
-                    minRows: 5,
-                  }}
-                />
+                <Grid item xs={12}>
+                  <FormInput
+                    fieldProps={{
+                      label: t('Description'),
+                      name: 'description',
+                      value: formik.values.description,
+                      onBlur: formik.handleBlur,
+                      error: !!(
+                        formik.touched.description && formik.errors.description
+                      ),
+                      helperText:
+                        formik.touched.description && formik.errors.description
+                          ? formik.errors.description
+                          : '',
+                      onChange: formik.handleChange,
+                      multiline: true,
+                      minRows: 5,
+                    }}
+                  />
+                </Grid>
               </Grid>
-            </Grid>
-          </DialogContentText>
+            </DialogContentText>
+          )}
         </DialogContent>
         <DialogActions sx={{mt: '1rem'}}>
           <Button
