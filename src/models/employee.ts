@@ -252,6 +252,7 @@ export type CreateEmployeeAccountData = Partial<CreateUserAccountData> & {
   roles: string[];
   address: AddressRecord | null;
   employeeId: string;
+  shifts?: ShiftForm;
   team?: string;
   totalYearlyVacationDaysAllowed?: number;
 };

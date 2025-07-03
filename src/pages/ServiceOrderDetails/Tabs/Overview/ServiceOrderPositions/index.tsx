@@ -94,7 +94,11 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
   const initialValues = {
     items:
       serviceOrderArticles?.map((item) =>
-        serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
+        JSON.parse(
+          JSON.stringify(
+            serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
+          ),
+        ),
       ) ?? [],
     discount: getDiscoutObj(serviceOrder?.additionalInfo?.discount),
   };
@@ -224,7 +228,7 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
   };
 
   useEffect(() => {
-    if (!serviceOrderArticles) return;
+    if (!serviceOrderArticles || isLoadingServiceOrderArticles) return;
 
     const newItems = serviceOrderArticles.map((item) =>
       serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
@@ -233,7 +237,13 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
       items: newItems,
       discount: getDiscoutObj(serviceOrder?.additionalInfo?.discount),
     });
-  }, [serviceOrder, serviceOrderArticles, subItemsMap, reset]);
+  }, [
+    serviceOrder,
+    serviceOrderArticles,
+    subItemsMap,
+    isLoadingServiceOrderArticles,
+    reset,
+  ]);
 
   useEffect(() => {
     recalcServiceOrder();
