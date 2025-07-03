@@ -30,7 +30,9 @@ export const formatCreateEmployeeAccountData = (
     team: data.team,
     roles: data?.roles || [],
     externalId: data.employeeId || '',
-    workingHours: [], // pass additional data to BE not included in the form
+    workingHours: data?.shifts
+      ? generateShiftRestDataFromForm(data?.shifts)
+      : [],
     totalYearlyVacationDaysAllowed: data?.totalYearlyVacationDaysAllowed,
   };
 

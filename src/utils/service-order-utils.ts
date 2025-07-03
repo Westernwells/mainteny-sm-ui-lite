@@ -586,8 +586,22 @@ export const serviceOrderItemToServiceOrderItemRecord = (
     name: serviceOrderItem.name,
     description: serviceOrderItem.description,
     quantity: serviceOrderItem.quantity,
-    unitAmount: serviceOrderItem.unitAmount,
-    unitPurchaseAmount: serviceOrderItem.unitPurchaseAmount,
+    unitAmount: {
+      ...serviceOrderItem.unitAmount,
+      netAmount: serviceOrderItem.unitAmount?.netAmount ?? 0,
+      percentageVat: serviceOrderItem.unitAmount?.percentageVat ?? 0,
+      currency: serviceOrderItem.unitAmount?.currency,
+      vatId: serviceOrderItem.unitAmount?.vatId ?? '',
+      vatName: serviceOrderItem.unitAmount?.vatName ?? '',
+    },
+    unitPurchaseAmount: {
+      ...serviceOrderItem.unitPurchaseAmount,
+      netAmount: serviceOrderItem.unitPurchaseAmount?.netAmount ?? 0,
+      percentageVat: serviceOrderItem.unitPurchaseAmount?.percentageVat ?? 0,
+      currency: serviceOrderItem.unitPurchaseAmount?.currency!,
+      vatId: serviceOrderItem.unitPurchaseAmount?.vatId ?? '',
+      vatName: serviceOrderItem.unitPurchaseAmount?.vatName ?? '',
+    },
     discount: serviceOrderItem?.additionalInfo?.discount
       ? {
           ...serviceOrderItem.additionalInfo.discount,
@@ -681,7 +695,10 @@ export const buildServiceOrderPayload = (
     description: item.description,
     unitAmount: {
       currency: item.unitAmount?.currency || currentCurrency.code,
-      netAmount: Number(item.unitAmount?.netAmount) || 0,
+      netAmount:
+        item.unitAmount?.netAmount !== undefined
+          ? Number(item.unitAmount.netAmount)
+          : 0,
       percentageVat: item.unitAmount?.percentageVat || 0,
       vatId: item.unitAmount?.vatId || '',
       vatName: item.unitAmount?.vatName || '',
