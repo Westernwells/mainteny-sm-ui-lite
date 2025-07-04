@@ -1,10 +1,20 @@
 import {test as base} from '@playwright/test';
 
+import {UserSession} from '../src/models/session';
+import {
+  USER_ACCOUNT_LOCALSTORAGE_KEY,
+  USER_LOCALSTORAGE_KEY,
+} from '../src/userStorage/index';
+import {UserView} from '../src/models/user';
+
 type Fixtures = {
   navigatePW: (primaryId: string, secondaryId: string) => void;
+  navigateSingleDrawer: (primaryId: string) => Promise<void>;
   login: () => Promise<void>;
   getRichTextField: (field: string) => Promise<any>;
   waitForSpinnerToDisappear: () => Promise<void>;
+  getAuthUser: () => Promise<UserSession | null>;
+  getAuthUserAccount: () => Promise<UserView | null>;
 };
 
 export const test = base.extend<Fixtures>({
@@ -17,6 +27,14 @@ export const test = base.extend<Fixtures>({
         )
         .click();
       await page.locator(`[data-testid="${secondaryId}-nav-item"]`).click();
+    };
+    await use(navigate);
+  },
+  navigateSingleDrawer: async ({page}, use) => {
+    const navigate = async (primaryId: string) => {
+      await page.locator(`[data-testid="${primaryId}-nav-item"]`).hover();
+      await page.locator(`[data-testid="${primaryId}-nav-item"]`).click();
+      await page.mouse.move(500, 0); // Move the mouse to 500px to un hover
     };
     await use(navigate);
   },
@@ -57,6 +75,22 @@ export const test = base.extend<Fixtures>({
         .waitFor({state: 'detached'});
     };
     await use(waitForSpinnerToDisappear);
+  },
+  getAuthUser: async ({page}, use) => {
+    await use(() =>
+      page.evaluate((key) => {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+      }, USER_LOCALSTORAGE_KEY),
+    );
+  },
+  getAuthUserAccount: async ({page}, use) => {
+    await use(() =>
+      page.evaluate((key) => {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+      }, USER_ACCOUNT_LOCALSTORAGE_KEY),
+    );
   },
 });
 

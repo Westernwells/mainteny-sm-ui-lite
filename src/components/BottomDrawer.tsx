@@ -133,7 +133,7 @@ export const BottomDrawer = ({
           <Box key={`${item.label}-${index}`}>
             <MenuItem
               onClick={() => {
-                item.onClick();
+                item.onClick?.();
                 handleClose();
               }}>
               <ListItemIcon>{item.icon}</ListItemIcon>

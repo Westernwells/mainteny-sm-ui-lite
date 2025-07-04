@@ -58,6 +58,7 @@ import ErrorBoundary from 'components/ErrorBoundary';
 import {UpdateSnackbar} from 'components/UpdateSnackbar';
 import MixedPositions from 'pages/Articles/Tabs/MixedPositions';
 import {UserCompanyProvider} from 'context/UserCompanyProvider';
+import Tasks from 'pages/Tasks';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -619,6 +620,22 @@ export const Router = () => {
                       excludeDefaultSpacing
                       contentStyles={{p: 0}}>
                       <Articles />
+                    </PageLayout>
+                  </>
+                }
+              />
+
+              <Route
+                path="/tasks"
+                element={
+                  <>
+                    <Helmet>
+                      <title>Tasks</title>
+                    </Helmet>
+                    <PageLayout
+                      contentStyles={{padding: '10px'}}
+                      pageTitle="Tasks">
+                      <Tasks />
                     </PageLayout>
                   </>
                 }

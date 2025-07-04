@@ -83,6 +83,14 @@ export const stripHtmlTags = (html: string): string => {
   return textContent.replace(/\s+/g, ' ').trim();
 };
 
+export const stripHTMLTagsLight = (html?: string) => {
+  if (!html) {
+    return '';
+  }
+
+  return html.replace(/<\/?[^>]+(>|$)/g, '');
+};
+
 export const cleanHtmlContent = (
   html: string,
   customAdjustments: boolean = false,

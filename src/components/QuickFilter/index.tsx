@@ -1,17 +1,27 @@
-import {Box, useTheme} from '@mui/system';
+import {Box, SxProps, useTheme} from '@mui/system';
 import {Chip} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {OptionWithTranslationKey} from 'models/filter';
+import {Theme} from '@mui/material/styles';
 
 type Props = {
   selected: string[];
   options: OptionWithTranslationKey[];
   statistics?: Record<string, number>;
   onChange: (value: string) => void;
+  chipSx?: SxProps<Theme>;
+  alwaysShowCount?: boolean;
 };
 
-const QuickFilter = ({selected, options, statistics, onChange}: Props) => {
+const QuickFilter = ({
+  selected,
+  options,
+  statistics,
+  onChange,
+  alwaysShowCount = false,
+  chipSx = {},
+}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
 
@@ -33,7 +43,8 @@ const QuickFilter = ({selected, options, statistics, onChange}: Props) => {
             ? option.value === 'ALL'
             : selected.includes(option.value);
 
-        const chipNumber = statistics?.[option.value] ?? null;
+        const chipNumber = statistics?.[option.value] || null;
+
         return (
           <Box
             key={`quick-filter-option-${option.value}`}
@@ -70,9 +81,12 @@ const QuickFilter = ({selected, options, statistics, onChange}: Props) => {
               }}>
               {t(option.labelKey)}
             </Typography>
-            {isSelected && chipNumber && (
+            {(isSelected || alwaysShowCount) && chipNumber && (
               <Chip
-                sx={{height: '25px'}}
+                sx={{
+                  height: '25px',
+                  ...chipSx,
+                }}
                 label={chipNumber}
                 variant="outlined"
               />

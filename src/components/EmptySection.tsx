@@ -26,6 +26,7 @@ import {ReactComponent as InvoiceIcon} from 'assets/icons/Invoice.svg';
 import {ReactComponent as BasicInfoIcon} from 'assets/icons/BasicInfoIcon.svg';
 import {ReactComponent as HierarchyIcon} from 'assets/icons/Hierarchy.svg';
 import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
+import {ReactComponent as TaskListIllustration} from 'assets/illustrations/TaskList.svg';
 import {ButtonProps} from '@mui/material';
 import {Button} from './Button';
 
@@ -59,7 +60,8 @@ export interface Props extends BoxProps {
     | 'quotation'
     | 'hierarchy'
     | 'emailSignature'
-    | 'mixedPositions';
+    | 'mixedPositions'
+    | 'tasks';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
@@ -185,6 +187,12 @@ export const EmptySection = ({
       case 'mixedPositions':
         return (
           <WrenchScrewdriverIllustration
+            style={{width: '100%', height: '100%', color: illustrationColor}}
+          />
+        );
+      case 'tasks':
+        return (
+          <TaskListIllustration
             style={{width: '100%', height: '100%', color: illustrationColor}}
           />
         );

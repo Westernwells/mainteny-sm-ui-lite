@@ -8,6 +8,7 @@ import {
   EmployeeAccountData as EditEmployeeAccountData,
 } from 'models/employee';
 import {generateShiftRestDataFromForm} from 'utils/shift';
+import {UserAccountSimpleView} from 'models/user';
 
 export const formatCreateEmployeeAccountData = (
   data: CreateEmployeeAccountData,
@@ -95,4 +96,11 @@ export const convertPropertyOwnerObjectToAvatar = (
 ): AvatarView => ({
   firstName: propertyOwner?.name,
   photoUrl: propertyOwner.additionalInfo.customerImagePath,
+});
+
+export const convertUserAccountSimpleViewToAvatar = (
+  account?: UserAccountSimpleView,
+): AvatarView => ({
+  firstName: account?.firstName,
+  photoUrl: account?.photoUrl,
 });

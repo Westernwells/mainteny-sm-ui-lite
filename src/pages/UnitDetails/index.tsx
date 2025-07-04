@@ -2,10 +2,10 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import ListIcon from '@mui/icons-material/ListAlt';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import SettingsIcon from '@mui/icons-material/Settings';
+import RuleOutlinedIcon from '@mui/icons-material/RuleOutlined';
 import {Button} from '@mui/material';
 import Box from '@mui/material/Box';
 import {Confirm} from 'components/Confirm';
@@ -27,7 +27,7 @@ import {OverviewTab} from './Tabs/OverviewTab';
 import {PerformanceTab} from './Tabs/PerformanceTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 import TechnicalDataTab from './Tabs/TechnicalDataTab';
-import {TodosTab} from './Tabs/TodosTab';
+import TasksTab from './Tabs/TasksTab';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -55,8 +55,8 @@ const tabItems = [
     icon: <GraphicEqIcon />,
   },
   {
-    label: "To-Do's",
-    icon: <ListIcon />,
+    label: 'Tasks',
+    icon: <RuleOutlinedIcon />,
   },
 ];
 
@@ -66,7 +66,7 @@ enum TabIndex {
   SERVICE_HISTORY = 2,
   INVOICE_HISTORY = 3,
   PERFORMANCE = 4,
-  TODOS = 5,
+  TASKS = 5,
 }
 
 export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
@@ -133,7 +133,8 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
         currentIndex={value}
         onChange={(index) => setValue(index)}
         containerStyles={{
-          marginBottom: theme.spacing(8),
+          marginBottom:
+            value === TabIndex.TASKS ? theme.spacing(4) : theme.spacing(8),
           '& > div:first-of-type': {marginBottom: theme.spacing(2)},
         }}>
         <TabsBody value={value} index={TabIndex.OVERVIEW}>
@@ -160,8 +161,17 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
           <PerformanceTab />
         </TabsBody>
 
-        <TabsBody value={value} index={TabIndex.TODOS}>
-          <TodosTab />
+        <TabsBody
+          containerStyle={{
+            height: '1px',
+            overflow: 'auto',
+            marginTop: 1,
+            backgroundColor: 'white',
+            padding: 3,
+          }}
+          value={value}
+          index={TabIndex.TASKS}>
+          <TasksTab elevatorId={elevatorId!} />
         </TabsBody>
         <Box
           sx={{

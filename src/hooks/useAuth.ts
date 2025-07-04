@@ -3,11 +3,16 @@ import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {axiosClient} from 'utils/axios-utils';
 
-import {clearStoredAdmin, getStoredAdmin} from 'userStorage';
+import {
+  clearStoredAdmin,
+  getStoredAdmin,
+  setStoredUserAccount,
+} from 'userStorage';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './reactQuery/useUserSession';
 import {UserSession} from '../models/session';
 import {Role, UserAccount} from '../models/user';
+import {getUserAccount} from './reactQuery/useUserAccount';
 
 interface UseAuth {
   signin: (email: string, password: string) => Promise<void>;
@@ -69,6 +74,13 @@ export const useAuth = (): UseAuth => {
         }
 
         axiosClient.defaults.headers.common.Authorization = `Bearer ${session.token}`;
+
+        if (!session.userAccount.roles.includes(Role.ADMIN)) {
+          const userAccount = await getUserAccount(session.userAccount.id);
+
+          setStoredUserAccount(userAccount);
+        }
+
         updateUser(session);
 
         if (location.state?.from) {

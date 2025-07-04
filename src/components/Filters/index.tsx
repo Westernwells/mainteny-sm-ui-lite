@@ -12,6 +12,8 @@ type Props = {
   onOpen?: () => void;
   onSave: () => void;
   onReset: () => void;
+  filterButtonTestId?: string;
+  filterDrawerMainTestId?: string;
 };
 
 const Filters = ({
@@ -20,6 +22,8 @@ const Filters = ({
   onOpen,
   onSave,
   onReset,
+  filterButtonTestId,
+  filterDrawerMainTestId,
 }: PropsWithChildren<Props>) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -53,6 +57,7 @@ const Filters = ({
         pt: 1,
       }}
       gap={1}
+      data-testid={filterButtonTestId}
       onClick={handleOpen}>
       <FilterListIcon />
       <Typography variant="subtitle1">{capitalize(t('Filters'))}</Typography>
@@ -81,6 +86,7 @@ const Filters = ({
           top={0}
           bgcolor="white"
           zIndex={99}
+          data-testid={filterDrawerMainTestId}
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -147,7 +153,12 @@ const Filters = ({
               alignItems: 'center',
               padding: '16px 24px',
             }}>
-            <Button onClick={onReset} variant="text">
+            <Button
+              onClick={() => {
+                onReset();
+                handleClose();
+              }}
+              variant="text">
               <Typography
                 sx={{
                   fontSize: '14px',

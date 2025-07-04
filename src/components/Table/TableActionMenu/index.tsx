@@ -8,12 +8,14 @@ type Props = {
   options: MenuAction[];
   isOpen?: boolean;
   onToggle?: (value: boolean) => void;
+  testId?: string;
 };
 
 const TableActionMenuWithButton = ({
   options,
   isOpen: externalOpenState,
   onToggle: externalSetOpenState,
+  testId,
 }: Props) => {
   const anchorEl = useRef<HTMLButtonElement | null>(null);
   const [internalOpen, setInternalOpen] = useState(false);
@@ -28,6 +30,7 @@ const TableActionMenuWithButton = ({
   return (
     <>
       <IconButton
+        data-testid={testId}
         ref={anchorEl}
         onClick={handleOpen}
         aria-controls={isOpen ? 'action-menu-vertical' : undefined}

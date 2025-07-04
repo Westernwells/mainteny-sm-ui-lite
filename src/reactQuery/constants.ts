@@ -138,6 +138,11 @@ export const queryKeys = {
   fetchTags: 'fetchTags',
   fetchTagStatistics: 'fetchTagStatistics',
 
+  queryTasks: 'queryTasks',
+  getTaskById: 'getTaskById',
+  queryAllTasks: 'queryAllTasks',
+  fetchTasksStatistics: 'fetchTasksStatistics',
+
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',
   // Fetching config emails

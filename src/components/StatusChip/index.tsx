@@ -31,6 +31,8 @@ export const statusColor: {[key: string]: string} = {
   'grey.300': 'grey.300',
   'info.main': 'info.main',
   'purple.main': 'purple.main',
+  'secondary.mainLight': 'secondary.mainLight',
+  '#8F9BB326': '#8F9BB326',
 };
 
 interface Props {

@@ -153,12 +153,16 @@ export const getTechnicianByEmployeeId = async (employeeId: string) => {
   return response.data;
 };
 
-export const useGetTechniciansByEmployeeId = (employeeId?: string) =>
+export const useGetTechniciansByEmployeeId = (
+  employeeId?: string,
+  options?: UseQueryOptions<EmployeesView, unknown, EmployeesView>,
+) =>
   useQuery<EmployeesView>(
     [qks.queryServiceCompanyTechnicians, employeeId],
     () => getTechnicianByEmployeeId(employeeId!),
     {
       enabled: !!employeeId,
+      ...options,
     },
   );
 

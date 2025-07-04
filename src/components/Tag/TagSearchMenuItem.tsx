@@ -60,6 +60,7 @@ const TagSearchMenuItem = forwardRef(
           e.stopPropagation();
         }}>
         <Box
+          data-role="tag-item"
           sx={{
             display: 'flex',
           }}

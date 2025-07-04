@@ -1619,7 +1619,7 @@ export const Actions = ({
               data-testid={`invoice-action-menu-item-${item.label}`}
               disabled={item.disabled ?? false}
               onClick={() => {
-                item.onClick();
+                item.onClick?.();
                 handleClose();
               }}
               sx={{py: '0.7rem'}}>

@@ -15,6 +15,7 @@ import Box from '@mui/material/Box';
 import {SxProps, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {mapLanguageToLocale} from 'utils/language';
+import useWindowDimensions from 'hooks/useWindowDimensions';
 import CustomActionBar from './CustomActionBar';
 import CustomToolbar from './CustomToolbar';
 
@@ -71,6 +72,7 @@ export const DatePicker = ({
   const [value, setValue] = useState<Date | null>(defaultDate);
   const [open, setOpen] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const {innerHeight} = useWindowDimensions();
 
   const handleOpen = () => {
     setOpen(true);
@@ -322,6 +324,7 @@ export const DatePicker = ({
               popper: {
                 sx: popperSx,
                 'data-testid': popupTestId,
+                placement: innerHeight <= 750 ? 'top-start' : undefined,
               },
               textField: {
                 sx: {
@@ -329,6 +332,7 @@ export const DatePicker = ({
                     lineHeight: 'unset',
                   },
                   width: '100%',
+                  height: '36px',
                 },
                 ...textFieldProps,
                 size: textFieldProps?.size || 'small',
