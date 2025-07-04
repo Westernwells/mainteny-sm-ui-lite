@@ -67,6 +67,7 @@ const Tag = ({
 
   return (
     <span
+      data-role="tag-selected-item"
       data-testid={`chip-tag-${name}`}
       onMouseEnter={handleHover(true)}
       onMouseLeave={handleHover(false)}

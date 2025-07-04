@@ -4,7 +4,9 @@ import {ReactNode} from 'react';
 export type MenuAction = {
   label: string;
   icon: ReactNode | JSX.Element;
+  endIcon?: ReactNode | JSX.Element;
   showBorder?: boolean;
   disabled?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
+  subMenu?: MenuAction[];
 };

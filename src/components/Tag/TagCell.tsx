@@ -8,11 +8,12 @@ import useTheme from '@mui/material/styles/useTheme';
 
 type Props = {
   tags: TagRecord[];
-  entity: TagEntityType;
-  onChange: (tags: TagRecord[]) => void;
+  entity?: TagEntityType;
+  onChange?: (tags: TagRecord[]) => void;
+  disabled?: boolean;
 };
 
-const TagCell = ({tags, entity, onChange}: Props) => {
+const TagCell = ({tags, entity, onChange, disabled = false}: Props) => {
   const theme = useTheme();
   const [shownTag, ...rest] = tags;
   const [isOpen, setIsOpen] = useState(false);
@@ -30,6 +31,9 @@ const TagCell = ({tags, entity, onChange}: Props) => {
         }}
         onClick={(e) => {
           e.stopPropagation();
+
+          if (disabled) return;
+
           setIsOpen(true); // set
         }}>
         {tags.length > 0 && (
@@ -46,7 +50,7 @@ const TagCell = ({tags, entity, onChange}: Props) => {
         )}
         {tags.length === 0 && '-'}
       </Box>
-      {isOpen && (
+      {isOpen && !!entity && !!onChange && (
         <TagSearch
           open={isOpen}
           onClose={() => {

@@ -26,6 +26,7 @@ interface Props {
   anchorOrigin?: PopoverOrigin;
   transformOrigin?: PopoverOrigin;
   disabled?: boolean;
+  hideTooltip?: boolean;
 }
 
 const DEFAULT_ANCHOR_ORIGIN: PopoverOrigin = {
@@ -38,6 +39,7 @@ const DEFAULT_TRANSFORM_ORIGIN: PopoverOrigin = {
 };
 
 export const ThreeDotMenu = ({
+  hideTooltip = false,
   actions = [],
   anchorOrigin = DEFAULT_ANCHOR_ORIGIN,
   transformOrigin = DEFAULT_TRANSFORM_ORIGIN,
@@ -55,15 +57,24 @@ export const ThreeDotMenu = ({
     setAnchorEl(null);
   };
 
+  const renderButton = () => (
+    <IconButton
+      data-role="menu"
+      disabled={disabled}
+      onClick={(e) => handleClick(e.currentTarget)}>
+      <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
+    </IconButton>
+  );
+
   return (
     <>
-      <Tooltip title={t('More')} placement="right" arrow>
-        <IconButton
-          disabled={disabled}
-          onClick={(e) => handleClick(e.currentTarget)}>
-          <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
-        </IconButton>
-      </Tooltip>
+      {!hideTooltip ? (
+        <Tooltip title={t('More')} placement="right" arrow>
+          {renderButton()}
+        </Tooltip>
+      ) : (
+        renderButton()
+      )}
       <Menu
         id="actions-menu"
         anchorEl={anchorEl}

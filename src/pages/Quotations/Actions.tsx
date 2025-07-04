@@ -399,7 +399,7 @@ const Actions = ({quotation}: Props) => {
             <Box key={`${item.label}-${index}`}>
               <MenuItem
                 onClick={() => {
-                  item.onClick();
+                  item.onClick?.();
                   handleClose();
                 }}
                 sx={{py: '0.5rem'}}>

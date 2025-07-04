@@ -27,6 +27,8 @@ import {ReactComponent as InventoryIcon} from 'assets/icons/InventoryIcon.svg';
 import {ReactComponent as InventoryIconColor} from 'assets/icons/InventoryIconColor.svg';
 import {ReactComponent as JobsIcon} from 'assets/icons/Jobs.svg';
 import {ReactComponent as JobsIconColor} from 'assets/icons/JobsIconColor.svg';
+import {ReactComponent as TaskListColoredIcon} from 'assets/illustrations/TaskListColored.svg';
+import {ReactComponent as TaskListGreyedIcon} from 'assets/illustrations/TaskListGreyed.svg';
 import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {ReactComponent as MaintenyLogoWhite} from 'assets/icons/MaintenyLogoWhite.svg';
 import {ReactComponent as MyCompanyIcon} from 'assets/icons/MyCompanyIcon.svg';
@@ -221,6 +223,23 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         setSelectedPath('/');
         setSelectedPathOrigin('');
         navigate('/');
+      },
+    },
+    {
+      text: 'Tasks',
+      icon: <TaskListGreyedIcon fontSize="1.5rem" style={{color: '#F5FDFE'}} />,
+      selectIcon: <TaskListColoredIcon fontSize="1.5rem" />,
+      path: '/tasks',
+      access: !isAdmin,
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+
+        setSelectedIndex(index);
+        setSelectedPath('/tasks');
+        navigate('/tasks');
       },
     },
     {

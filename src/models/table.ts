@@ -2,6 +2,7 @@ import {SvgIconComponent} from '@mui/icons-material';
 
 export const ACTION_CELL_WIDTH = '48px';
 export const NOTES_CELL_WIDTH = '64px';
+export const DESCRIPTION_CELL_WIDTH = '100px';
 
 export type CellCallbackProps = {
   onClick?: () => void;

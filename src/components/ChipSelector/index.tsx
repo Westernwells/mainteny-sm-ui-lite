@@ -9,6 +9,7 @@ type Props = {
   selectedChips: string[];
   headerLabel?: string;
   onChange: (value: string) => void;
+  testId?: string;
 };
 
 const ChipSelector = ({
@@ -16,6 +17,7 @@ const ChipSelector = ({
   selectedChips,
   headerLabel,
   onChange,
+  testId,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -25,7 +27,7 @@ const ChipSelector = ({
   };
 
   return (
-    <Box sx={{display: 'flex'}} flexWrap="wrap" gap={1}>
+    <Box data-testid={testId} sx={{display: 'flex'}} flexWrap="wrap" gap={1}>
       {headerLabel && (
         <Typography variant="subtitle2">
           {capitalize(t(headerLabel))}

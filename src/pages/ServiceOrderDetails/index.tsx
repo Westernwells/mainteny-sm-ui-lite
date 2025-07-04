@@ -17,10 +17,12 @@ import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {companyLanguageContextMap} from 'utils/language';
 import {useCreateAndSetPdfBlobUrl} from 'hooks/useCreateAndSetPdfBlobUrl';
 import {useSnackbar} from 'hooks/useSnackbar';
+import RuleOutlinedIcon from '@mui/icons-material/RuleOutlined';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
 import SupplierInvoices from './Tabs/SupplierInvoices';
+import Tasks from './Tabs/Tasks';
 
 const tabItems = [
   {
@@ -38,6 +40,10 @@ const tabItems = [
   {
     label: 'Supplier Invoices',
     icon: <ReceiptLongIcon />,
+  },
+  {
+    label: 'Tasks',
+    icon: <RuleOutlinedIcon />,
   },
 ];
 
@@ -140,6 +146,18 @@ export const ServiceOrderDetails = () => {
         index={3}
         containerStyle={{height: '1px', overflow: 'auto', marginTop: 3}}>
         <SupplierInvoices serviceOrderId={serviceOrder?.id!} />
+      </TabsBody>
+      <TabsBody
+        value={tabValue}
+        index={4}
+        containerStyle={{
+          height: '1px',
+          overflow: 'auto',
+          marginTop: 1,
+          backgroundColor: 'white',
+          padding: 3,
+        }}>
+        <Tasks serviceOrderId={serviceOrder?.id!} />
       </TabsBody>
     </Tabs>
   );

@@ -28,6 +28,7 @@ type Props = {
   entity: TagEntityType;
   onClose: () => void;
   onChange: (tags: TagRecord[]) => void;
+  testId?: string;
 };
 
 const TagSearch = ({
@@ -37,6 +38,7 @@ const TagSearch = ({
   entity,
   onClose,
   onChange,
+  testId,
 }: Props) => {
   const theme = useTheme();
   const ref = useRef<HTMLInputElement>(null);
@@ -154,6 +156,7 @@ const TagSearch = ({
       open={open}
       anchorEl={anchorRef.current}
       onClose={handleClose}
+      data-testid={testId}
       sx={{
         '& .MuiPaper-root': {
           position: 'relative',
@@ -206,6 +209,7 @@ const TagSearch = ({
           </Box>
 
           <Box
+            data-testid="selected-tag-container"
             sx={{
               display: 'flex',
               padding: '8px 0',

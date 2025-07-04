@@ -19,6 +19,7 @@ export enum TagEntityType {
   SERVICE_COMPANY_ACTIVITY = 'SERVICE_COMPANY_ACTIVITY',
   SERVICE_ORDER = 'SERVICE_ORDER',
   SERVICE_ORDER_REPORT = 'SERVICE_ORDER_REPORT',
+  TASK = 'TASK',
 }
 
 // Mapping to get text color from background color

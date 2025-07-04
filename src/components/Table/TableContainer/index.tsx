@@ -10,6 +10,7 @@ type Props = {
   setShowRightShadow?: (value: boolean) => void;
   containerRef?: RefObject<HTMLDivElement>;
   tableLayoutStyles?: SxProps;
+  sx?: SxProps;
 };
 
 const TableContainer = ({
@@ -19,6 +20,7 @@ const TableContainer = ({
   setShowLeftShadow,
   containerRef,
   tableLayoutStyles,
+  sx,
 }: PropsWithChildren<Props>) => {
   const scroller = useScrollHorizontalPosition(containerRef?.current ?? null);
 
@@ -40,6 +42,7 @@ const TableContainer = ({
       sx={{
         overflow: showNoMatchWarning ? undefined : 'auto',
         height: 'fill-available',
+        ...sx,
       }}
       data-testid="table-scroll-div-container">
       <Table
