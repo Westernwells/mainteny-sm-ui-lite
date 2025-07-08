@@ -192,6 +192,7 @@ import * as Sentry from '@sentry/react';
 import InvoiceShowOnPDFSwitch from 'components/Switch/InvoiceShowOnPDFSwitch';
 import FinalInvoicePdfTemplate from 'components/pdf-templates/invoice-previews/FinalInvoicePdfTemplate';
 import {VatView} from 'models/vat';
+import {addDays} from 'date-fns';
 
 interface Props {
   invoice?: InvoiceView;
@@ -654,6 +655,7 @@ export const InvoiceForm = ({
   const watchedShowArticleSection = watch('showArticleSection');
   const watchedIncludeWorkReport = watch('includeWorkReport');
   const watchedIncludeChecklist = watch('includeCheckList');
+  const watchedDueDate = watch('dueDate');
 
   const [invoiceAmountDetail, setInvoiceAmountDetail] = useState<
     InvoiceAmountDetail | undefined
@@ -940,6 +942,7 @@ export const InvoiceForm = ({
         useFallback: true,
         fallbackDate: invoice?.dueDate,
         hasPaymentTerm: !!invoice?.additionalInfo?.paymentTerm?.id,
+        baseDate: invoice?.sentDate,
       }),
     );
 
@@ -1088,6 +1091,7 @@ export const InvoiceForm = ({
           handleDueDateChange({
             numberOfDaysToAdd: customerData?.paymentTerm?.data?.dueDays || 0,
             hasPaymentTerm: true,
+            baseDate: getValues('sentDate'),
           }),
         );
         setResetDueDatePicker(true);
@@ -1187,6 +1191,7 @@ export const InvoiceForm = ({
         'dueDate',
         handleDueDateChange({
           numberOfDaysToAdd: dueDays,
+          baseDate: getValues('sentDate'),
         }),
       );
       setResetDueDatePicker(true);
@@ -1382,6 +1387,17 @@ export const InvoiceForm = ({
     fieldName: 'sentDate' | 'dueDate' | 'deliveryStartDate' | 'deliveryEndDate',
     newValue?: Date | null,
   ) => {
+    // If invoice date changes and there's a payment term, recalculate due date
+    if (fieldName === 'sentDate' && newValue && watchedPaymentTerm?.id) {
+      const paymentTermObj = contractPaymentTerms?.data.find(
+        ({id}) => id === watchedPaymentTerm?.id,
+      );
+      const dueDays = paymentTermObj?.data?.dueDays || 0;
+      const newDueDate = addDays(newValue, dueDays);
+      setValue('dueDate', newDueDate);
+      // Trigger DatePicker reset to update the UI
+      setResetDueDatePicker(true);
+    }
     setValue(fieldName, newValue || undefined);
   };
 
@@ -1616,13 +1632,11 @@ export const InvoiceForm = ({
       );
     }
 
-    setValue(
-      'dueDate',
-      handleDueDateChange({
-        numberOfDaysToAdd: paymentTermObj?.data?.dueDays || 0,
-        hasPaymentTerm: true,
-      }),
-    );
+    // Calculate and set the due date based on current invoice date
+    const invoiceDate = getValues('sentDate') || new Date();
+    const dueDays = paymentTermObj?.data?.dueDays || 0;
+    const newDueDate = addDays(invoiceDate, dueDays);
+    setValue('dueDate', newDueDate);
     setResetDueDatePicker(true);
 
     if (paymentTermId) {
@@ -2370,9 +2384,7 @@ export const InvoiceForm = ({
             <Grid item xs={6} md={3}>
               <DatePicker
                 defaultDate={
-                  getValues('dueDate')
-                    ? new Date(getValues('dueDate') as Date)
-                    : undefined
+                  watchedDueDate ? new Date(watchedDueDate as Date) : undefined
                 }
                 reset={resetDueDatePicker}
                 getReset={(_reset) => {
