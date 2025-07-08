@@ -184,6 +184,7 @@ export type GetInvoiceDueDateProps = {
   useFallback?: boolean;
   fallbackDate?: Date | string;
   hasPaymentTerm?: boolean;
+  baseDate?: Date | string;
 };
 
 export const getInvoiceDueDate = ({
@@ -193,10 +194,13 @@ export const getInvoiceDueDate = ({
   useFallback = false,
   fallbackDate,
   hasPaymentTerm,
+  baseDate,
 }: GetInvoiceDueDateProps): Date | undefined => {
+  const calculationBaseDate = baseDate ? new Date(baseDate) : new Date();
+
   // has payment terms (including when dueDays is 0)
   if (numberOfDaysToAdd !== 0 || !useFallback || hasPaymentTerm)
-    return addDays(new Date(), numberOfDaysToAdd);
+    return addDays(calculationBaseDate, numberOfDaysToAdd);
 
   // default date for credit note
   if (invoiceType === InvoiceType.CREDIT_NOTE && isNewInvoice)
