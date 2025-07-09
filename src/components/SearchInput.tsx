@@ -1,4 +1,4 @@
-import {RefObject, useEffect, useMemo} from 'react';
+import {ChangeEvent, RefObject, useEffect, useMemo} from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import * as _ from 'lodash';
 import TextField from '@mui/material/TextField';
@@ -14,6 +14,7 @@ interface Props {
   label?: string;
   refInput?: RefObject<HTMLInputElement>;
   defaultValue?: string;
+  debounceMs?: number;
 }
 
 // Deprecated component
@@ -26,24 +27,34 @@ export const SearchInput = ({
   label,
   refInput,
   defaultValue = '',
+  debounceMs = 300,
 }: Props) => {
   const {t} = useTranslation();
 
-  const debouncedChangeHandler = useMemo(
+  const debouncedValueChange = useMemo<_.DebouncedFunc<
+    (value: string) => void
+  > | null>(
     () =>
-      _.debounce((e) => {
-        onValueChanged?.(e.target.value);
-      }, 300),
-    [onValueChanged],
+      debounceMs > 0
+        ? _.debounce((v: string) => onValueChanged?.(v), debounceMs)
+        : null,
+    [onValueChanged, debounceMs],
   );
 
   useEffect(
     () => () => {
-      debouncedChangeHandler.cancel();
+      debouncedValueChange?.cancel();
     },
-    [debouncedChangeHandler],
+    [debouncedValueChange],
   );
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (debouncedValueChange) {
+      debouncedValueChange(e.target.value);
+    } else {
+      onValueChanged?.(e.target.value);
+    }
+  };
   return (
     <TextField
       id="my-input"
@@ -83,7 +94,7 @@ export const SearchInput = ({
       label={label && t(label)}
       defaultValue={defaultValue}
       inputRef={refInput}
-      onChange={debouncedChangeHandler}
+      onChange={handleChange}
       InputLabelProps={{shrink: variant === 'outlined'}}
       InputProps={{
         id: label,

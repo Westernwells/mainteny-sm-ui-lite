@@ -21,7 +21,6 @@ import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
-import {toSentenceCase} from 'utils/string';
 import {
   getAddressComponentFromQuotation,
   getAddressComponentFromServiceOrder,
@@ -393,8 +392,7 @@ const JobOverviewPdfTemplate = React.memo(
 
             <View>
               <PdfPageTitle fontStyles={fontStyles} primaryColor={primaryColor}>
-                {translate('Job Confirmation:')}{' '}
-                {translate(toSentenceCase(serviceOrderType))}
+                {translate('Job Confirmation:')} {translate(serviceOrderType)}
               </PdfPageTitle>
 
               {serviceOrder?.description.trim() !== '' && (

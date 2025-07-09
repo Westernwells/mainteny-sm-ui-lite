@@ -259,7 +259,7 @@ const RichTextField = ({
   const renderLeaf = useCallback((p: RenderLeafProps) => <Leaf {...p} />, []);
 
   useEffect(() => {
-    if (!editor || !html) return;
+    if (!editor || html == null) return;
     const newVal = getValue(html);
     const sel = editor.selection;
     if (JSON.stringify(value) !== JSON.stringify(newVal)) {

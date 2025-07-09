@@ -11,6 +11,7 @@ import {DropzoneProvider} from 'context/DropzoneProvider';
 import {UserCompanyProvider} from 'context/UserCompanyProvider';
 import {PdfStylesProvider} from 'context/PdfStylesProvider';
 import CssBaseline from '@mui/material/CssBaseline';
+import {vi} from 'vitest';
 
 // Create a mock user company context for testing to avoid state update warnings
 const MockUserCompanyProvider = ({children}: PropsWithChildren<unknown>) => (
@@ -29,6 +30,18 @@ export function createQueryClient() {
     },
   });
 }
+
+vi.mock('react-i18next', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-i18next')>();
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string) => key,
+      i18n, // <-- use your real i18n instance, not `actual.i18n`
+      ready: true, // optional but often expected
+    }),
+  };
+});
 
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   queryClient?: QueryClient;

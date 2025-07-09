@@ -15,7 +15,6 @@ import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddr
 import {HtmlPDF} from 'components/HtmlPDF';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromQuotation} from 'utils/pdfTemplates';
-import {toSentenceCase} from 'utils/string';
 import {ContextProps} from 'context/PdfStylesProvider';
 import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContainer';
 import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
@@ -325,8 +324,7 @@ const QuotationPdfTemplate = React.memo(
                 <PdfPageTitle
                   fontStyles={fontStyles}
                   primaryColor={primaryColor}>
-                  {translate('Job Confirmation:')}{' '}
-                  {translate(toSentenceCase(serviceOrderType))}
+                  {translate('Job Confirmation:')} {translate(serviceOrderType)}
                 </PdfPageTitle>
               ) : (
                 <View>
