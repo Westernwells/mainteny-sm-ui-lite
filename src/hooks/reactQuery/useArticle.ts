@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useEffect, useState, useMemo} from 'react';
 import {
   useInfiniteQuery,
   UseInfiniteQueryOptions,
@@ -10,7 +10,7 @@ import {
 import {queryKeys, queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
-import _ from 'lodash';
+import {omitBy, debounce} from 'lodash';
 import {
   ArticleComment,
   ArticleOrderView,
@@ -45,7 +45,7 @@ export const fetchArticles = async (
   params: QueryArticleParams,
   id: string,
 ): Promise<Resource<ArticleView>> => {
-  params = <QueryArticleParams>_.omitBy(params, (it) => !it);
+  params = <QueryArticleParams>omitBy(params, (it) => !it);
   const response = await axiosClient.get<Resource<ArticleView>>(
     `/api/serviceCompanies/${id}/articles`,
     {
@@ -65,11 +65,41 @@ export function useArticles(
   params: QueryArticleParams,
   options?: any,
   showPartial?: boolean,
+  debounceDelay: number = 500,
 ) {
   const {user} = useUserSession();
+
+  // Separate the "query" field from the rest of the params so we can debounce
+  // ONLY the query string. All other parameters (page, filters, etc.) should
+  // trigger an immediate request without delay.
+  const {query: currentQuery, ...restParams} = params;
+
+  const [debouncedQuery, setDebouncedQuery] = useState<string | undefined>(
+    currentQuery,
+  );
+
+  const debouncedSetQuery = useMemo(
+    () =>
+      debounce((q: string | undefined) => setDebouncedQuery(q), debounceDelay),
+    [debounceDelay],
+  );
+
+  useEffect(() => {
+    debouncedSetQuery(currentQuery);
+
+    return () => {
+      debouncedSetQuery.cancel();
+    };
+  }, [currentQuery, debouncedSetQuery]);
+
+  const debouncedParams = {
+    ...restParams,
+    query: debouncedQuery,
+  };
+
   return useQuery<Resource<ArticleView>, RestError>(
-    [qk.fetchArticles, params, user?.userAccount.id],
-    () => fetchArticles(params, user!.userAccount.serviceCompany.id),
+    [qk.fetchArticles, debouncedParams, user?.userAccount.id],
+    () => fetchArticles(debouncedParams, user!.userAccount.serviceCompany.id),
     {
       enabled: !!user,
       select: useCallback(

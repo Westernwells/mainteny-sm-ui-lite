@@ -921,6 +921,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
         <Box mt="1em">
           <RichTextField
+            key={report?.id}
             label="Description of Service"
             html={formik.values.description || ''}
             updateHtml={(h) => formik.setFieldValue('description', h)}

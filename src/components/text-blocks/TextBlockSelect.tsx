@@ -16,6 +16,7 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -24,6 +25,7 @@ import {mapJsonToTextBlockView} from 'utils/text-block';
 import {Widget} from 'components/Widget';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
+import _ from 'lodash';
 import {columns, makeRows} from './TextBlockSelectGridProps';
 import {Order, OrderByParams} from '../../models/pagination';
 
@@ -68,7 +70,7 @@ const TextBlockSelect = ({
       category: TextBlockCategory.QUOTATION,
       text: '',
     },
-    onSubmit: (_, {resetForm}) => {
+    onSubmit: (_ignore, {resetForm}) => {
       resetForm();
     },
     validationSchema,
@@ -148,17 +150,37 @@ const TextBlockSelect = ({
     [getEditableTextBlocks, getDeletableTextBlocks, getPreviewTextBlocks],
   );
 
+  const debouncedSetQuery = useMemo(
+    () => _.debounce((q: string) => setQuery(q), 300),
+    [],
+  );
+
+  useEffect(
+    () => () => {
+      debouncedSetQuery.cancel();
+    },
+    [debouncedSetQuery],
+  );
+
+  const handleSearch = useCallback(
+    (val: string) => {
+      debouncedSetQuery(val);
+    },
+    [debouncedSetQuery],
+  );
+
   return (
     <Box>
       <Widget
         searchPlaceholder="Find your text block"
-        getSearchValue={setQuery}
+        getSearchValue={handleSearch}
         refInput={textInput}
         showActionBtn={showNewBlockButton}
         btnLabel="New Block"
         btnOnClick={onCreateContact}
         searchInputStyles={{width: '100%'}}
         searchInputWrapperStyles={{width: showNewBlockButton ? '60%' : '100%'}}
+        searchDebounceMs={0}
       />
 
       <DataGridLayout

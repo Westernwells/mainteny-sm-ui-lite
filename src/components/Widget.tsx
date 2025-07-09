@@ -28,6 +28,7 @@ interface Props {
   width?: string;
   buttonStyles?: {[key: string]: string | number};
   buttonLabelStyles?: {[key: string]: string | number};
+  searchDebounceMs?: number;
 }
 
 export const Widget = ({
@@ -50,6 +51,7 @@ export const Widget = ({
   width,
   buttonLabelStyles,
   buttonStyles,
+  searchDebounceMs,
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -68,6 +70,7 @@ export const Widget = ({
             refInput={refInput}
             variant={searchInputVariant}
             width={width}
+            debounceMs={searchDebounceMs}
           />
         </Box>
       ) : null}
