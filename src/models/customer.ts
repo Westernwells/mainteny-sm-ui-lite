@@ -1,8 +1,8 @@
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {Address, AddressRecord, Priority} from './misc';
 import {InvoiceFormat} from './propertyManager';
 import {ContactsView} from './contacts';
 import {UserAccountView} from 'models/user';
+import {FileWithPreview} from 'models/files';
 
 export interface CreateCustomerNote {
   content: string;

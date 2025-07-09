@@ -5,7 +5,11 @@ module.exports = {
     'jest/globals': true,
     'cypress/globals': true,
   },
-  extends: ['plugin:react/recommended', 'airbnb', 'prettier'],
+  extends: [
+    'plugin:react/recommended',
+    'airbnb',
+    'prettier',
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
@@ -24,7 +28,7 @@ module.exports = {
     'react/jsx-no-bind': 'off',
     'import/prefer-default-export': 'off',
     'react/jsx-fragments': 'off',
-    'react/jsx-filename-extension': [1, { extensions: ['.tsx'] }],
+    'react/jsx-filename-extension': [1, {extensions: ['.tsx']}],
     '@typescript-eslint/no-unused-vars': ['warn'],
     'no-shadow': 'off',
     'consistent-return': 'off',
@@ -38,16 +42,13 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'react/function-component-definition': [
       2,
-      { namedComponents: 'arrow-function' },
+      {namedComponents: 'arrow-function'},
     ],
     'import/extensions': 'off',
     'arrow-body-style': 1,
     'no-nested-ternary': 0,
-    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
-    "no-unused-vars": [
-      "error",
-      { "varsIgnorePattern": "^_" }
-    ]
+    'import/no-extraneous-dependencies': ['error', {devDependencies: true}],
+    'no-unused-vars': ['error', {varsIgnorePattern: '^_'}],
   },
   settings: {
     react: {

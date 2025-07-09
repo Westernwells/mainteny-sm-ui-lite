@@ -2,18 +2,20 @@ import MenuLib from '@mui/material/Menu';
 import {Box} from '@mui/material';
 import Divider from '@mui/material/Divider';
 import {MenuAction} from 'models/action';
-
+import {SxProps} from '@mui/system';
 import Menu from './Menu';
 
 type Props = {
   options: MenuAction[];
   isOpen: boolean;
   anchorEl: HTMLButtonElement | null;
+  sx?: SxProps;
   onClose: () => void;
 };
 
-const TableActionMenu = ({options, isOpen, anchorEl, onClose}: Props) => {
+const TableActionMenu = ({options, isOpen, anchorEl, sx, onClose}: Props) => {
   if (anchorEl && !isOpen) return;
+
   return (
     <MenuLib
       id="action-menu"
@@ -26,7 +28,7 @@ const TableActionMenu = ({options, isOpen, anchorEl, onClose}: Props) => {
         <Box
           key={`container-menu-option-${option.label}-${index}`}
           data-testid={`container-menu-option-${option.label}-${index}`}>
-          <Menu option={option} onClose={onClose} index={index} />
+          <Menu sx={sx} option={option} onClose={onClose} index={index} />
           {option.showBorder && <Divider />}
         </Box>
       ))}

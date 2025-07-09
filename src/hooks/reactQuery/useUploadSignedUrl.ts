@@ -1,8 +1,8 @@
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useMutation, useQueryClient} from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
+import {FileWithPreview} from 'models/files';
 import {useUserSession} from './useUserSession';
 
 const getArrayBuffer = (file: FileWithPreview | File) =>
@@ -31,18 +31,20 @@ const uploadAndSave = async (
   file: FileWithPreview | File,
   serviceCompanyId: string,
   uploadPath: string,
+  fullPathWithName?: string,
 ) => {
   try {
+    const filePath = fullPathWithName ?? `${uploadPath}/${file.name}`;
     const [signedUrl, arrayBuffer] = await Promise.all([
-      getUploadSignedUrl([`${uploadPath}/${file.name}`], serviceCompanyId),
+      getUploadSignedUrl([filePath], serviceCompanyId),
       getArrayBuffer(file) as unknown as ArrayBuffer,
     ]);
 
-    if (!signedUrl[`${uploadPath}/${file.name}`]) {
+    if (!signedUrl[filePath]) {
       throw new Error('Signed URL is undefined or invalid');
     }
 
-    const response = await fetch(signedUrl[`${uploadPath}/${file.name}`], {
+    const response = await fetch(signedUrl[filePath], {
       method: 'PUT',
       headers: {
         'Content-Type': file.type,
@@ -63,12 +65,20 @@ export const uploadImages = async (
   files: FileWithPreview[] | File[],
   serviceCompanyId: string,
   uploadPath: string,
+  useNameAsFullPath?: boolean, // when upload path already has name
 ) =>
   Promise.all(
-    files.map((item) => uploadAndSave(item, serviceCompanyId!, uploadPath)),
+    files.map((item) =>
+      uploadAndSave(
+        item,
+        serviceCompanyId!,
+        uploadPath,
+        useNameAsFullPath ? uploadPath : undefined,
+      ),
+    ),
   );
 
-export const useUploadFiles = (successMsg: string, companyId?: string) => {
+export const useUploadFiles = (successMsg?: string, companyId?: string) => {
   const {enqueueSnackbar, showError} = useSnackbar();
   const {user} = useUserSession();
   const queryClient = useQueryClient();
@@ -81,10 +91,12 @@ export const useUploadFiles = (successMsg: string, companyId?: string) => {
     ({
       files,
       uploadPath,
+      useNameAsFullPath = false,
     }: {
       files: FileWithPreview[] | File[];
       uploadPath: string;
-    }) => uploadImages(files, fetchId!, uploadPath),
+      useNameAsFullPath?: boolean;
+    }) => uploadImages(files, fetchId!, uploadPath, useNameAsFullPath),
     {
       onSuccess: () => {
         if (successMsg) {

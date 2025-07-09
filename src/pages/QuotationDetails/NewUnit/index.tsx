@@ -28,7 +28,6 @@ import {convertToMacro, formatAddressFullname} from 'utils/utils';
 import {QuotationView} from 'models/quotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {convertTechnicianArrayToWeights} from 'utils/elevator-utils';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {LocationForm} from './LocationForm';
@@ -39,6 +38,7 @@ import {CustomerForm} from './CustomerForm';
 import {PriorityEngineersForm} from './PriorityEngineersForm';
 import {AttachmentForm} from './AttachmentForm';
 import {T} from 'utils/i18n-utils';
+import {FileWithPreview} from 'models/files';
 
 const steps = [
   'Select customer',

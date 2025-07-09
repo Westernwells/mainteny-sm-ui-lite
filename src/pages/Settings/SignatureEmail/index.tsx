@@ -1,4 +1,4 @@
-import {Typography, Grid2 as Grid, Switch} from '@mui/material';
+import {Grid2 as Grid, Switch, Typography} from '@mui/material';
 import {CardAlert} from 'components/CardAlert';
 import {EmptySection} from 'components/EmptySection';
 import React, {useEffect, useRef, useState} from 'react';
@@ -19,9 +19,9 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
 import {EmailSignature} from 'models/employee';
 import {Progress} from 'components/Progress';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {FileWithPreview} from 'models/files';
 import SignatureContent from './SignatureContent';
 import PreviewSignature from './PreviewSignature';
 import NewSignatureForm from './NewSignatureForm';

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {QueryClient, QueryClientProvider} from 'react-query';
 import {ReactQueryDevtools} from 'react-query/devtools';
 import {createRoot} from 'react-dom/client';
@@ -18,6 +17,7 @@ import BigNumber from 'bignumber.js';
 import './utils/withResolversPolyfill';
 import {AxiosError} from 'axios';
 import {UserCompanyProvider} from 'context/UserCompanyProvider';
+import {DropzoneProvider} from 'context/DropzoneProvider';
 
 BigNumber.config({DECIMAL_PLACES: 2});
 
@@ -86,14 +86,14 @@ root.render(
           maxSnack={3}>
           <UserCompanyProvider>
             <PdfStylesProvider>
-              <App />
+              <DropzoneProvider>
+                <App />
+              </DropzoneProvider>
             </PdfStylesProvider>
           </UserCompanyProvider>
         </SnackbarProvider>
-
         {window.Cypress ? null : <ReactQueryDevtools />}
       </QueryClientProvider>
-
       <CssBaseline />
     </LanguageProvider>
   </ThemeProvider>,

@@ -11,7 +11,7 @@ import {olStyles} from 'styles';
 import AddIcon from '@mui/icons-material/Add';
 import {EmptySection} from 'components/EmptySection';
 import {Dialog} from 'components/Dialog';
-import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
+import MyDropzone from 'components/MyDropZone';
 import {FileResource} from 'models/media';
 import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
 import DocumentIcon from '@mui/icons-material/AttachFile';
@@ -24,6 +24,7 @@ import {InfoCard} from 'components/InfoCard';
 import {SxProps, Tooltip} from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {FileWithPreview} from 'models/files';
 
 interface Props {
   uploadedDocument?: FileResource[];
@@ -422,9 +423,9 @@ export const AttachDocument: FC<Props> = ({
             maxWidth: 'md',
             open: openDocumentDialog || false,
           }}>
-          <MyDropZone
-            getAcceptedFiles={(dropedFiles) => {
-              setDocuments(dropedFiles);
+          <MyDropzone
+            getAcceptedFiles={(droppedFiles) => {
+              setDocuments(droppedFiles);
             }}
             acceptedFileTypes={[
               'application/pdf',

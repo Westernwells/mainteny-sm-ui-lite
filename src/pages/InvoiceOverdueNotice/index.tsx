@@ -36,7 +36,6 @@ import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {createFilesFromBlobArray, dateToString} from 'utils/utils';
 import printJS from 'print-js';
 import {useUuid} from 'hooks/reactQuery/useUuid';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {EmailRecord} from 'models/misc';
 import {CreateInvoiceOverdueNoticeRecord} from 'models/invoice';
@@ -54,6 +53,7 @@ import RichTextField from 'components/RichTextField';
 import DialogPdfPreview from 'components/pdf-templates/DialogPdfPreview';
 import {Dialog} from 'components/Dialog';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {FileWithPreview} from 'models/files';
 import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 import InvoiceOverduePdfPreview from './InvoiceOverduePdfPreview';
 

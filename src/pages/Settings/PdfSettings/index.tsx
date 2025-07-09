@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Box} from '@mui/material';
-import NewDropZone, {
+import InlineImageView, {
   BIG_SCREEN_WIDTH,
   FOOTER_BIG_SCREEN_DROPZONE_HEIGHT,
   FOOTER_SMALL_SCREEN_DROPZONE_HEIGHT,
@@ -8,7 +8,7 @@ import NewDropZone, {
   HEADER_BIG_SCREEN_DROPZONE_HEIGHT,
   HEADER_SMALL_SCREEN_DROPZONE_HEIGHT,
   SMALL_SCREEN_WIDTH,
-} from 'components/MyDropZone/NewDropZone';
+} from 'components/MyDropZone/InlineImageDropzone/InlineImageView';
 import PdfSkeleton from 'assets/images/PdfSkeleton.svg';
 import PdfBigSkeleton from 'assets/images/PdfBigSkeleton.svg';
 import {t} from 'i18next';
@@ -457,7 +457,7 @@ const PdfSettings = ({company, onBigVariantToggle}: Props) => {
           height,
           position: 'relative',
         }}>
-        <NewDropZone
+        <InlineImageView
           hint="JPEG OR PNG"
           getAcceptedFiles={() => selectFile(isFooter)}
           acceptedFileTypes={['image/png', 'image/jpeg']}

@@ -1,17 +1,17 @@
 import {TabContext, TabList, TabPanel} from '@mui/lab';
 import {
+  Avatar,
+  Box,
+  Button,
+  FormControl,
+  Grid2 as Grid,
+  IconButton,
+  Input,
+  InputLabel,
+  MenuItem,
+  Select,
   Tab,
   Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Grid2 as Grid,
-  Box,
-  Input,
-  Avatar,
-  IconButton,
-  Button,
 } from '@mui/material';
 import {FormInput} from 'components/form/FormInput';
 import {t} from 'i18next';
@@ -24,7 +24,7 @@ import {Priority} from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {PropertyOwnerView} from 'models/propertyManager';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {FileWithPreview} from 'models/files';
 import {EditGeneralAddress} from './EditGeneralAddress';
 
 type Props = {

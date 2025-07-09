@@ -1,5 +1,5 @@
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {Address} from 'models/misc';
+import {FileWithPreview} from 'models/files';
 
 export interface BasicInformationCompanyFormModel {
   name: string;

@@ -10,11 +10,11 @@ import {CheckCircleRounded} from '@mui/icons-material';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Grid from '@mui/material/Grid';
 import {Tooltip} from '@mui/material';
+import {FileWithPreview} from 'models/files';
 import {FormInput} from '../form/FormInput';
-import {FileWithPreview} from './MyDropzone';
 
 interface Props {
-  oneMbInByes: number;
+  oneMbInBytes: number;
   onKbinBytes: number;
   file: FileWithPreview;
   onNameChange: (
@@ -30,7 +30,7 @@ interface Props {
 }
 
 export const Thumb = ({
-  oneMbInByes,
+  oneMbInBytes,
   onKbinBytes,
   file,
   onNameChange,
@@ -130,8 +130,8 @@ export const Thumb = ({
           )}
 
           <Typography variant="caption" color="text.secondary">
-            {file.size >= oneMbInByes
-              ? `${(file.size / oneMbInByes).toFixed(2)} MB`
+            {file.size >= oneMbInBytes
+              ? `${(file.size / oneMbInBytes).toFixed(2)} MB`
               : `${(file.size / onKbinBytes).toFixed(2)} KB`}
           </Typography>
         </Box>

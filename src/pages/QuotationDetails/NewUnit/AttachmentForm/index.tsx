@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import {FormikErrors, FormikValues, useFormik} from 'formik';
 import {AttachmentFormModel} from 'models/unitForm';
 import {PageCard} from 'components/PageCard';
-import {MyDropZone} from 'components/MyDropZone/MyDropzone';
+import MyDropzone from 'components/MyDropZone';
 import {useEffect} from 'react';
 
 interface Props {
@@ -42,7 +42,7 @@ export const AttachmentForm = ({
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12} md={12} width="100%">
-            <MyDropZone
+            <MyDropzone
               hint="PDF, DOCX, XLSX, XLS, CSV, TSV, JPEG, PNG, BMP, GIF, WEBP or SVG"
               acceptedFileTypes={[
                 'application/pdf',

@@ -1,21 +1,23 @@
 import {
   ListItemIcon,
   ListItemText,
+  Menu as MenuLib,
   MenuItem,
   Typography,
-  Menu as MenuLib,
 } from '@mui/material';
 import {MenuAction} from 'models/action';
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {SxProps} from '@mui/system';
 
 type Props = {
   option: MenuAction;
   index: number;
+  sx?: SxProps;
   onClose: () => void;
 };
 
-const Menu = ({option, index, onClose}: Props) => {
+const Menu = ({option, index, sx, onClose}: Props) => {
   const {t} = useTranslation();
   const [submenuAnchorEl, setSubmenuAnchorEl] = useState<HTMLElement | null>(
     null,
@@ -39,10 +41,12 @@ const Menu = ({option, index, onClose}: Props) => {
       <MenuItem
         key={`option-menu-index-${index}`}
         data-testid={`option-menu-index-${index}`}
+        sx={sx}
         onClick={() => {
           if (option.onClick) option.onClick();
           if (!hasSubMenu) onClose();
         }}
+        disabled={option.disabled}
         onMouseEnter={(e) => {
           setSubmenuAnchorEl(e.currentTarget);
         }}>
@@ -68,6 +72,7 @@ const Menu = ({option, index, onClose}: Props) => {
           }}>
           {subMenus.map((item, subMenuIndex) => (
             <Menu
+              sx={sx}
               option={item}
               index={subMenuIndex}
               onClose={handleSubMenuClose}

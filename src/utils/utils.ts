@@ -2,7 +2,6 @@ import {formatISO} from 'date-fns';
 import * as XLSX from 'xlsx';
 import BigNumber from 'bignumber.js';
 import * as Yup from 'yup';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {get} from 'lodash';
 import {TFunction} from 'i18next';
 import {
@@ -19,6 +18,7 @@ import {VatView} from 'models/vat';
 import {EditableQuotationItem} from 'models/quotation';
 import {MONTH_NUMBER_TO_NAME} from 'models/jobFrequency';
 import {ContractServiceFormElevator, ContractTimeUnit} from 'models/contract';
+import {FileWithPreview} from 'models/files';
 import {
   Address,
   AddressRecord,

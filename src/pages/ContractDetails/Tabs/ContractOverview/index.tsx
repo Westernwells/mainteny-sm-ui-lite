@@ -22,7 +22,6 @@ import {
 import {InfoCard} from 'components/InfoCard';
 import {Dialog} from 'components/Dialog';
 import {Progress} from 'components/Progress';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import * as Yup from 'yup';
 import {
   amountForView,
@@ -31,8 +30,6 @@ import {
   useCurrentCurrency,
 } from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {
   calculateRenewDays,
   transformContractViewComponentToContractRecord,
@@ -51,6 +48,8 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import {UserSession} from 'models/session';
 import ContactsWidget from 'pages/Contacts/ContactsWidget';
 import {ContactPersonAssociationType} from 'models/contacts';
+import AttachmentsCard from 'components/Attachments/AttachmentsCard';
+import {AttachmentEntityType} from 'models/attachment';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
@@ -58,7 +57,6 @@ import EditContractForm from './EditContractForm';
 import {SectionTitle} from '../../../InvoiceDetails/SectionTitle';
 import {CancelContract} from './CancelContract';
 import {Parties} from './Parties';
-import {AttachDocument} from './AttachDocument';
 import {Services} from './Services';
 import InvoiceSetup from './InvoiceSetup';
 import {Order} from '../../../../models/pagination';
@@ -90,26 +88,14 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
   const {user} = useUserSession();
 
   const [openContractDialog, setOpenContractDialog] = useState(false);
-  const [openDocumentDialog, setOpenDocumentDialog] = useState(false);
 
   const [openCancelContract, setCancelContract] = useState(false);
   const [cancellationDate, setCancellationDate] = useState(
     contractDetails?.end || '',
   );
 
-  const [documents, setDocuments] = useState<FileWithPreview[]>([]);
-
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const {mutateAsync: uploadFiles, isLoading: isUploadLoading} = useUploadFiles(
-    'Documents uploaded successfully',
-  );
-
-  const {data: downloadUrls = {}} = useDownloadUrl(
-    contractDetails?.additionalInfo?.documents
-      ? contractDetails.additionalInfo.documents.map((item) => item.uri)
-      : [],
-  );
 
   const [initValue, setInitValue] = useState('');
   const [updatedValue, setUpdatedValue] = useState('');
@@ -258,51 +244,6 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
     setCancelContract(false);
   };
 
-  const uploadedDocument = contractDetails?.additionalInfo?.documents;
-
-  const onDocsPreview = async () => {
-    const serviceCompanyId = user?.userAccount.serviceCompany.id;
-    const uploadPath = `${serviceCompanyId}/contracts/${contractId}/documents`;
-    await uploadFiles({files: documents, uploadPath});
-
-    const updatedDocuments = uploadedDocument?.length
-      ? [
-          ...uploadedDocument,
-          ...documents.map((item) => ({
-            description: item.name.split('.')[0],
-            type: item.type,
-            uri: `${uploadPath}/${item.name}`,
-          })),
-        ]
-      : [
-          ...documents.map((item) => ({
-            description: item.name.split('.')[0],
-            type: item.type,
-            uri: `${uploadPath}/${item.name}`,
-          })),
-        ];
-
-    await updateContract({
-      body: {
-        documents: updatedDocuments,
-      } as Partial<ContractRequestBody>,
-      contractId: contractId!,
-    });
-    setOpenDocumentDialog(false);
-  };
-
-  const onRemoveDoc = async (id: string) => {
-    const documentsToSave = uploadedDocument?.length
-      ? uploadedDocument?.filter((d) => d.id !== id)
-      : [];
-
-    await updateContract({
-      body: {
-        documents: documentsToSave,
-      } as Partial<ContractRequestBody>,
-      contractId: contractId!,
-    });
-  };
   const handleCancel = () => {
     formik.resetForm();
     setOpenContractDialog(false);
@@ -508,20 +449,6 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
 
         <Parties contractDetails={contractDetails} user={user as UserSession} />
 
-        <AttachDocument
-          uploadedDocument={uploadedDocument}
-          setOpenDocumentDialog={setOpenDocumentDialog}
-          setDocuments={setDocuments}
-          downloadUrls={downloadUrls}
-          onRemoveDoc={onRemoveDoc}
-          onDocsPreview={onDocsPreview}
-          openDocumentDialog={openDocumentDialog}
-          documents={documents}
-          isUpdateLoading={isUpdateLoading || isUploadLoading}
-          contractId={contractId}
-          updateContract={updateContract as unknown as () => void}
-        />
-
         <Services contractDetails={contractDetails} />
         <InvoiceSetup
           contractId={contractId}
@@ -533,6 +460,13 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
           <ContactsWidget
             refId={contractId!}
             refType={ContactPersonAssociationType.CONTRACT}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={8}>
+          <AttachmentsCard
+            entityId={contractDetails?.id}
+            entityType={AttachmentEntityType.CONTRACT}
           />
         </Grid>
       </Grid>

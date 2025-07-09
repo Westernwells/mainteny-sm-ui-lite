@@ -31,7 +31,8 @@ import {ServiceCompanySimpleView, ServiceCompanyType} from './service-company';
 import {ServiceOrderType} from './service-order';
 import {InvoiceGeneration} from './invoice';
 import {Order} from './pagination';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+
+import {FileWithPreview} from 'models/files';
 
 export interface QueryContractCommentsParams {
   pageIndex: number;
