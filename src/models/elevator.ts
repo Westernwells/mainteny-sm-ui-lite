@@ -20,13 +20,13 @@ import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from './propertyManager';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {Order} from './pagination';
 import {InvoiceOrderField, InvoiceStatus, InvoiceType} from 'models/invoice';
 import {theme} from 'theme';
 import {UserAccountSimpleView} from './user';
 import {ContactPersonAdditionalInfo} from './contacts';
 import {CustomizableColumn} from 'models/table';
+import {FileWithPreview} from 'models/files';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',

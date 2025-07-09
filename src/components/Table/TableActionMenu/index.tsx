@@ -2,10 +2,12 @@ import React, {useRef, useState} from 'react';
 import IconButton from '@mui/material/IconButton';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
 import {MenuAction} from 'models/action';
+import {SxProps} from '@mui/system';
 import TableActionMenu from './TableActionMenu';
 
 type Props = {
   options: MenuAction[];
+  itemProps?: SxProps;
   isOpen?: boolean;
   onToggle?: (value: boolean) => void;
   testId?: string;
@@ -13,6 +15,7 @@ type Props = {
 
 const TableActionMenuWithButton = ({
   options,
+  itemProps,
   isOpen: externalOpenState,
   onToggle: externalSetOpenState,
   testId,
@@ -40,9 +43,10 @@ const TableActionMenuWithButton = ({
 
       <TableActionMenu
         isOpen={isOpen}
-        onClose={handleClose}
         anchorEl={anchorEl.current}
         options={options}
+        onClose={handleClose}
+        {...itemProps}
       />
     </>
   );

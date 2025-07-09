@@ -21,6 +21,11 @@ export enum Order {
   DESC = 'DESC',
 }
 
+export type OrderQuery<T> = {
+  order: Order;
+  orderBy: T;
+};
+
 export interface OrderByParams<T> {
   orderByField: T;
   sortOrder: Order;

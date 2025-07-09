@@ -15,6 +15,7 @@ import {ContactPersonAssociationType} from 'models/contacts';
 import {JobOverviewBottomDrawer} from 'components/JobOverviewBottomDrawer';
 import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
 import {getDefaultTechnician, getDialogTitle} from 'utils/service-order-utils';
+import {AttachmentEntityType} from 'models/attachment';
 import {OrderInfoCard} from './OrderInfoCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
@@ -98,7 +99,10 @@ export const Overview = ({serviceOrder}: Props) => {
             <JobNotes order={serviceOrder} />
           </Box>
           <Box mt="1em" flexGrow={1}>
-            <Attachment order={serviceOrder} />
+            <Attachment
+              entityId={serviceOrder.id}
+              entityType={AttachmentEntityType.SERVICE_ORDER}
+            />
           </Box>
           <Box mt="1em" flexGrow={1}>
             <ContactsWidget

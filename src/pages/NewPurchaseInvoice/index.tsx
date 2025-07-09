@@ -47,15 +47,15 @@ import {
   UpdatePurchaseInvoiceRecord,
 } from 'models/purchaseInvoice';
 import {
-  useServiceOrders,
   useServiceOrderDetails,
+  useServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
 import {useQueryState} from 'hooks/useQueryState';
 import {ServiceOrderOrderField, ServiceOrderView} from 'models/service-order';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
 import {Order} from 'models/pagination';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
+import MyDropzone from 'components/MyDropZone';
 import {
   useCreatePurchaseInvoice,
   useDeletePurchaseInvoice,
@@ -63,7 +63,7 @@ import {
 } from 'hooks/reactQuery/usePurchaseInvoice';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {useNavigate, useLocation} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {ServiceOrderComboBox} from 'components/ServiceOrderComboBox';
 import CurrencySelect from 'components/CurrencySelect';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
@@ -76,6 +76,7 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {PurchaseInvoiceInfo} from 'pages/PurchaseInvoiceDetails/PurchaseInvoiceInfo';
 import {getCurrencyData} from 'components/CurrencyIcons';
 import queryString from 'query-string';
+import {FileWithPreview} from 'models/files';
 
 const NumericFormat = forwardRef<
   HTMLElement,
@@ -638,7 +639,7 @@ const NewPurchaseInvoice = ({
             justifyContent: 'center',
           }}>
           <Box>
-            <MyDropZone
+            <MyDropzone
               getAcceptedFiles={handleFilesUpdate}
               hint={t('PDF, PNG or JPG (max. 5MB)')}
               acceptedFileTypes={['application/pdf', 'image/jpeg', 'image/png']}

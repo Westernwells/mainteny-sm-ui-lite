@@ -47,7 +47,6 @@ import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate'
 import {pdf} from '@react-pdf/renderer';
 import {useCurrentCurrency} from 'utils/currency';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {stripHtmlTags} from 'utils/text-block';
 import {
@@ -60,6 +59,7 @@ import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {companyLanguageContextMap} from 'utils/language';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {FileWithPreview} from 'models/files';
 import {useVats} from 'hooks/reactQuery/useVats';
 import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 

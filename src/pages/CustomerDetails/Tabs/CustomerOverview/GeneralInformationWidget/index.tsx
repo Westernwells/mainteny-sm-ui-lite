@@ -18,7 +18,6 @@ import {ReactComponent as TwoPin} from 'assets/illustrations/TwoPin.svg';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useUuid} from 'hooks/reactQuery/useUuid';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {t} from 'i18next';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
@@ -26,6 +25,7 @@ import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {useTranslation} from 'react-i18next';
 import {formatAddressFullname} from 'utils/utils';
 import {companyLanguageContextMap} from 'utils/language';
+import {FileWithPreview} from 'models/files';
 import EditCustomerGeneralInformation from './EditCustomerGeneralInformation';
 
 type Props = {

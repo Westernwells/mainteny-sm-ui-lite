@@ -61,7 +61,6 @@ import {
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {EmailRecord, PdfGenerationStatus, ReportStatus} from 'models/misc';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {IconButton, InputAdornment} from '@mui/material';
@@ -85,8 +84,11 @@ import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmatio
 import {Confirm} from 'components/Confirm';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {FileWithPreview} from 'models/files';
 import {useCurrentCurrency} from 'utils/currency';
 import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
+import {useAttachments} from 'hooks/reactQuery/useAttachment';
+import {ATTACHMENT_LIMIT, AttachmentEntityType} from 'models/attachment';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -197,10 +199,29 @@ export const WorkReport = ({serviceOrder}: Props) => {
     {enabled: !!report?.signatures?.length},
   );
 
-  const {data: imageDownloadUrls = {}} = useDownloadUrl(
-    report?.attachments?.map((item) => item.fileResource.uri) ?? [],
-    {enabled: true},
+  const {data: filesResource} = useAttachments(
+    {
+      entityType: AttachmentEntityType.SERVICE_ORDER_REPORT,
+      entityId: serviceOrder.id,
+      isNested: true,
+      isFolder: false,
+      pageSize: ATTACHMENT_LIMIT,
+    },
+    {
+      enabled: !report?.attachments,
+    },
   );
+
+  const filesToDownload = report?.attachments
+    ? report?.attachments?.map((item) => item.fileResource.uri)
+    : filesResource?.data.reduce((acc, attachment) => {
+        if (attachment.uri) return [...acc, attachment.uri];
+        return acc;
+      }, [] as string[]) || [];
+
+  const {data: imageDownloadUrls = {}} = useDownloadUrl(filesToDownload, {
+    enabled: true,
+  });
 
   const technicianSignatureImage = useFetchAndConvertImage(
     downloadUrls[signatureKeys.TECHNICIAN],

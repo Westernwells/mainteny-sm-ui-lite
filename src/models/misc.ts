@@ -4,11 +4,11 @@ import {UseMutationResult} from 'react-query';
 import {UserAccountSimpleView} from './user';
 import {ContractNameTypes, ContractTypes} from './contract';
 import {AccountSystems, MinToStep} from './service-company';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {CompanyStatus} from './company';
 import {Page} from './pagination';
 import {VersionType} from './versions';
 import {VatAmount} from './invoice';
+import {FileWithPreview} from 'models/files';
 
 export interface RestError {
   errorCode: number;
@@ -216,6 +216,7 @@ export interface VatInfo {
   vatId?: string;
   vatName?: string;
 }
+
 export interface AmountRecord {
   currency: string;
   netAmount?: number;

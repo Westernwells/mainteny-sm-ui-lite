@@ -1,54 +1,29 @@
+import React, {
+  forwardRef,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import {FileErrors, FileWithPreview} from 'models/files';
+import {FileRejection, useDropzone} from 'react-dropzone';
+import {ONE_KB_IN_BYTES, ONE_MB_IN_BYTES} from 'utils/constants';
+import {WrapperProps} from 'components/MyDropZone/types';
 import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {CheckCircleRounded} from '@mui/icons-material';
-import React, {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from 'react';
-import {FileRejection, FileWithPath, useDropzone} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
 import {Cropper} from 'react-cropper';
 import 'styles/cropper.css';
 import {ReactComponent as CloudUploadIcon} from 'assets/icons/CloudUploadIcon.svg';
 
 import {Dialog} from 'components/Dialog';
-import {ONE_KB_IN_BYTES, ONE_MB_IN_BYTES} from 'utils/constants';
+import {useDropzoneContext} from 'context/DropzoneProvider';
 import {Button} from '../Button';
 import {Thumb} from './Thumb';
-
-export interface FileWithPreview extends FileWithPath {
-  preview: string;
-  description?: string;
-  uri?: string;
-  contentId?: string;
-}
-
-export interface MappedFile extends FileWithPreview {
-  uri: string;
-  description: string;
-}
-
-interface Props {
-  existingFiles?: FileWithPreview[];
-  getAcceptedFiles?: (val: FileWithPreview[]) => void;
-  getRejectedFileWithErrors?: (val: FileRejection[]) => void;
-  hint?: string;
-  acceptedFileTypes?: string[];
-  maxFiles?: number;
-  cropperTitle?: string;
-  isCropped?: boolean;
-  children?: React.ReactNode;
-  isWrapper?: boolean;
-  bgColor?: string;
-}
-
-type FileErrors = {
-  type: boolean;
-  size: boolean;
-};
 
 function formatAcceptedFileType(items: string[]) {
   const result: {[key: string]: any} = {};
@@ -65,7 +40,7 @@ function formatAcceptedFileType(items: string[]) {
   return result;
 }
 
-export const MyDropZone = forwardRef(
+const MyDropZone = forwardRef(
   (
     {
       existingFiles = [],
@@ -75,15 +50,18 @@ export const MyDropZone = forwardRef(
       acceptedFileTypes,
       maxFiles,
       isCropped = false,
+      clearFilesAfterSubmit = false,
       cropperTitle,
       children,
       isWrapper = false,
       bgColor,
-    }: Props,
+    }: PropsWithChildren<WrapperProps>,
     ref,
   ) => {
     const {t} = useTranslation();
     const theme = useTheme();
+    const {setOpen, setGetInputProps, setGetRootProps} = useDropzoneContext();
+
     const [openDialog, setOpenDialog] = useState(false);
     const [errors, setErrors] = useState<FileErrors>({type: false, size: true});
     const [isEditingFileName, setIsEditingFileName] = useState(false);
@@ -92,12 +70,6 @@ export const MyDropZone = forwardRef(
     const [isDragActive, setIsDragActive] = useState(false);
     const isDropzoneWrapperShown = isWrapper && children && !isDragActive;
     const [files, setFiles] = useState<FileWithPreview[]>([]);
-
-    useEffect(() => {
-      if (existingFiles.length) {
-        setFiles(existingFiles);
-      }
-    }, [existingFiles]);
 
     const [cropper, setCropper] = useState<any>();
     const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
@@ -146,32 +118,39 @@ export const MyDropZone = forwardRef(
       },
     });
 
-    const handleCropped = (croppFile?: null | File) => {
-      if (getAcceptedFiles) {
-        if (croppFile && croppFile !== null) {
-          const result = [
-            Object.assign(croppFile, {
-              preview: URL.createObjectURL(croppFile!),
-            }),
-          ];
-          getAcceptedFiles(result);
-          return;
-        }
-        getAcceptedFiles(files);
-      }
-      if (getRejectedFileWithErrors) {
-        getRejectedFileWithErrors(fileRejections as FileRejection[]);
-      }
-    };
+    const hasProcessedCurrentFiles = useRef(false);
 
-    useEffect(() => {
-      if (isCropped && files.length > 0) {
-        setOpenDialog(true);
-      }
-      if (files.length >= 0 && !isCropped) {
-        handleCropped();
-      }
-    }, [files, fileRejections]);
+    const handleCropped = useCallback(
+      (croppedFile?: null | File) => {
+        if (getAcceptedFiles) {
+          if (croppedFile && croppedFile !== null) {
+            const result = [
+              Object.assign(croppedFile, {
+                preview: URL.createObjectURL(croppedFile!),
+              }),
+            ];
+            getAcceptedFiles(result);
+          } else {
+            getAcceptedFiles(files);
+          }
+
+          if (clearFilesAfterSubmit) {
+            setFiles([]);
+            hasProcessedCurrentFiles.current = false;
+          }
+        }
+        if (getRejectedFileWithErrors) {
+          getRejectedFileWithErrors(fileRejections as FileRejection[]);
+        }
+      },
+      [
+        getAcceptedFiles,
+        getRejectedFileWithErrors,
+        files,
+        clearFilesAfterSubmit,
+        fileRejections,
+      ],
+    );
 
     const removeFile = (fileKey: string) => {
       const newFiles = files.filter(
@@ -180,14 +159,6 @@ export const MyDropZone = forwardRef(
 
       setFiles(newFiles);
     };
-
-    useEffect(
-      () =>
-        // revoke the data uris to avoid memory leaks
-        () =>
-          files.forEach((file) => URL.revokeObjectURL(file.preview)),
-      [],
-    );
 
     const onSaveFileName = (fileKey: string) => {
       const result = files.map((item, index) => {
@@ -219,7 +190,7 @@ export const MyDropZone = forwardRef(
     const thumbs = files.map((file: FileWithPreview, index) => (
       <Thumb
         key={`${file.name}-${index}`}
-        oneMbInByes={ONE_MB_IN_BYTES}
+        oneMbInBytes={ONE_MB_IN_BYTES}
         onKbinBytes={ONE_KB_IN_BYTES}
         file={file}
         onNameChange={(e) => {
@@ -289,6 +260,36 @@ export const MyDropZone = forwardRef(
       handleCropped(croppedFile);
       setOpenDialog(false);
     };
+
+    useEffect(() => {
+      if (existingFiles.length) {
+        setFiles(existingFiles);
+      }
+    }, [existingFiles]);
+
+    useEffect(() => {
+      if (isCropped && files.length > 0) {
+        setOpenDialog(true);
+      }
+
+      if (files.length > 0 && !isCropped) {
+        handleCropped();
+      }
+    }, [files, fileRejections, isCropped, handleCropped]);
+
+    useEffect(
+      () =>
+        // revoke the data uris to avoid memory leaks
+        () =>
+          files.forEach((file) => URL.revokeObjectURL(file.preview)),
+      [],
+    );
+
+    useEffect(() => {
+      setOpen(open);
+      setGetInputProps(getInputProps);
+      setGetRootProps(getRootProps);
+    }, []);
 
     return (
       <Box
@@ -464,3 +465,5 @@ export const MyDropZone = forwardRef(
     );
   },
 );
+
+export default MyDropZone;

@@ -6,11 +6,7 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {PurchaseInvoiceView} from 'models/purchaseInvoice';
 import {PDFContainer} from 'components/PDFContainer';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {
-  FileWithPreview,
-  MappedFile,
-  MyDropZone,
-} from 'components/MyDropZone/MyDropzone';
+import MyDropzone from 'components/MyDropZone';
 import {useMemo, useState} from 'react';
 import NewPurchaseInvoice from 'pages/NewPurchaseInvoice';
 import {FileResourceRecord} from 'models/media';
@@ -21,6 +17,7 @@ import CustomSnackbar from 'components/CustomSnackbar';
 import {useDeletePurchaseInvoice} from 'hooks/reactQuery/usePurchaseInvoice';
 import {Confirm} from 'components/Confirm';
 import {useSnackbar} from 'hooks/useSnackbar';
+import {FileWithPreview, MappedFile} from 'models/files';
 import {PurchaseInvoiceInfo} from './PurchaseInvoiceInfo';
 
 interface Props {
@@ -146,7 +143,7 @@ export const PurchaseInvoiceDetails = ({purchaseInvoice}: Props) => {
             justifyContent: 'center',
           }}>
           <Box>
-            <MyDropZone
+            <MyDropzone
               getAcceptedFiles={handleFilesUpdate}
               hint={t('PDF, PNG or JPG (max. 5MB)')}
               acceptedFileTypes={['application/pdf', 'image/jpeg', 'image/png']}

@@ -9,7 +9,7 @@ import {EditorProvider} from '@tiptap/react';
 import {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Control, Controller} from 'react-hook-form';
-import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
+import MyDropzone from 'components/MyDropZone';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
@@ -21,6 +21,7 @@ import {
   plainTextToParagraphs,
 } from 'utils/text-block';
 import {EmailSignature} from 'models/employee';
+import {FileWithPreview} from 'models/files';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
 import EditorMenuControls from './EditorMenuControls';
 import useExtensions from './useExtensions';
@@ -354,7 +355,7 @@ const RichTextEditor = ({
         }}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}>
-        <MyDropZone
+        <MyDropzone
           isWrapper
           existingFiles={existingFiles}
           ref={dropzoneRef}
@@ -376,7 +377,7 @@ const RichTextEditor = ({
           ) : (
             renderEditor(html, () => {})
           )}
-        </MyDropZone>
+        </MyDropzone>
       </Box>
     </FormControl>
   );

@@ -1,8 +1,8 @@
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {AggregatedAmount, Discount, DiscountType, VatAmount} from './invoice';
 import {FileResourceRecord} from './media';
 import {Meta, Money} from './misc';
 import {Order} from './pagination';
+import {FileWithPreview} from 'models/files';
 
 export interface PurchaseInvoiceView {
   id: string;

@@ -66,7 +66,6 @@ import {pdf} from '@react-pdf/renderer';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
 import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {
   correctCreditNoteInvoicesPercentages,
   formatInvoiceViewToUpdateInvoice,
@@ -110,6 +109,7 @@ import {invoiceItemToInvoiceItemRecord, isXMLNeeded} from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
 import FinalInvoicePdfTemplate from 'components/pdf-templates/invoice-previews/FinalInvoicePdfTemplate';
+import {FileWithPreview} from 'models/files';
 import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 
 interface Props {

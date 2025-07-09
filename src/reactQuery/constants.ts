@@ -137,6 +137,7 @@ export const queryKeys = {
   serviceOrderAmountById: 'serviceOrderAmountById',
   fetchTags: 'fetchTags',
   fetchTagStatistics: 'fetchTagStatistics',
+  fetchAttachments: 'fetchAttachments',
 
   queryTasks: 'queryTasks',
   getTaskById: 'getTaskById',

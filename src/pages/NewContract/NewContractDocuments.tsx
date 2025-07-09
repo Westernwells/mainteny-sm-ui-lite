@@ -1,13 +1,13 @@
 import React, {FC} from 'react';
 import {FormikProps} from 'formik';
-import {MyDropZone} from 'components/MyDropZone/MyDropzone';
+import MyDropzone from 'components/MyDropZone';
 
 interface Props {
   formik: FormikProps<any>;
 }
 
 const NewContractDocuments: FC<Props> = ({formik}) => (
-  <MyDropZone
+  <MyDropzone
     hint="PDF, DOCX, XLSX, XLS, CSV or TSV"
     acceptedFileTypes={[
       'application/pdf',

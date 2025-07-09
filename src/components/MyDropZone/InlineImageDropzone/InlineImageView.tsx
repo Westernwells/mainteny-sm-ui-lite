@@ -1,11 +1,11 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useDropzone} from 'react-dropzone';
 import {Box, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {ReactComponent as CloudUploadIcon} from 'assets/icons/CloudUploadIcon.svg';
 import {Button} from 'components/Button';
-import {Rnd, RndResizeCallback, DraggableData} from 'react-rnd';
-import './NewDropZone.css';
+import {DraggableData, Rnd, RndResizeCallback} from 'react-rnd';
+import 'components/MyDropZone/InlineImageDropzone/InlineImageView.styles.css';
 import {DraggableEvent} from 'react-draggable';
 import {theme} from 'theme';
 
@@ -43,7 +43,7 @@ interface Props {
   isFooter?: boolean;
 }
 
-const NewDropZone: React.FC<Props> = ({
+const InlineImageView: React.FC<Props> = ({
   hint = '',
   acceptedFileTypes = ['image/png', 'image/jpeg'],
   maxFiles = 1,
@@ -370,4 +370,4 @@ const NewDropZone: React.FC<Props> = ({
   );
 };
 
-export default NewDropZone;
+export default InlineImageView;

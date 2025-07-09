@@ -23,11 +23,11 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {FormHelperText, IconButton, InputAdornment} from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import RichTextEditor from 'components/RichTextEditor';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useFetchCompanyEmailConfig} from 'hooks/reactQuery/useEmail';
 import {useCurrentEditor} from '@tiptap/react';
 import {EmailSignature} from 'models/employee';
 import {EMAIL_ATTACHMENT_SIZE_UPPER_LIMIT} from 'models/email';
+import {FileWithPreview} from 'models/files';
 import {Order} from '../../models/pagination';
 
 interface Props {

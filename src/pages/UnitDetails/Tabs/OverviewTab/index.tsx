@@ -107,12 +107,9 @@ export const OverviewTab = ({getUnitName}: Props) => {
         maintainers={elevator?.assignments}
       />
 
-      <Grid container spacing={2} mt="0.3em">
+      <Grid container spacing={2} mt="0.3em" height="100%">
         <Grid item xs={12} md={12}>
-          <Pictures
-            elevator={elevator!}
-            propertyOwnerId={elevator?.propertyOwner.id}
-          />
+          <Pictures elevator={elevator!} />
         </Grid>
       </Grid>
     </>

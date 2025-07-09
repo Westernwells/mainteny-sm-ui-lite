@@ -1,5 +1,4 @@
 import {FlexContainer} from 'components/FlexContainer';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {PageCard} from 'components/PageCard';
 import {Stepper} from 'components/Stepper';
 import {useFormik} from 'formik';
@@ -30,6 +29,7 @@ import {createEmptyResource} from 'utils/paging';
 import {Box, Typography} from '@mui/material';
 import {theme} from 'theme';
 import {useTranslation} from 'react-i18next';
+import {FileWithPreview} from 'models/files';
 import NewContractBasicInfo from './NewContractBasicInfo';
 import NewContractDocuments from './NewContractDocuments';
 import NewContractSelectUnits from './NewContractSelectUnits';
