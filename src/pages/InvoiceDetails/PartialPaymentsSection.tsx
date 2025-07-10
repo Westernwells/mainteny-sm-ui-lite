@@ -34,7 +34,6 @@ import {
 } from 'models/invoice';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
-  aggregatedAmountToMoney,
   centsToMoney,
   formatCurrency,
   getCurrencySymbol,
@@ -45,11 +44,7 @@ import {
 import {fixRounding, isNumber} from 'utils/utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {ReactComponent as PartialInvoiceIcon} from 'assets/icons/PartialInvoiceIcon.svg';
-import {
-  applyDiscount,
-  correctCreditNoteInvoicesPercentages,
-  getAggregatedPartialPaymentsVats,
-} from './utils';
+import {applyDiscount, correctCreditNoteInvoicesPercentages} from './utils';
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 import {State} from 'models/misc';
@@ -339,6 +334,11 @@ export const PartialPaymentsSection = ({
         ? lastInvoiceIndex + 1
         : 1
       : previousInvoices.length + 1;
+    const articlesAreSame =
+      ((firstInvoicePayment?.amount?.netAmount || 0) /
+        (subtotalExclVat * 100)) *
+        100 ===
+      firstInvoicePayment?.percentage;
 
     if (isEditing) {
       // do nothing if editing
@@ -346,30 +346,64 @@ export const PartialPaymentsSection = ({
       const description = `${invoiceIndex}. ${t('Final invoice')}`;
       // Check before setting the value to avoid unnecessary updates
       if (watchedPayment?.description !== description) {
-        setValue('payment', {
-          ...getValues('payment'),
-          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
-            ? {
-                type: PaymentType.PERCENTAGE,
-                description,
-                percentage: 100 - prevInvoicesPercentage,
-              }
-            : firstInvoicePaymentType === PaymentType.PER_ITEM
-            ? {
-                type: PaymentType.PER_ITEM,
-                description,
-              }
-            : {
-                type: PaymentType.LUMP_SUM,
-                description,
-                amount: {
-                  ...watchedPayment?.amount,
-                  currency:
-                    watchedPayment?.amount?.currency || currentCurrency.code,
-                  value: subtotalExclVat,
-                },
-              }),
-        });
+        if (
+          firstInvoicePaymentType === PaymentType.PERCENTAGE &&
+          articlesAreSame
+        ) {
+          setValue('payment', {
+            ...getValues('payment'),
+            type: PaymentType.PERCENTAGE,
+            description,
+            percentage: 100 - prevInvoicesPercentage,
+          });
+        } else if (
+          firstInvoicePaymentType === PaymentType.PER_ITEM ||
+          (!articlesAreSame && firstInvoicePaymentType !== PaymentType.LUMP_SUM)
+        ) {
+          const getItemOverallPercentage = (name: string): number =>
+            previousInvoices
+              ?.map((i) => i.items)
+              ?.flat()
+              ?.filter((i) => i.article?.name && i.article?.name === name)
+              ?.reduce(
+                (acc, i) => acc + (i.additionalInfo?.payment?.percentage ?? 0),
+                0,
+              );
+
+          // Set payment type first
+          setValue('payment', {
+            ...getValues('payment'),
+            type: PaymentType.PER_ITEM,
+            description,
+          });
+
+          const updatedItems = getValues('items')?.map((item) => {
+            const itemName = item.article?.name ?? '';
+            const overallPercentage = getItemOverallPercentage(itemName);
+            const remainingPercentage = 100 - (overallPercentage || 0);
+
+            return {
+              ...item,
+              payment: {
+                type: InvoiceItemPaymentType.PERCENTAGE,
+                percentage: Math.max(0, remainingPercentage),
+              },
+            };
+          });
+          setValue('items', updatedItems);
+        } else {
+          setValue('payment', {
+            ...getValues('payment'),
+            type: PaymentType.LUMP_SUM,
+            description,
+            amount: {
+              ...watchedPayment?.amount,
+              currency:
+                watchedPayment?.amount?.currency || currentCurrency.code,
+              value: subtotalExclVat,
+            },
+          });
+        }
       }
     } else {
       const description = `${invoiceIndex}. ${t('Partial invoice')}`;
