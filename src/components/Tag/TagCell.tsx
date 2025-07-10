@@ -8,16 +8,20 @@ import useTheme from '@mui/material/styles/useTheme';
 
 type Props = {
   tags: TagRecord[];
-  entity?: TagEntityType;
-  onChange?: (tags: TagRecord[]) => void;
   disabled?: boolean;
+  // needed to open tag search functionality
+  entity?: TagEntityType;
+  // needed to open tag search functionality
+  onChange?: (tags: TagRecord[]) => void;
 };
 
-const TagCell = ({tags, entity, onChange, disabled = false}: Props) => {
+const TagCell = ({tags, entity, disabled = false, onChange}: Props) => {
   const theme = useTheme();
   const [shownTag, ...rest] = tags;
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const canOpenTagSearch = !!entity && !!onChange;
 
   return (
     <>
@@ -50,7 +54,7 @@ const TagCell = ({tags, entity, onChange, disabled = false}: Props) => {
         )}
         {tags.length === 0 && '-'}
       </Box>
-      {isOpen && !!entity && !!onChange && (
+      {isOpen && canOpenTagSearch && (
         <TagSearch
           open={isOpen}
           onClose={() => {
@@ -58,8 +62,8 @@ const TagCell = ({tags, entity, onChange, disabled = false}: Props) => {
           }}
           selectedTags={tags}
           entity={entity}
-          onChange={onChange}
           anchorRef={ref}
+          onChange={onChange}
         />
       )}
     </>
