@@ -635,7 +635,6 @@ export const InvoiceForm = ({
   const vatSyncInitialized = useRef(false);
 
   const watchedItems = watch('items');
-  const watchedItemsHookValue = useWatch({control, name: 'items'});
   const watchedType = watch('type');
   const watchedPropertyOwnerId = watch('propertyOwnerId');
   const watchedDiscount = watch('discount');
@@ -1861,7 +1860,15 @@ export const InvoiceForm = ({
     }
 
     if (isNewInvoice) {
-      if (serviceOrder.articles?.length) {
+      if (
+        serviceOrder.articles?.length &&
+        (!watchedItems?.length ||
+          ![
+            InvoiceType.FINAL,
+            InvoiceType.PARTIAL,
+            InvoiceType.UPFRONT,
+          ].includes(invoiceType!))
+      ) {
         const rows = serviceOrder.articles.map((article) =>
           serviceOrderItemToServiceOrderItemRecord(
             article,
@@ -2200,7 +2207,7 @@ export const InvoiceForm = ({
     if (!invoice?.id) {
       checkIfLaborOrMaterialIsSelected(watchedItems);
     }
-  }, [watchedItemsHookValue]);
+  }, [watchedAllItems]);
 
   const [shouldShow, setShouldShow] = useState(watchedShowArticleSection);
 
