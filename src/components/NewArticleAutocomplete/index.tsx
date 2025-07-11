@@ -1,4 +1,10 @@
-import {SyntheticEvent, useCallback, useEffect, useRef, useState} from 'react';
+import React, {
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Autocomplete,
   IconButton,
@@ -15,14 +21,13 @@ import {
 import {t} from 'i18next';
 import {centsToMoney, formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {createHighlightedText} from 'utils/utils';
-import {createEmptyResource} from 'utils/paging';
 import {
   ArticleType,
   ArticleView,
   COLUMN_DATA,
   ExtendedArticleView,
 } from 'models/article';
-import {useArticles} from 'hooks/reactQuery/useArticle';
+import {useInfiniteArticles} from 'hooks/reactQuery/useArticle';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
@@ -122,7 +127,7 @@ export const CustomPopper = ({
             ? `${resolvedAnchorEl.offsetTop - 320}px`
             : `${resolvedAnchorEl.offsetTop + 40}px`
           : 0,
-        maxHeight: '450px',
+        maxHeight: '495px',
         overflow: 'hidden',
       }}
       placement={openUpwards ? 'top-start' : 'bottom-start'}>
@@ -275,17 +280,18 @@ export const NewArticleAutoComplete = ({
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const {data: articlesResource = createEmptyResource<ArticleView>(10)} =
-    useArticles(
-      {
-        pageIndex: 0,
-        pageSize: 25,
-        query: createSearchQuery({search: query}),
-        type: getArticleTypes({excludeTypes}),
-      },
-      {keepPreviousData: true},
-      true,
-    );
+  const {
+    items: rawArticles,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteArticles(
+    {
+      query: createSearchQuery({search: query}),
+      type: getArticleTypes({excludeTypes}),
+    },
+    50,
+  );
 
   const {data: customPrices = []} = usePropertyOwnerQueryTravelWorks(
     propertyOwnerId || '',
@@ -294,7 +300,7 @@ export const NewArticleAutoComplete = ({
   );
 
   const mergedArticles: ExtendedArticleView[] = showCustomPriceColumn
-    ? (articlesResource.data ?? []).map((article) => {
+    ? (rawArticles ?? []).map((article) => {
         const customPricesMap = keyBy(customPrices, (item) => item.article.id);
         const customItem = customPricesMap[article.id];
         if (customItem?.article) {
@@ -314,7 +320,7 @@ export const NewArticleAutoComplete = ({
           isCustom: false,
         };
       })
-    : (articlesResource.data ?? []).map((article) => ({
+    : (rawArticles ?? []).map((article) => ({
         ...article,
         name: removeHtmlTags(article.name || ''),
         description: article.description || '',
@@ -359,6 +365,17 @@ export const NewArticleAutoComplete = ({
     [showCustomPriceColumn],
   );
 
+  const handleScroll = (e: React.UIEvent<HTMLElement>) => {
+    const ul = e.currentTarget;
+    if (
+      hasNextPage &&
+      !isFetchingNextPage &&
+      ul.scrollTop + ul.clientHeight >= ul.scrollHeight - 150
+    ) {
+      fetchNextPage();
+    }
+  };
+
   return (
     <Autocomplete
       freeSolo
@@ -379,6 +396,13 @@ export const NewArticleAutoComplete = ({
       }}
       inputValue={queryView}
       options={mergedArticles}
+      ListboxProps={{
+        onScroll: handleScroll,
+        style: {
+          maxHeight: 495 - 80,
+          overflowY: 'auto',
+        },
+      }}
       renderOption={(params, option) => (
         <li {...params} key={option.id}>
           <table style={{width: '100%', tableLayout: 'fixed'}}>

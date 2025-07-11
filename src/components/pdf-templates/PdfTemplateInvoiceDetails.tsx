@@ -10,6 +10,7 @@ import {PdfConfigurationStyles} from 'models/pdfs';
 import {isSwissAddress} from 'utils/address';
 import {ServiceCompanyItem} from 'models/service-company';
 import PdfUnitAddress from './containers/PdfUnitAddress';
+import PdfEmailContent from './containers/PdfEmailContent';
 
 type StyleProps = {
   isSwissOffset?: boolean;
@@ -19,7 +20,6 @@ const getStyles = ({
   boldFontStyle,
   regularFontStyle,
   primaryColor,
-  secondaryColor,
   isSwissOffset = false,
 }: StyleProps) =>
   StyleSheet.create({
@@ -39,6 +39,7 @@ const getStyles = ({
       flexDirection: 'row',
       justifyContent: 'space-between',
       paddingBottom: 6,
+      flexWrap: 'wrap',
     },
     tag: {
       ...boldFontStyle,
@@ -48,8 +49,9 @@ const getStyles = ({
     },
     tagContent: {
       fontSize: 8.5,
-      color: secondaryColor,
+      color: primaryColor,
       flex: '0 0 57%',
+      minWidth: 0,
       textAlign: 'right',
       ...regularFontStyle,
     },
@@ -158,26 +160,24 @@ const PdfTemplateInvoiceDetails = ({
 
       {userInfo?.contact?.phone && pdfConfigClientStorage.includeUserPhone && (
         <View style={styles.rightAddressContent}>
-          <Text style={styles.tag}>{translate('Phone number')}</Text>
+          <Text style={styles.tag}>{translate('Phone no.')}</Text>
           <Text style={styles.tagContent}>{userInfo?.contact?.phone}</Text>
         </View>
       )}
-      {userInfo?.contact?.email && pdfConfigClientStorage.includeUserEmail && (
-        <>
-          <View style={styles.rightAddressContent}>
-            <Text style={styles.tag}>{translate('Email address')}</Text>
-            <Text style={styles.tagContent}>
-              {userInfo.contact.email.split('@')[0]}@
-            </Text>
-          </View>
-          <View style={[styles.rightAddressContent, {marginTop: -6}]}>
-            <Text style={styles.tag} />
-            <Text style={[styles.tagContent, {marginLeft: 10}]}>
-              {userInfo.contact.email.split('@')[1]}
-            </Text>
-          </View>
-        </>
-      )}
+
+      <PdfEmailContent
+        email={userInfo?.contact?.email}
+        includeEmail={pdfConfigClientStorage?.includeUserEmail}
+        translate={translate}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
+        styles={{
+          container: styles.rightAddressContent,
+          label: styles.tag,
+          content: styles.tagContent,
+        }}
+      />
 
       {invoice?.propertyOwner?.externalId && (
         <View style={styles.rightAddressContent}>
@@ -241,7 +241,7 @@ const PdfTemplateInvoiceDetails = ({
         {invoice?.serviceOrder?.elevator.serialNumber &&
           pdfConfigClientStorage.includeSerialNumber && (
             <View style={styles.rightAddressContent}>
-              <Text style={styles.tag}>{translate('Serial number')}</Text>
+              <Text style={styles.tag}>{translate('Serial no.')}</Text>
               <Text style={styles.tagContent}>
                 {invoice?.serviceOrder?.elevator.serialNumber ?? '-'}
               </Text>

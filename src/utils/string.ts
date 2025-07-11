@@ -36,3 +36,11 @@ export const toCamelCase = (value: string, separator = '_') => {
     )
     .join('');
 };
+
+export function breakEmailAtSign(email: string, maxChars: number = 28): string {
+  if (email.length <= maxChars) {
+    return email;
+  }
+  const [local, domain] = email.split('@', 2);
+  return `${local}@\n${domain}`;
+}

@@ -22,6 +22,7 @@ import PdfPageContainer from './containers/PdfPageContainer';
 import PdfPageTitle from './containers/PdfPageTitle';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfUnitAddress from './containers/PdfUnitAddress';
+import PdfEmailContent from './containers/PdfEmailContent';
 
 type StyleProps = {
   isSwissOffset?: boolean;
@@ -31,7 +32,6 @@ const getStyles = ({
   boldFontStyle,
   regularFontStyle,
   primaryColor,
-  secondaryColor,
   isSwissOffset = false,
 }: StyleProps) =>
   StyleSheet.create({
@@ -61,7 +61,7 @@ const getStyles = ({
     },
     tagContent: {
       fontSize: 8.5,
-      color: secondaryColor,
+      color: primaryColor,
       flex: '0 0 57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -101,7 +101,7 @@ const getStyles = ({
     sectionBody: {
       fontSize: 10,
       ...regularFontStyle,
-      color: secondaryColor,
+      color: primaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -119,7 +119,7 @@ const getStyles = ({
       width: '100%',
     },
     tableHeading: {
-      color: secondaryColor,
+      color: primaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
@@ -159,7 +159,7 @@ const getStyles = ({
       marginHorizontal: 5,
     },
     imageDescription: {
-      color: secondaryColor,
+      color: primaryColor,
       marginTop: 10,
     },
     signatureWrapper: {
@@ -396,25 +396,25 @@ const WorkReportTemplate = React.memo(
                 {userInfo?.contact?.phone &&
                   pdfConfigClientStorage.includeUserPhone && (
                     <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Phone number')}
-                      </Text>
+                      <Text style={styles.tag}>{translate('Phone no.')}</Text>
                       <Text style={styles.tagContent}>
                         {userInfo?.contact?.phone}
                       </Text>
                     </View>
                   )}
-                {userInfo?.contact?.email &&
-                  pdfConfigClientStorage.includeUserEmail && (
-                    <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Email address')}
-                      </Text>
-                      <Text style={styles.tagContent}>
-                        {userInfo?.contact?.email}
-                      </Text>
-                    </View>
-                  )}
+                <PdfEmailContent
+                  email={userInfo?.contact?.email}
+                  includeEmail={pdfConfigClientStorage?.includeUserEmail}
+                  translate={translate}
+                  fontStyles={fontStyles}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
+                  styles={{
+                    container: styles.rightAddressContent,
+                    label: styles.tag,
+                    content: styles.tagContent,
+                  }}
+                />
                 {technicianName && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Engineer')}</Text>
@@ -439,7 +439,7 @@ const WorkReportTemplate = React.memo(
                     pdfConfigClientStorage.includeSerialNumber && (
                       <View style={styles.rightAddressContent}>
                         <Text style={styles.tag}>
-                          {translate('Serial number')}
+                          {translate('Serial no.')}
                         </Text>
                         <Text style={styles.tagContent}>
                           {serviceOrder?.elevator?.serialNumber || '-'}

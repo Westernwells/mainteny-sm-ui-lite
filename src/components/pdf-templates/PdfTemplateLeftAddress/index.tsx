@@ -124,7 +124,6 @@ const PdfTemplateLeftAddress = ({
           beneficiaryInfo={beneficiaryInfo}
           fontStyles={fontStyles}
           primaryColor={primaryColor}
-          secondaryColor={secondaryColor}
         />
       )}
     </View>

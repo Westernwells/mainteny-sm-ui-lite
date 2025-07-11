@@ -13,7 +13,6 @@ const getStyles = ({
   boldFontStyle,
   regularFontStyle,
   primaryColor,
-  secondaryColor,
 }: PdfConfigurationStyles) =>
   StyleSheet.create({
     rightAddressContent: {
@@ -31,7 +30,7 @@ const getStyles = ({
     },
     tagContent: {
       fontSize: 8.5,
-      color: secondaryColor,
+      color: primaryColor,
       flex: '0 0 57%',
       textAlign: 'right',
       ...regularFontStyle,
