@@ -8,10 +8,12 @@ import {Progress} from 'components/Progress';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {useDeleteCustomer, useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {ContactPersonAssociationType} from 'models/contacts';
-import {Box, Button, TextField, Grid2 as Grid} from '@mui/material';
+import {Box, Button, Grid2 as Grid, TextField} from '@mui/material';
 import Notes from 'pages/CustomerDetails/Notes';
 import {ConfirmDelete} from 'components/ConfirmDelete';
 import {normalizeString} from 'utils/string';
+import AttachmentsCard from 'components/Attachments/AttachmentsCard';
+import {AttachmentEntityType} from 'models/attachment';
 import CustomerPortalWidget from './CustomerPortalWidget';
 import PerformanceWidget from './PerformanceWidget';
 import GeneralInformationWidget from './GeneralInformationWidget';
@@ -104,6 +106,13 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
           <CustomerPortalWidget
             customerId={customerId!}
             customerPortalEnabled={customerPortalEnabled}
+          />
+        </Grid>
+
+        <Grid size={{xs: 12}}>
+          <AttachmentsCard
+            entityId={customerId!}
+            entityType={AttachmentEntityType.PROPERTY_OWNER}
           />
         </Grid>
       </Grid>
