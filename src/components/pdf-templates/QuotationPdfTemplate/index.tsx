@@ -233,7 +233,7 @@ const QuotationPdfTemplate = React.memo(
                   pdfConfigClientStorage.includeUserPhone
                 ) && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Phone number')}</Text>
+                    <Text style={styles.tag}>{translate('Phone no.')}</Text>
                     <Text style={styles.tagContent}>
                       {userInfo?.contact?.phone}
                     </Text>

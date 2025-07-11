@@ -21,6 +21,7 @@ import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
 import {ServiceCompanyItem} from 'models/service-company';
 import {isSwissAddress} from 'utils/address';
+import PdfEmailContent from 'components/pdf-templates/containers/PdfEmailContent';
 
 type StyleProps = {
   isSwissOffset?: boolean;
@@ -232,21 +233,25 @@ const InvoiceOverduePdfPreview = ({
               {userInfo?.contact?.phone &&
                 pdfConfigClientStorage.includeUserPhone && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Phone number')}</Text>
+                    <Text style={styles.tag}>{translate('Phone no.')}</Text>
                     <Text style={styles.tagContent}>
                       {userInfo?.contact?.phone}
                     </Text>
                   </View>
                 )}
-              {userInfo?.contact?.email &&
-                pdfConfigClientStorage.includeUserEmail && (
-                  <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Email address')}</Text>
-                    <Text style={styles.tagContent}>
-                      {userInfo?.contact?.email}
-                    </Text>
-                  </View>
-                )}
+              <PdfEmailContent
+                email={userInfo?.contact?.email}
+                includeEmail={pdfConfigClientStorage?.includeUserEmail}
+                translate={translate}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
+                styles={{
+                  container: styles.rightAddressContent,
+                  label: styles.tag,
+                  content: styles.tagContent,
+                }}
+              />
               {invoice?.propertyOwner?.externalId && (
                 <View style={styles.rightAddressContent}>
                   <Text style={styles.tag}>{translate('Customer no.')}</Text>
@@ -280,9 +285,7 @@ const InvoiceOverduePdfPreview = ({
                 {invoice?.serviceOrder?.elevator.serialNumber &&
                   pdfConfigClientStorage.includeSerialNumber && (
                     <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Serial number')}
-                      </Text>
+                      <Text style={styles.tag}>{translate('Serial no.')}</Text>
                       <Text style={styles.tagContent}>
                         {invoice?.serviceOrder?.elevator.serialNumber ?? '-'}
                       </Text>

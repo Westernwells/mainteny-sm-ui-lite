@@ -26,6 +26,7 @@ export const queryKeys = {
   fetchContractComments: 'fetchContractComments',
   fetchQuotationActivities: 'fetchQuotationActivities',
   fetchArticles: 'fetchArticles',
+  fetchInfiniteArticles: 'fetchInfiniteArticles',
   fetchArticleDetail: 'fetchArticleDetail',
   fetchArticleSubAssociations: 'fetchArticleSubAssociations',
   fetchArticleComments: 'fetchArticleComments',

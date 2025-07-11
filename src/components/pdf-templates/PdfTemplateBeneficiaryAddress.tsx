@@ -6,13 +6,12 @@ import {PdfConfigurationStyles} from 'models/pdfs';
 type Props = {
   translate: (key: string) => string;
   beneficiaryInfo?: AddressComponent | null;
-} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor'>;
 
 const getStyles = ({
   regularFontStyle,
   boldFontStyle,
   primaryColor,
-  secondaryColor,
 }: PdfConfigurationStyles) =>
   StyleSheet.create({
     leftAddress: {
@@ -30,7 +29,7 @@ const getStyles = ({
     },
     partialAddressText: {
       fontSize: 9,
-      color: secondaryColor,
+      color: primaryColor,
       textAlign: 'left',
       ...regularFontStyle,
       marginTop: 2,
@@ -42,13 +41,11 @@ const PdfTemplateBeneficiaryAddress = ({
   beneficiaryInfo,
   fontStyles,
   primaryColor,
-  secondaryColor,
 }: Props) => {
   const styles = getStyles({
     boldFontStyle: fontStyles.bold,
     regularFontStyle: fontStyles.regular,
     primaryColor,
-    secondaryColor,
   });
 
   return (

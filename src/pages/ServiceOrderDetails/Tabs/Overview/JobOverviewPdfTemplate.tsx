@@ -34,6 +34,7 @@ import {ArticleSectionBody} from 'components/pdf-templates/ArticleSection/Articl
 import ArticleSectionFooter from 'components/pdf-templates/ArticleSection/ArticleSectionFooter';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {isSwissAddress} from 'utils/address';
+import PdfEmailContent from 'components/pdf-templates/containers/PdfEmailContent';
 
 type StyleProps = {
   isSwissOffset?: boolean;
@@ -325,25 +326,25 @@ const JobOverviewPdfTemplate = React.memo(
                 {userInfo?.contact.phone &&
                   pdfConfigClientStorage.includeUserPhone && (
                     <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Phone number')}
-                      </Text>
+                      <Text style={styles.tag}>{translate('Phone no.')}</Text>
                       <Text style={styles.tagContent}>
                         {userInfo?.contact.phone}
                       </Text>
                     </View>
                   )}
-                {userInfo?.contact.email &&
-                  pdfConfigClientStorage.includeUserEmail && (
-                    <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Email address')}
-                      </Text>
-                      <Text style={styles.tagContent}>
-                        {userInfo?.contact.email}
-                      </Text>
-                    </View>
-                  )}
+                <PdfEmailContent
+                  email={userInfo?.contact?.email}
+                  includeEmail={pdfConfigClientStorage?.includeUserEmail}
+                  translate={translate}
+                  fontStyles={fontStyles}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
+                  styles={{
+                    container: styles.rightAddressContent,
+                    label: styles.tag,
+                    content: styles.tagContent,
+                  }}
+                />
 
                 {quotation?.externalId && (
                   <View style={styles.rightAddressContent}>
@@ -370,7 +371,7 @@ const JobOverviewPdfTemplate = React.memo(
                     pdfConfigClientStorage.includeSerialNumber && (
                       <View style={styles.rightAddressContent}>
                         <Text style={styles.tag}>
-                          {translate('Serial number')}
+                          {translate('Serial no.')}
                         </Text>
                         <Text style={styles.tagContent}>
                           {serviceOrder?.elevator.serialNumber || '-'}
