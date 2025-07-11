@@ -291,6 +291,7 @@ const PartialInvoicePdfTemplate = ({
                   secondaryColor={secondaryColor}
                 />
               )}
+            <View minPresenceAhead={86} />
 
             {isPartialInvoice && (
               <PdfPartialPaymentSection
@@ -305,6 +306,7 @@ const PartialInvoicePdfTemplate = ({
                 secondaryColor={secondaryColor}
               />
             )}
+            <View minPresenceAhead={86} />
 
             {isUpfrontInvoice && (
               <PdfUpfrontPaymentSection
@@ -319,6 +321,7 @@ const PartialInvoicePdfTemplate = ({
                 secondaryColor={secondaryColor}
               />
             )}
+            <View minPresenceAhead={86} />
 
             <InvoiceNotesPdf
               moreInfo={invoice?.additionalInfo?.moreInfo}

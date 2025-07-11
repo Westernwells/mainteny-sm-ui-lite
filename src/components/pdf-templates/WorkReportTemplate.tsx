@@ -611,7 +611,7 @@ const WorkReportTemplate = React.memo(
                   )}
                 </View>
               </View>
-
+              <View minPresenceAhead={86} />
               {serviceOrder?.articles.length && (
                 <Text style={styles.sectionHeading}>
                   {translate('Articles')}{' '}
@@ -715,7 +715,7 @@ const WorkReportTemplate = React.memo(
                   </View>
                 </View>
               )}
-
+              <View minPresenceAhead={86} />
               {filteredPictures.length &&
                 Object.keys(workReportPictures).length && (
                   <View>

@@ -305,7 +305,7 @@ const FullInvoicePdfTemplate = ({
                 secondaryColor={secondaryColor}
               />
             )}
-
+            <View minPresenceAhead={86} />
             {invoice?.additionalInfo.paymentTerm?.term?.trim() && (
               <View style={styles.paymentTermsSection}>
                 <Text style={styles.sectionHeading}>
@@ -321,7 +321,7 @@ const FullInvoicePdfTemplate = ({
                 />
               </View>
             )}
-
+            <View minPresenceAhead={86} />
             <InvoiceNotesPdf
               moreInfo={invoice?.additionalInfo?.moreInfo}
               labor={labor}

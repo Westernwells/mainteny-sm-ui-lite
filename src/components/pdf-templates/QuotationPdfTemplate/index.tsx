@@ -390,7 +390,7 @@ const QuotationPdfTemplate = React.memo(
                   </View>
                 </View>
               )}
-
+              <View minPresenceAhead={86} />
               {plainPaymentTerm && (
                 <View style={styles.paymentTermsSection}>
                   <Text style={styles.sectionHeading}>
@@ -399,7 +399,7 @@ const QuotationPdfTemplate = React.memo(
                   <HtmlPDF html={rawPaymentTerm} fontStyles={fontStyles} />
                 </View>
               )}
-
+              <View minPresenceAhead={86} />
               {plainNotes && (
                 <View style={styles.notesSection}>
                   <HtmlPDF
@@ -412,7 +412,7 @@ const QuotationPdfTemplate = React.memo(
                   />
                 </View>
               )}
-
+              <View minPresenceAhead={86} />
               {!isJobOverview && (
                 <View wrap={false} style={styles.signatureBoxWrap}>
                   <Text style={styles.sectionHeading}>

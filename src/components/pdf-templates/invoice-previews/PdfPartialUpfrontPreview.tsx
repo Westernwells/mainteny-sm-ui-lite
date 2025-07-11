@@ -305,6 +305,8 @@ const PdfPartialUpfrontPreview = ({
                 />
               )}
 
+            <View minPresenceAhead={86} />
+
             {isPartialInvoice && (
               <PdfPartialPaymentSection
                 translate={translate}
@@ -319,6 +321,8 @@ const PdfPartialUpfrontPreview = ({
               />
             )}
 
+            <View minPresenceAhead={86} />
+
             {isUpfrontInvoice && (
               <PdfUpfrontPaymentSection
                 translate={translate}
@@ -332,6 +336,8 @@ const PdfPartialUpfrontPreview = ({
                 secondaryColor={secondaryColor}
               />
             )}
+
+            <View minPresenceAhead={86} />
 
             <InvoiceNotesPdf
               moreInfo={invoice?.additionalInfo?.moreInfo}
