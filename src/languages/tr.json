@@ -1890,5 +1890,6 @@
   "Amount Due: {{amountDue}}": "Beklenmesi gereken miktar: {{miktarDue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Ödediyseniz, lütfen bize bildirin. Değilse, ekstra ücretlerden kaçınmak için lütfen yakında yapın.",
   "Questions? Contact us at {{contactEmail}}": "Sorular? {{Contactemail}} adresinden bize ulaşın",
-  "Thanks, {{companyName}}": "Teşekkürler, {{companyName}}"
+  "Thanks, {{companyName}}": "Teşekkürler, {{companyName}}",
+  "Serial number": "Seri numarası"
 }

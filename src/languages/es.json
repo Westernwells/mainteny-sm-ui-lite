@@ -3115,5 +3115,6 @@
   "Amount Due: {{amountDue}}": "Cantidad adeudada: {{montiondue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Si ha pagado, háganoslo saber. Si no, hágalo pronto para evitar tarifas adicionales.",
   "Questions? Contact us at {{contactEmail}}": "¿Preguntas? Contáctenos en {{ContactEmail}}",
-  "Thanks, {{companyName}}": "Gracias, {{CompanyName}}"
+  "Thanks, {{companyName}}": "Gracias, {{CompanyName}}",
+  "Serial number": "Número de serie"
 }
