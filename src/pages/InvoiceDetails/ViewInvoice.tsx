@@ -346,8 +346,10 @@ export const ViewInvoice = ({
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice.serviceOrder?.id,
   );
-  const {data: invoiceAmountDetail, isLoading: isLoadingInvoiceAmountDetail} =
-    useInvoiceAmountDetailQuery(invoice?.id);
+  const {
+    isLoading: isLoadingInvoiceAmountDetail,
+    refetch: refetchInvoiceAmountDetail,
+  } = useInvoiceAmountDetailQuery(invoice?.id, {enabled: false});
 
   const sortedPreviousInvoices = useMemo(
     () =>
@@ -659,6 +661,8 @@ export const ViewInvoice = ({
           subItemsMap,
         ),
       ) || [];
+
+    const {data: invoiceAmountDetail} = await refetchInvoiceAmountDetail();
 
     const blob = await pdf(
       <PdfTemplate

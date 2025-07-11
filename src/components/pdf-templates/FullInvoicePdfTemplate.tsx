@@ -197,7 +197,6 @@ const FullInvoicePdfTemplate = ({
     currentCurrency!,
     selectedLng,
   );
-  console.log(replacedPaymentTerms, 'replacedPaymentTerms');
 
   const {labor, material} = useCalculateLaborMaterialCost(
     invoiceItems,
