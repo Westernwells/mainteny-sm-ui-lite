@@ -1891,5 +1891,6 @@
   "Amount Due: {{amountDue}}": "Importo dovuto: {{quantitàdue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Se hai pagato, faccelo sapere. In caso contrario, fai così presto per evitare commissioni extra.",
   "Questions? Contact us at {{contactEmail}}": "Domande? Contattaci a {{contactEmail}}",
-  "Thanks, {{companyName}}": "Grazie, {{CompanyName}}"
+  "Thanks, {{companyName}}": "Grazie, {{CompanyName}}",
+  "Serial number": "Numero di serie"
 }

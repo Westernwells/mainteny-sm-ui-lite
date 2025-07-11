@@ -2600,5 +2600,6 @@
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "If you've paid, please let us know. If not, please do so soon to avoid extra fees.",
   "Questions? Contact us at {{contactEmail}}": "Questions? Contact us at {{contactEmail}}",
   "Thanks, {{companyName}}": "Thanks, {{companyName}}",
-  "press_enter_to_create_tag": "Press <Image></Image> Enter to create a new tag"
+  "press_enter_to_create_tag": "Press <Image></Image> Enter to create a new tag",
+  "Serial number": "Serial Number"
 }
