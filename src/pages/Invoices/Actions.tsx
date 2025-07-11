@@ -250,8 +250,10 @@ export const Actions = ({
     selectedInvoice?.id!,
   );
 
-  const {data: invoiceAmountDetail, refetch: fetchInvoiceAmountDetail} =
-    useInvoiceAmountDetailQuery(invoice?.id, {enabled: false});
+  const {refetch: refetchInvoiceAmountDetail} = useInvoiceAmountDetailQuery(
+    invoice?.id,
+    {enabled: false},
+  );
 
   const {refetch: refetchDownloadUrl} = useDownloadUrl(
     invoice?.additionalInfo.pdfPath ? [invoice?.additionalInfo.pdfPath] : [],
@@ -616,6 +618,8 @@ export const Actions = ({
         ),
       ) || [];
 
+    const {data: invoiceAmountDetail} = await refetchInvoiceAmountDetail();
+
     const blob = await pdf(
       <PdfTemplate
         serviceCompany={company}
@@ -648,7 +652,7 @@ export const Actions = ({
   const handleClick = async (event: any) => {
     setAnchorEl(event.currentTarget);
     setSelectedInvoice(invoice);
-    await Promise.all([fetchSubItems(), fetchInvoiceAmountDetail()]);
+    await fetchSubItems();
   };
 
   const handleClose = () => {
