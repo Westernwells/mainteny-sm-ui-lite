@@ -231,8 +231,8 @@ const TaskForm = ({control, setValue, watch, fixedRefEntity}: Props) => {
                       tagSearchTestId="tags-form-search"
                       tags={field.value ?? []}
                       entity={TagEntityType.TASK}
-                      onChange={field.onChange}
                       height="40px"
+                      onChange={field.onChange}
                     />
                   )}
                 />

@@ -11,18 +11,18 @@ type Props = {
   tags: TagRecord[];
   entity: TagEntityType;
   height?: string;
-  onChange: (tags: TagRecord[]) => void;
   testId?: string;
   tagSearchTestId?: string;
+  onChange: (tags: TagRecord[]) => void;
 };
 
 const TagFormField = ({
   tags,
   entity,
   height,
-  onChange,
   testId,
   tagSearchTestId,
+  onChange,
 }: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
@@ -75,12 +75,12 @@ const TagFormField = ({
       </Box>
       <TagSearch
         open={isOpen}
-        onClose={() => setIsOpen(false)}
         selectedTags={tags}
         entity={entity}
-        onChange={onChange}
         anchorRef={ref}
         testId={tagSearchTestId}
+        onChange={onChange}
+        onClose={() => setIsOpen(false)}
       />
     </>
   );

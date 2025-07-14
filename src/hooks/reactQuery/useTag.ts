@@ -7,7 +7,7 @@ import {
   UseQueryOptions,
 } from 'react-query';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {Resource, RestError, StringValue} from 'models/misc';
+import {Resource, RestError} from 'models/misc';
 import {queryKeys} from 'reactQuery/constants';
 import {
   GetTagsQuery,
@@ -82,7 +82,7 @@ type UpdateTagQueryPrams = {
 } & UpdateTagRecord;
 
 export const updateTag = async ({tagId, ...body}: UpdateTagQueryPrams) =>
-  axiosClient.put<StringValue>(`api/tags/${tagId}`, body);
+  axiosClient.put<Tag>(`api/tags/${tagId}`, body);
 
 export const useUpdateTag = (message: string) => {
   const queryClient = useQueryClient();
@@ -108,7 +108,7 @@ type CreateTagQueryPrams = {
 } & UpdateTagRecord;
 
 export const createTag = async (body: CreateTagQueryPrams) =>
-  axiosClient.post<StringValue>(`api/tags/`, body);
+  axiosClient.post<Tag>(`api/tags/`, body);
 
 export const useCreateTag = () => {
   const queryClient = useQueryClient();

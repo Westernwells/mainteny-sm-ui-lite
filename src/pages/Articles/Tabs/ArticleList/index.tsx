@@ -221,14 +221,18 @@ const ArticleList = () => {
     t('Article updated successfully.'),
   );
 
+  const handleUpdateTags = (articleId: string) => (tagIds: string[]) => {
+    updateArticle({
+      articleId,
+      article: {
+        tags: tagIds,
+      },
+    });
+  };
+
   const handleUpdateArticleTags =
     (articleId: string) => (tags: TagRecord[]) => {
-      updateArticle({
-        articleId,
-        article: {
-          tags: tags.map((tag) => tag.id),
-        },
-      });
+      handleUpdateTags(articleId)(tags.map((tag) => tag.id));
     };
 
   const navigateToNew = () => {

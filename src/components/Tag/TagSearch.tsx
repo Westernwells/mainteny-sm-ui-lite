@@ -26,9 +26,9 @@ type Props = {
   selectedTags: TagType[] | TagRecord[];
   anchorRef: RefObject<HTMLDivElement>;
   entity: TagEntityType;
+  testId?: string;
   onClose: () => void;
   onChange: (tags: TagRecord[]) => void;
-  testId?: string;
 };
 
 const TagSearch = ({
@@ -36,9 +36,9 @@ const TagSearch = ({
   selectedTags,
   anchorRef,
   entity,
+  testId,
   onClose,
   onChange,
-  testId,
 }: Props) => {
   const theme = useTheme();
   const ref = useRef<HTMLInputElement>(null);
@@ -72,8 +72,11 @@ const TagSearch = ({
   const isActionCreateTag =
     !foundTagsResource || foundTagsResource.data.length === 0;
 
-  const handleSelectTag = (tag: TagType, e: SyntheticEvent | KeyboardEvent) => {
-    e.stopPropagation();
+  const handleSelectTag = (
+    tag: TagType,
+    e?: SyntheticEvent | KeyboardEvent,
+  ) => {
+    e?.stopPropagation();
     if (!renameTagId || renameTagId !== tag.id) {
       onChange([...selectedTags, tag]);
     }
@@ -98,8 +101,8 @@ const TagSearch = ({
     onClose,
   });
 
-  const handleCreateTag = (tagName: string) => {
-    handleQueryCreateTag(
+  const handleCreateTag = async (tagName: string) => {
+    const createdTagRequest = await handleQueryCreateTag(
       generateTag(
         tagName,
         entity,
@@ -108,6 +111,11 @@ const TagSearch = ({
           : undefined,
       ),
     );
+
+    const createdTag = createdTagRequest.data;
+    handleSelectTag(createdTag);
+
+    setSearch('');
   };
 
   const handleKeyDownControl: KeyboardEventHandler<HTMLDivElement> =
@@ -195,7 +203,7 @@ const TagSearch = ({
             }}>
             <SearchInput
               refInput={ref}
-              defaultValue={search}
+              value={search}
               maxLength={50}
               onChange={(val: string) => setSearch(val)}
               onKeyDown={handleKeyDownControl}
