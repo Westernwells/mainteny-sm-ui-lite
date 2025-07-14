@@ -11,6 +11,7 @@ import {ContactPersonAssociationType} from 'models/contacts';
 import {Box, Button, TextField, Grid2 as Grid} from '@mui/material';
 import Notes from 'pages/CustomerDetails/Notes';
 import {ConfirmDelete} from 'components/ConfirmDelete';
+import {normalizeString} from 'utils/string';
 import CustomerPortalWidget from './CustomerPortalWidget';
 import PerformanceWidget from './PerformanceWidget';
 import GeneralInformationWidget from './GeneralInformationWidget';
@@ -174,7 +175,8 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
             },
           }}
           disableSave={
-            customerName.toLowerCase() !== customer?.name?.toLowerCase()
+            normalizeString(customerName.toLowerCase()) !==
+            normalizeString(customer?.name?.toLowerCase() || '')
           }
           open={openDeleteConfirm ?? false}
           onConfirm={async () => {

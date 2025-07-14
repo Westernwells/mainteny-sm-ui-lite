@@ -44,3 +44,11 @@ export function breakEmailAtSign(email: string, maxChars: number = 28): string {
   const [local, domain] = email.split('@', 2);
   return `${local}@\n${domain}`;
 }
+
+export function normalizeString(str: string) {
+  return (str || '')
+    .normalize('NFKC')
+    .replace(/\s+/g, ' ')
+    .replace(/\u200B/g, '')
+    .trim();
+}
