@@ -102,7 +102,11 @@ export const OverviewTab = ({getUnitName}: Props) => {
       </Grid>
 
       <PriorityTechnician
-        containerStyles={{mt: '1.2em'}}
+        containerStyles={{
+          mt: '1.2em',
+          overflow: 'visible',
+          minHeight: 'inherit',
+        }}
         elevatorId={elevator?.id}
         maintainers={elevator?.assignments}
       />
