@@ -132,6 +132,7 @@ import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {useSnackbar} from 'hooks/useSnackbar';
 import * as Sentry from '@sentry/react';
 import {VatView} from 'models/vat';
+import {T} from 'utils/i18n-utils';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord} from './utils';
 import {Notes} from './Notes';
@@ -142,6 +143,9 @@ interface Props {
   serviceCompanyType: ServiceCompanyType;
   quotationSubItems?: Record<string, QuotationSubItemRecord[]>;
 }
+
+const alternativeInvoiceDestinationTooltip =
+  'Enter address to receive invoice if different from billing or shipping address. Ensure accuracy to prevent misdelivery.';
 
 const localStorageQuotationDataKey = 'QUOTATION_DATA';
 
@@ -1566,7 +1570,7 @@ export const DraftQuotation = ({
                           text={t('Alternative Invoice Destination')}
                         />
                         <Tooltip
-                          title=""
+                          title={T(alternativeInvoiceDestinationTooltip) ?? ''}
                           placement="top"
                           componentsProps={{
                             tooltip: {
@@ -1578,8 +1582,13 @@ export const DraftQuotation = ({
                               },
                             },
                           }}>
-                          <IconButton sx={{fontSize: '1.375rem'}}>
-                            <InfoOutlinedIcon />
+                          <IconButton
+                            sx={{
+                              fontSize: '1.375rem',
+                              paddingTop: 0,
+                              paddingBottom: 0,
+                            }}>
+                            <InfoOutlinedIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </Box>
