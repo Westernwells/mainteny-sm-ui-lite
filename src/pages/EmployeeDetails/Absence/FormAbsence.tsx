@@ -4,7 +4,6 @@ import {FormikProps} from 'formik';
 import {Role} from 'models/user';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from '@mui/material/styles';
-
 import {DatePicker} from 'components/DatePicker';
 import {FormSelect} from 'components/form/FormSelect';
 import {capitalize} from 'utils/utils';
@@ -23,7 +22,10 @@ const FormAbsence = ({formik, roles, name, takenDates}: Props) => {
   const theme = useTheme();
 
   const shouldDisableDate = (date: Date) =>
-    takenDates.some((takenDate) => formatDate(takenDate) === formatDate(date));
+    !(
+      formik.values.dateEnd &&
+      takenDates.some((takenDate) => formatDate(takenDate) === formatDate(date))
+    );
 
   const options = [
     {label: t('1 Day'), value: '1 day'},
@@ -183,7 +185,6 @@ const FormAbsence = ({formik, roles, name, takenDates}: Props) => {
               error: !!(formik.touched.date && formik.errors.date),
             }}
             containerStyles={{mb: '1.5em'}}
-            shouldDisableDate={shouldDisableDate}
             required
           />
         )}
@@ -209,7 +210,12 @@ const FormAbsence = ({formik, roles, name, takenDates}: Props) => {
                   : undefined
               }
               containerStyles={{mb: '1.5em'}}
-              shouldDisableDate={shouldDisableDate}
+              shouldDisableDate={(date) => {
+                if (formik.values.dateEnd) {
+                  return date > formik.values.dateEnd;
+                }
+                return false;
+              }}
               required
             />
             <DatePicker
