@@ -105,7 +105,6 @@
     "mui-address-autocomplete": "^3.0.5",
     "notistack": "^2.0.3",
     "print-js": "^1.6.0",
-    "pusher-js": "^7.2.0",
     "query-string": "^7.1.1",
     "react": "18.3.1",
     "react-beautiful-dnd": "^13.1.1",
