@@ -352,27 +352,32 @@ export const getUserFullName = (userAccount?: {
 
 export const addTimeToDate = (dateObject: string | Date, timeObject: Date) => {
   if (!timeObject) return '';
-  const newTime = new Date(dateObject || timeObject);
-  newTime.setHours(
+  const date = new Date(dateObject);
+  const newTime = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
     timeObject.getHours(),
     timeObject.getMinutes(),
     timeObject.getSeconds(),
+    0,
   );
   return newTime.toISOString() ?? '';
 };
 
 export const addDateToTime = (timeObject: Date | string, dateObject: Date) => {
   if (!dateObject) return '';
-
-  const newDate = new Date(timeObject || dateObject);
-
-  newDate.setUTCFullYear(
-    dateObject.getUTCFullYear(),
-    dateObject.getUTCMonth(),
-    dateObject.getUTCDate(),
+  const time = new Date(timeObject);
+  const newDate = new Date(
+    dateObject.getFullYear(),
+    dateObject.getMonth(),
+    dateObject.getDate(),
+    time.getHours(),
+    time.getMinutes(),
+    time.getSeconds(),
+    0,
   );
-
-  return newDate?.toISOString() ?? '';
+  return newDate.toISOString() ?? '';
 };
 
 export const hasProtocol = (url: string) => {
