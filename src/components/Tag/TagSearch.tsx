@@ -69,8 +69,10 @@ const TagSearch = ({
 
   const {mutateAsync: handleQueryCreateTag} = useCreateTag();
 
-  const isActionCreateTag =
-    !foundTagsResource || foundTagsResource.data.length === 0;
+  const isActionCreateTag = useMemo(
+    () => !foundTagsResource?.data.some((element) => element.name === search),
+    [foundTagsResource, search],
+  );
 
   const handleSelectTag = (
     tag: TagType,
