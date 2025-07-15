@@ -221,7 +221,7 @@ const DiscountPanel = <TForm extends DiscountFormShape & FieldValues>({
                   textAlign="right">
                   {watchedDiscount.type === DiscountType.AMOUNT
                     ? t('Lump-sum')
-                    : t('Pecentage')}
+                    : t('Percentage')}
                 </Typography>
                 <Typography
                   variant="subtitle2"

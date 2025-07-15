@@ -1,7 +1,11 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
-import {ElevatorDataSchemaView, ElevatorView} from 'models/elevator';
+import {
+  ElevatorDataSchemaView,
+  ElevatorView,
+  ElevatorDataItemRecord,
+} from 'models/elevator';
 import {InfoCard} from 'components/InfoCard';
 import EditOutlined from '@mui/icons-material/EditOutlined';
 import Grid from '@mui/material/Grid';
@@ -18,7 +22,6 @@ import {
   escapeDotInString,
   getTechnicalFieldCategory,
   getTechnicalFieldName,
-  restoreDotInString,
 } from 'utils/utils';
 import EditTechnicalDataForm from './EditTechnicalDataForm';
 import TechnicalDataView from './TechnicalDataView';
@@ -81,27 +84,54 @@ const TechnicalData = ({elevator, schema}: Props) => {
   }, [elevator, openDialog]);
 
   const onSubmit = async () => {
-    // Restore dot character in the names. It was escaped before
-    const values = Object.keys(getValues()).reduce((acc, item) => {
-      acc[restoreDotInString(item)] = getValues()[item];
-      return acc;
-    }, {} as {[key: string]: string});
+    const values = getValues();
 
-    const items = elevatorDataItems.map((item) => ({
-      name: item.name,
-      value: values[item.name] || '',
-    }));
+    const items: Record<string, string | number> = {};
 
+    Object.entries(values as Record<string, unknown>).forEach(
+      ([key, value]) => {
+        if (!Object.prototype.hasOwnProperty.call(values, key)) return;
+        if (
+          typeof value === 'object' &&
+          value !== null &&
+          !Array.isArray(value)
+        ) {
+          Object.entries(value as Record<string, unknown>).forEach(
+            ([subKey, v]) => {
+              let numOrStr: string | number = v as string;
+              if (typeof v === 'string') {
+                if (v.trim() !== '' && !Number.isNaN(Number(v))) {
+                  numOrStr = Number(v);
+                }
+              }
+              items[`${key.trim()} [${subKey}]`] = numOrStr;
+            },
+          );
+        } else if (typeof value === 'string') {
+          let numOrStr: string | number = value;
+          if (value.trim() !== '' && !Number.isNaN(Number(value))) {
+            numOrStr = Number(value);
+          }
+          items[key] = numOrStr;
+        }
+      },
+    );
+
+    const itemsArray: ElevatorDataItemRecord[] = Object.entries(items).map(
+      ([name, value]) => ({
+        name,
+        value: String(value),
+      }),
+    );
     await updateElevatorDataItem({
       queryParams: {
         elevatorId: elevator.id,
         schemaId: schema.id,
       },
       body: {
-        items,
+        items: itemsArray,
       },
     });
-
     setDialogState(INITIAL_DIALOG_STATE);
   };
 
@@ -201,7 +231,7 @@ const TechnicalData = ({elevator, schema}: Props) => {
         {dialogState.mode === 'view' && (
           <TechnicalDataView elevatorDataItems={elevatorDataItems} />
         )}
-        {dialogState.mode === 'edit' && (
+        {dialogState.mode === 'edit' && dialogState.open && (
           <EditTechnicalDataForm
             elevatorDataItems={elevatorDataItems}
             register={register}
