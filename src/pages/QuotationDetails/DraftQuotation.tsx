@@ -1122,32 +1122,6 @@ export const DraftQuotation = ({
   }, [elevator]);
 
   useEffect(() => {
-    if (customerData) {
-      setCustomer({
-        ...customerData,
-        billingAddress: initialLocalStorage?.billingAddress
-          ? {
-              ...initialLocalStorage.billingAddress,
-              id: customerData.billingAddress?.id!,
-            }
-          : customerData.billingAddress,
-        beneficiaryAddress: initialLocalStorage?.beneficiaryAddress
-          ? {
-              ...initialLocalStorage.beneficiaryAddress,
-              id: customerData.beneficiaryAddress?.id!,
-            }
-          : customerData.beneficiaryAddress,
-        otherAddress: initialLocalStorage?.alternativeAddress
-          ? {
-              ...initialLocalStorage.alternativeAddress,
-              id: customerData.otherAddress?.id!,
-            }
-          : customerData.otherAddress,
-      });
-    }
-  }, [customerData]);
-
-  useEffect(() => {
     const emptyAddressState = {fullName: null};
 
     if (
