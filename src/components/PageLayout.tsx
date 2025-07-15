@@ -3,10 +3,6 @@ import {SxProps, Theme} from '@mui/system';
 import {useOutletContext} from 'react-router';
 import {useTranslation} from 'react-i18next';
 import {Dispatch, ReactNode, SetStateAction} from 'react';
-import {usePusher} from 'hooks/usePusher';
-import {queryKeys} from 'reactQuery/constants';
-import {MessageType} from 'models/notification';
-import {useQueryClient} from 'react-query';
 import {AppTopBar} from './AppTopBar';
 
 interface Props {
@@ -40,38 +36,6 @@ export const PageLayout = ({
   onBackAction,
 }: Props) => {
   const {t} = useTranslation();
-  const queryClient = useQueryClient();
-  usePusher({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    onMessageReceived: (event: MessageType | string) => {
-      queryClient.invalidateQueries([queryKeys.queryNotifications]);
-      queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
-      if (event === MessageType.FILE_UPDATED) {
-        queryClient.invalidateQueries([queryKeys.invoiceById]);
-        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
-      }
-      if (
-        [
-          MessageType.EMERGENCE_ASSIGNMENT_REQUEST,
-          MessageType.NON_TECHNICIAN_ASSIGNMENT_FOR_SERVICE_ORDER,
-          MessageType.EMERGENCY_ORDER_ACCEPTED,
-          MessageType.TECHNICIAN_JOB_SCHEDULE_UPDATED,
-          MessageType.SERVICE_ORDER_SCHEDULE_UPDATED,
-          MessageType.SERVICE_ORDER_STATUS_CHANGED,
-          MessageType.SERVICE_ORDER_SCHEDULE_ALERT,
-        ].includes(event as MessageType)
-      ) {
-        [
-          queryKeys.queryServiceOrders,
-          queryKeys.queryDueServiceOrders,
-          queryKeys.getServiceOrderDetails,
-          queryKeys.fetchServiceOrderChecklist,
-          queryKeys.serviceOrderActivity,
-          queryKeys.queryAppointmentConfirmationRequiredOrders,
-        ].map((q) => queryClient.invalidateQueries(q));
-      }
-    },
-  });
 
   const outletContext: OpenContext | null = useOutletContext();
 
