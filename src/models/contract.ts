@@ -1,12 +1,4 @@
-import {Client} from './client';
-import {
-  Address,
-  Amount,
-  AmountRecord,
-  Meta,
-  TimeWindowRecord,
-  TimeWindowType,
-} from './misc';
+import {Address, Amount, AmountRecord, Meta} from './misc';
 import {
   ElevatorAdditionalInfo,
   ElevatorAssignmentSimpleView,
@@ -17,7 +9,6 @@ import {
   ElevatorSortableFields,
   ElevatorStatus,
   ElevatorTimeRuleView,
-  ElevatorView,
 } from './elevator';
 import {
   PropertyContactPersonSimpleView,
@@ -69,6 +60,7 @@ export enum TimeUnitYearView {
   BIENNIALLY = 'Every 2 year',
   TRIENNIALLY = 'Every 3 year',
   QUADRENNIALLY = 'Every 4 year',
+  EVERY_5_YEARS = 'Every 5 years',
   WEEKLY = 'Weekly',
   BIWEEKLY = 'Every 2 weeks',
   TRIWEEKLY = 'Every 3 weeks',
@@ -103,6 +95,7 @@ export enum ContractTimeUnit {
   BIENNIALLY = 'BIENNIALLY',
   TRIENNIALLY = 'TRIENNIALLY',
   QUADRENNIALLY = 'QUADRENNIALLY',
+  EVERY_5_YEARS = 'EVERY_5_YEARS',
 }
 
 export enum YearlyContractTimeUnit {
@@ -110,6 +103,7 @@ export enum YearlyContractTimeUnit {
   BIENNIALLY = 'Every 2 years',
   TRIENNIALLY = 'Every 3 years',
   QUADRIENNIALLY = 'Every 4 years',
+  EVERY_5_YEARS = 'Every 5 years',
 }
 
 export enum ContractServiceDeliveryType {
@@ -522,6 +516,7 @@ export interface ContractElevatorQueryParams {
 export interface ContractElevatorUpdate {
   removalDate: string | null;
 }
+
 export interface ContractServiceForm {
   id?: string;
   name: string;
@@ -599,6 +594,7 @@ export interface ContractComponentAdditionalInfo {
   yearlyPrice?: number;
   serviceDeliveryType?: ContractServiceDeliveryType;
 }
+
 export interface ContractServiceFormElevator {
   elevatorId: string;
   invoiceJob?: JobTimeUnit;
@@ -731,6 +727,7 @@ const YEARLY_TIME_UNIT_TO_NUMBER = new Map<ContractTimeUnit, number>([
   [ContractTimeUnit.BIENNIALLY, 2],
   [ContractTimeUnit.TRIENNIALLY, 3],
   [ContractTimeUnit.QUADRENNIALLY, 4],
+  [ContractTimeUnit.EVERY_5_YEARS, 5],
 ]);
 
 const weeklyDivider = (
@@ -782,7 +779,8 @@ export const calculateContractInvoicePriceTotal = (
           | ContractTimeUnit.ANNUALLY
           | ContractTimeUnit.BIENNIALLY
           | ContractTimeUnit.TRIENNIALLY
-          | ContractTimeUnit.QUADRENNIALLY,
+          | ContractTimeUnit.QUADRENNIALLY
+          | ContractTimeUnit.EVERY_5_YEARS,
       );
       timeLength = 1 / (divider || 1);
     }
@@ -849,6 +847,7 @@ export enum ContractTimeUnitYearView {
   BIENNIALLY = 'Every 2 years',
   TRIENNIALLY = 'Every 3 years',
   QUADRENNIALLY = 'Every 4 years',
+  EVERY_5_YEARS = 'Every 5 years',
   WEEKLY = 'Weekly',
   BIWEEKLY = 'Every 2 weeks',
   NONE = 'After job',
@@ -872,6 +871,7 @@ export const getSingleItemViewFrequency = (
     case ContractTimeUnit.BIENNIALLY:
     case ContractTimeUnit.TRIENNIALLY:
     case ContractTimeUnit.QUADRENNIALLY:
+    case ContractTimeUnit.EVERY_5_YEARS:
       frequencySet.add(ContractTimeUnitYearView[timeUnit]);
       break;
     default:
