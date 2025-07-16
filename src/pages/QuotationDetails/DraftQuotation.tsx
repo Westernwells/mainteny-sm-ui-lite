@@ -1255,6 +1255,18 @@ export const DraftQuotation = ({
     quotation?.externalId,
   ]);
 
+  // Only run if customerId is present and different from current customer.
+  // This handles the pre-population of the customer auto complete component after creating a new customer.
+  useEffect(() => {
+    if (typeof customerId !== 'string' || customerId === '') return;
+
+    if (customer?.id === customerId) return;
+
+    if (customerData?.id === customerId) {
+      setCustomer(customerData);
+    }
+  }, [customerId, customerData]);
+
   if (isLoadingElevator || isLoadingCustomer) {
     return (
       <Box
