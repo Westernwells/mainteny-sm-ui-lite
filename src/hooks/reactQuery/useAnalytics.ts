@@ -368,7 +368,7 @@ export const useInvoicesPdfUrls = (
   params: QueryFinancials,
 ) => {
   const {enqueueSnackbar, showError} = useSnackbar();
-  return useQuery(
+  return useQuery<Record<string, string>>(
     [serviceCompanyId, params],
     () => fetchInvoicesPdfUrls(serviceCompanyId, params),
     {
