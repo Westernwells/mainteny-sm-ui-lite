@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
@@ -126,26 +126,39 @@ export const Reports = () => {
     reportParams,
   );
 
-  const [pdfPaths, setPdfPaths] = useState<string[]>([]);
-  const {refetch: refetchDownloadUrl} = useDownloadUrl(pdfPaths || []);
+  const [pdfPaths, setPdfPaths] = useState<Record<string, string>>({});
+  const downloadUrls = useMemo(() => Object.values(pdfPaths), [pdfPaths]);
+  const {refetch: refetchDownloadUrl} = useDownloadUrl(downloadUrls || []);
 
   useEffect(() => {
     const downloadFiles = async () => {
+      // make the value the first entry. this way the key when creating the map will be the object URI
+      const pdfPathsMapData = Object.entries(pdfPaths).map(
+        ([key, value]) => [value, key] as [string, string],
+      );
+      const invoiceMap = new Map<string, string>(pdfPathsMapData);
       const downloadUrlsResult = await refetchDownloadUrl();
       const pdfUrlsArray = Object.entries(downloadUrlsResult?.data || {});
 
-      const filesToDownload = pdfUrlsArray.map(([pdfPath, url]) => ({
-        invoiceId: pdfPath.split('/').pop()!.replace('.pdf', ''), // Extract the ID from the path (before .pdf)
-        url,
-      }));
+      const filesToDownload = pdfUrlsArray.reduce((acc, [pdfPath, url]) => {
+        const foundName = invoiceMap.get(pdfPath);
+        if (!foundName) return acc;
+        return [
+          ...acc,
+          {
+            name: foundName,
+            url,
+          },
+        ];
+      }, [] as Array<{name: string; url: string}>);
 
       if (filesToDownload.length) {
         await downloadAndZipFiles(filesToDownload, 'invoice_pdfs');
-        setPdfPaths([]);
+        setPdfPaths({});
       }
     };
 
-    if (formik.values.includePDFDocuments && pdfPaths.length) {
+    if (formik.values.includePDFDocuments && Object.values(pdfPaths).length) {
       downloadFiles();
     }
   }, [pdfPaths]);
@@ -174,7 +187,7 @@ export const Reports = () => {
         }
 
         const files = await getInvoicesPdfPaths.refetch();
-        setPdfPaths(files.data);
+        setPdfPaths(files.data || {});
       }
     }
   };
