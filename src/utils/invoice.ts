@@ -5,10 +5,12 @@ import {
   Discount,
   DiscountType,
   EditableInvoiceItem,
+  GetInvoiceTimeUnit,
   InvoiceActivityType,
   InvoiceActivityView,
   InvoiceAmountDetail,
   InvoiceFormData,
+  InvoiceFrequencyValues,
   InvoiceItemAmount,
   InvoiceItemRecord,
   InvoiceItemView,
@@ -32,6 +34,7 @@ import {addDays} from 'date-fns';
 import {
   ContractPaymentTermView,
   ContractTermView,
+  ContractTimeUnit,
   PaymentTermArticleType,
   PaymentTermData,
 } from 'models/contract';
@@ -1649,4 +1652,85 @@ export const getFormattedPaymentTerms = (
       ? `${paymentTerm.term}\n${discountOptions}`
       : paymentTerm.term,
   };
+};
+
+export const getInvoiceFrequencyTimeUnit = ({
+  selectedFrequency,
+  isYearlyFrequency,
+  isAfterJobCompletion,
+}: GetInvoiceTimeUnit) => {
+  // on Job completion case
+  if (isAfterJobCompletion) {
+    return ContractTimeUnit.NONE;
+  }
+
+  // yearly frequency cases
+  if (isYearlyFrequency) {
+    switch (selectedFrequency) {
+      case 'everyYear':
+        return ContractTimeUnit.ANNUALLY;
+      case 'every2Years':
+        return ContractTimeUnit.BIENNIALLY;
+      case 'every3Years':
+        return ContractTimeUnit.TRIENNIALLY;
+      case 'every4Years':
+        return ContractTimeUnit.QUADRENNIALLY;
+      case 'every5Years':
+        return ContractTimeUnit.EVERY_5_YEARS;
+      default:
+        return ContractTimeUnit.MONTHLY;
+    }
+  }
+
+  // Default case for non-yearly frequencies
+  return ContractTimeUnit.MONTHLY;
+};
+
+export const getInvoiceFrequencyValuesFromTimeUnit = (
+  timeUnit?: ContractTimeUnit,
+): InvoiceFrequencyValues => {
+  switch (timeUnit) {
+    case ContractTimeUnit.NONE:
+      return {
+        selectedCaseFrequency: '',
+        yearlyFrequency: false,
+        afterJobCompletion: true,
+      };
+    case ContractTimeUnit.ANNUALLY:
+      return {
+        selectedCaseFrequency: 'everyYear',
+        yearlyFrequency: true,
+        afterJobCompletion: false,
+      };
+    case ContractTimeUnit.BIENNIALLY:
+      return {
+        selectedCaseFrequency: 'every2Years',
+        yearlyFrequency: true,
+        afterJobCompletion: false,
+      };
+    case ContractTimeUnit.TRIENNIALLY:
+      return {
+        selectedCaseFrequency: 'every3Years',
+        yearlyFrequency: true,
+        afterJobCompletion: false,
+      };
+    case ContractTimeUnit.QUADRENNIALLY:
+      return {
+        selectedCaseFrequency: 'every4Years',
+        yearlyFrequency: true,
+        afterJobCompletion: false,
+      };
+    case ContractTimeUnit.EVERY_5_YEARS:
+      return {
+        selectedCaseFrequency: 'every5Years',
+        yearlyFrequency: true,
+        afterJobCompletion: false,
+      };
+    default:
+      return {
+        selectedCaseFrequency: '',
+        yearlyFrequency: false,
+        afterJobCompletion: false,
+      };
+  }
 };

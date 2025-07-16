@@ -92,6 +92,7 @@ export enum InvoiceUnitAmountSource {
   MIX_ARTICLE = 'MIX_ARTICLE',
   MIX_SUB_ITEMS = 'MIX_SUB_ITEMS',
 }
+
 export interface InvoiceItemAdditionalInfo {
   discount?: Discount;
   unitAmountSource?: InvoiceUnitAmountSource;
@@ -644,6 +645,7 @@ export interface InvoiceSubItemPayment {
   amount?: AggregatedAmount;
   percentage?: number;
 }
+
 export interface InvoiceSubItemAmount {
   payment: InvoiceSubItemPayment;
   discount: Discount;
@@ -781,4 +783,16 @@ export type InvoicedColumn = {
   name: string;
   align: 'left' | 'right' | 'center' | 'justify' | undefined;
   width: string;
+};
+
+export type GetInvoiceTimeUnit = {
+  selectedFrequency: string;
+  isYearlyFrequency: boolean;
+  isAfterJobCompletion: boolean;
+};
+
+export type InvoiceFrequencyValues = {
+  selectedCaseFrequency: string;
+  yearlyFrequency: boolean;
+  afterJobCompletion: boolean;
 };

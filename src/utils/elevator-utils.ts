@@ -103,6 +103,8 @@ export const getFrequency = (elevator: ContractElevatorView) => {
         return TimeUnitYearView.TRIENNIALLY;
       case ContractTimeUnit.QUADRENNIALLY:
         return TimeUnitYearView.QUADRENNIALLY;
+      case ContractTimeUnit.EVERY_5_YEARS:
+        return TimeUnitYearView.EVERY_5_YEARS;
       case ContractTimeUnit.NONE:
         return '-';
       default:
@@ -142,6 +144,7 @@ export const getListViewFrequency = (
         case ContractTimeUnit.BIENNIALLY:
         case ContractTimeUnit.TRIENNIALLY:
         case ContractTimeUnit.QUADRENNIALLY:
+        case ContractTimeUnit.EVERY_5_YEARS:
           frequencySet.add(t(TimeUnitYearView[timeUnit]));
           break;
         default:

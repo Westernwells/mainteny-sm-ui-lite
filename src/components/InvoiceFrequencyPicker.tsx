@@ -6,11 +6,11 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import {
   Box,
-  Switch,
-  Typography,
   Divider,
   IconButton,
   SelectChangeEvent,
+  Switch,
+  Typography,
 } from '@mui/material';
 import {ContractServiceForm, ContractTimeUnit} from 'models/contract';
 import {theme} from 'theme';
@@ -18,6 +18,10 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {FormikProps} from 'formik';
 import {useTranslation} from 'react-i18next';
 import {getListViewFrequency} from 'utils/elevator-utils';
+import {
+  getInvoiceFrequencyTimeUnit,
+  getInvoiceFrequencyValuesFromTimeUnit,
+} from 'utils/invoice';
 import {FormSelect} from './form/FormSelect';
 import {Button} from './Button';
 
@@ -47,6 +51,14 @@ const monthsData: MonthData[] = [
   {month: 'October', isSelected: false, number: 10},
   {month: 'November', isSelected: false, number: 11},
   {month: 'December', isSelected: false, number: 12},
+];
+
+const FREQUENCY_OPTIONS = [
+  {label: 'Every year', value: 'everyYear'},
+  {label: 'Every 2 years', value: 'every2Years'},
+  {label: 'Every 3 years', value: 'every3Years'},
+  {label: 'Every 4 years', value: 'every4Years'},
+  {label: 'Every 5 years', value: 'every5Years'},
 ];
 
 const InvoiceFrequencyPicker = ({
@@ -84,9 +96,13 @@ const InvoiceFrequencyPicker = ({
       case 'every4Years':
         timeUnit = ContractTimeUnit.QUADRENNIALLY;
         break;
+      case 'every5Years':
+        timeUnit = ContractTimeUnit.EVERY_5_YEARS;
+        break;
       default:
         break;
     }
+
     formik.setFieldValue('invoiceJob.timeUnit', timeUnit);
     formik.setFieldValue('invoiceJob.timeNumbers', []);
   };
@@ -115,35 +131,13 @@ const InvoiceFrequencyPicker = ({
     let selectedCaseFrequency = '';
 
     if (elevator) {
-      switch (elevator.invoiceJob?.timeUnit) {
-        case ContractTimeUnit.NONE:
-          afterJobCompletion = true;
-          yearlyFrequency = false;
-          break;
-        case ContractTimeUnit.ANNUALLY:
-          yearlyFrequency = true;
-          afterJobCompletion = false;
-          selectedCaseFrequency = 'everyYear';
-          break;
-        case ContractTimeUnit.BIENNIALLY:
-          yearlyFrequency = true;
-          afterJobCompletion = false;
-          selectedCaseFrequency = 'every2Years';
-          break;
-        case ContractTimeUnit.TRIENNIALLY:
-          yearlyFrequency = true;
-          afterJobCompletion = false;
-          selectedCaseFrequency = 'every3Years';
-          break;
-        case ContractTimeUnit.QUADRENNIALLY:
-          yearlyFrequency = true;
-          afterJobCompletion = false;
-          selectedCaseFrequency = 'every4Years';
-          break;
-        default:
-          afterJobCompletion = false;
-          yearlyFrequency = false;
-      }
+      const newValue = getInvoiceFrequencyValuesFromTimeUnit(
+        elevator.invoiceJob?.timeUnit,
+      );
+
+      afterJobCompletion = newValue.afterJobCompletion;
+      yearlyFrequency = newValue.yearlyFrequency;
+      selectedCaseFrequency = newValue.selectedCaseFrequency;
     }
 
     setAfterJobCompletion(afterJobCompletion);
@@ -163,18 +157,11 @@ const InvoiceFrequencyPicker = ({
       .filter((item) => item.isSelected)
       .map((item) => item.number);
 
-    const timeUnit =
-      isYearlyFrequency && selectedFrequency === 'everyYear'
-        ? ContractTimeUnit.ANNUALLY
-        : isYearlyFrequency && selectedFrequency === 'every2Years'
-        ? ContractTimeUnit.BIENNIALLY
-        : isYearlyFrequency && selectedFrequency === 'every3Years'
-        ? ContractTimeUnit.TRIENNIALLY
-        : isYearlyFrequency && selectedFrequency === 'every4Years'
-        ? ContractTimeUnit.QUADRENNIALLY
-        : isAfterJobCompletion
-        ? ContractTimeUnit.NONE
-        : ContractTimeUnit.MONTHLY;
+    const timeUnit = getInvoiceFrequencyTimeUnit({
+      selectedFrequency,
+      isYearlyFrequency,
+      isAfterJobCompletion,
+    });
 
     if (
       filteredUnitIds.length > 0 &&
@@ -417,12 +404,7 @@ const InvoiceFrequencyPicker = ({
               <FormSelect
                 labelId="frequency-label"
                 label=""
-                options={[
-                  {label: 'Every year', value: 'everyYear'},
-                  {label: 'Every 2 years', value: 'every2Years'},
-                  {label: 'Every 3 years', value: 'every3Years'},
-                  {label: 'Every 4 years', value: 'every4Years'},
-                ]}
+                options={FREQUENCY_OPTIONS}
                 selectProps={{
                   id: 'frequency-label',
                   value: selectedFrequency,
