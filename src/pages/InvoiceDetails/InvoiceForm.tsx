@@ -1860,21 +1860,37 @@ export const InvoiceForm = ({
     }
 
     if (isNewInvoice) {
-      if (
-        serviceOrder.articles?.length &&
-        (!watchedItems?.length ||
-          ![
-            InvoiceType.FINAL,
-            InvoiceType.PARTIAL,
-            InvoiceType.UPFRONT,
-          ].includes(invoiceType!))
-      ) {
-        const rows = serviceOrder.articles.map((article) =>
-          serviceOrderItemToServiceOrderItemRecord(
+      if (serviceOrder.articles?.length) {
+        const currentItems = getValues('items');
+        const rows = serviceOrder.articles.map((article, index) => {
+          const serviceOrderItem = serviceOrderItemToServiceOrderItemRecord(
             article,
             serviceOrderSubItemsMap,
-          ),
-        );
+          );
+
+          // Preserve existing payment properties if available
+          const existingItem = currentItems?.[index];
+          if (existingItem?.payment) {
+            return {
+              ...serviceOrderItem,
+              payment: existingItem.payment,
+            };
+          }
+
+          // If payment type is PER_ITEM, ensure all items have payment properties
+          const currentPayment = getValues('payment');
+          if (currentPayment?.type === PaymentType.PER_ITEM) {
+            return {
+              ...serviceOrderItem,
+              payment: {
+                type: InvoiceItemPaymentType.PERCENTAGE,
+                percentage: 0,
+              },
+            };
+          }
+
+          return serviceOrderItem;
+        });
 
         setValue('items', rows);
 
@@ -1903,12 +1919,36 @@ export const InvoiceForm = ({
         return;
       }
 
-      const rows = serviceOrder.articles.map((article) =>
-        serviceOrderItemToServiceOrderItemRecord(
+      const currentItems = getValues('items');
+      const rows = serviceOrder.articles.map((article, index) => {
+        const serviceOrderItem = serviceOrderItemToServiceOrderItemRecord(
           article,
           serviceOrderSubItemsMap,
-        ),
-      );
+        );
+
+        // Preserve existing payment properties if available
+        const existingItem = currentItems?.[index];
+        if (existingItem?.payment) {
+          return {
+            ...serviceOrderItem,
+            payment: existingItem.payment,
+          };
+        }
+
+        // If payment type is PER_ITEM, ensure all items have payment properties
+        const currentPayment = getValues('payment');
+        if (currentPayment?.type === PaymentType.PER_ITEM) {
+          return {
+            ...serviceOrderItem,
+            payment: {
+              type: InvoiceItemPaymentType.PERCENTAGE,
+              percentage: 0,
+            },
+          };
+        }
+
+        return serviceOrderItem;
+      });
 
       setValue('items', rows);
 
