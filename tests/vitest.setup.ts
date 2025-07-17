@@ -124,11 +124,6 @@ vi.mock('hooks/reactQuery/useUserSession', () => ({
   }),
 }));
 
-vi.mock('hooks/reactQuery/useCompanies', () => ({
-  __esModule: true,
-  useCompanyNextNumber: () => ({data: null, isLoading: false, error: null}),
-}));
-
 vi.setConfig({
   testTimeout: 60000,
 });

@@ -5,9 +5,6 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 // https://github.com/wojtekmaj/react-pdf/issues/321#issuecomment-451291757
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-if (window.Cypress) {
-  pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
-}
 type Props = {
   blobUrl: string;
   scale?: number;

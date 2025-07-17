@@ -3,7 +3,6 @@ module.exports = {
     browser: true,
     es2021: true,
     'jest/globals': true,
-    'cypress/globals': true,
   },
   extends: [
     'plugin:react/recommended',
@@ -21,7 +20,7 @@ module.exports = {
   globals: {
     JSX: 'readonly',
   },
-  plugins: ['react', '@typescript-eslint', 'react-hooks', 'cypress', 'jest'],
+  plugins: ['react', '@typescript-eslint', 'react-hooks', 'jest'],
   ignorePatterns: ['src/models/*.ts'],
   rules: {
     'react/react-in-jsx-scope': 'off',

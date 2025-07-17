@@ -285,13 +285,13 @@ export const ScheduleDialog = ({
           onClose();
           reset();
         }}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+        aria-labelledby="schedule-dialog-title"
+        aria-describedby="schedule-dialog-description"
         fullWidth
         maxWidth="sm">
-        <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+        <DialogTitle id="schedule-dialog-title">{title}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description" component="div">
+          <DialogContentText id="schedule-dialog-description" component="div">
             <Autocomplete
               multiple
               size="small"
@@ -521,7 +521,7 @@ export const ScheduleDialog = ({
               autoFocus: true,
               disabled: !isFormValid || formNotValidCustomValidation,
             }}
-            testId="saveButton">
+            testId="saveScheduleButton">
             <Typography variant="subtitle2">{t('Save')}</Typography>
           </Button>
         </DialogActions>

@@ -109,8 +109,8 @@ export const SendEmailDialog = ({
       bccEmails:
         bccMails?.bccEmails && bccMails.bccEmails.length > 0
           ? bccMails.bccEmails
-          : user?.userAccount.contact.email
-          ? [user?.userAccount.contact.email]
+          : user?.userAccount?.contact?.email
+          ? [user?.userAccount?.contact?.email]
           : [],
       attachments: [],
     },

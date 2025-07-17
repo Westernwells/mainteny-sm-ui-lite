@@ -240,6 +240,9 @@ function setupMockHooks({invoice, downloadMap}: DummyInvoiceProps) {
   });
   (vi.mocked(useInvoiceAmountDetailQuery) as Mock).mockReturnValue({
     mutateAsync: vi.fn().mockResolvedValue(undefined),
+    refetch: vi.fn().mockResolvedValue({data: {}}),
+    isLoading: false,
+    data: {},
   });
   (vi.mocked(useInfiniteInvoiceComments) as Mock).mockReturnValue({
     mutateAsync: vi.fn().mockResolvedValue(undefined),
@@ -270,11 +273,14 @@ function renderViewInvoice(i: InvoiceView) {
           footerInfo={{path: '', width: 0, height: 0, posX: 0, posY: 0}}
           headerUrl=""
           footerUrl=""
+          isLoadingHeaderUrl={false}
+          isLoadingFooterUrl={false}
           checklistProps={{
             serviceOrderCheckLists: [],
             signatureImageUrl: '',
             sortedChecklistComponents: [],
           }}
+          invoiceSubItems={{}}
         />
       </MemoryRouter>
     </QueryClientProvider>,
@@ -336,22 +342,6 @@ describe('ViewInvoice – Print flow (PDF only)', () => {
       isSuccess: true,
       status: 'success',
       refetch: vi.fn().mockResolvedValue({data: downloadMap}),
-    } as any);
-
-    mockPrintInvoiceFn = vi
-      .fn()
-      .mockImplementation((_args: any, {onSuccess}: any) => {
-        onSuccess?.();
-        return Promise.resolve();
-      });
-    (usePrintInvoice as Mock).mockReturnValue({
-      mutateAsync: mockPrintInvoiceFn,
-      mutate: vi.fn(),
-      isLoading: false,
-      isError: false,
-      error: null,
-      isSuccess: true,
-      status: 'success',
     } as any);
 
     ({mockPrintInvoiceFn} = setupMockHooks({invoice, downloadMap}));

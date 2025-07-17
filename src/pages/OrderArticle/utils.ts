@@ -37,6 +37,7 @@ export const calculateTotal = (
 export const calculateTotalVAT = (items: any[]) => {
   const vatMap = new Map();
   items.forEach((item) => {
+    if (!item.unitPurchaseAmount) return;
     const {percentageVat, netAmount, fractionDigits} = item.unitPurchaseAmount;
     const vat =
       ((percentageVat / 100) * (netAmount * item.quantity)) /

@@ -3,6 +3,7 @@ import {
   RefObject,
   SyntheticEvent,
   useEffect,
+  useRef,
   useMemo,
   useState,
 } from 'react';
@@ -49,6 +50,7 @@ const SearchInput = ({
   const {t} = useTranslation();
   const theme = useTheme();
   const [value, setValue] = useState<string>(defaultValue);
+  const isInitialRender = useRef(true);
 
   const handleChange = (e: {target: {value: string}}) => {
     setValue(e.target.value);
@@ -68,6 +70,10 @@ const SearchInput = ({
 
   // input delay
   useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
     debouncedChangeHandler(value);
     return () => {
       debouncedChangeHandler.cancel();
