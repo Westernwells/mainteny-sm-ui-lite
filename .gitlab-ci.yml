@@ -16,16 +16,12 @@ variables:
   dependencies:
     - lint-project
     - playwright-tests
-    - e2e-tests
-    - component-tests
+    - vitest
   script:
     - node -v
     - export NODE_OPTIONS='--max-old-space-size=4096'
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn prepare_env
-    - yarn check-format
-    - yarn check-types
-    - yarn check-lint
     - yarn build:${ENV}
   artifacts:
     paths:
@@ -113,6 +109,8 @@ lint-project:
 playwright-tests:
   stage: playwright-tests
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
+  parallel: 6
+  timeout: 2h
   dependencies:
     - lint-project
   variables:
@@ -120,6 +118,7 @@ playwright-tests:
     REACT_APP_BASE_URL: http://localhost:5173
     REACT_APP_API_URL: $REACT_APP_API_URL_STAGE
     REACT_APP_GOOGLE_MAPS_KEY: $REACT_APP_GOOGLE_MAPS_KEY_STAGE
+    PERCY_TOKEN: $PERCY_TOKEN
   cache:
     - <<: *global_cache_node_mods
       when: on_success
@@ -132,7 +131,39 @@ playwright-tests:
     - yarn start & # Start the application in the background
     - sleep 30 # Wait for the application to start
     - yarn playwright:install # Install Playwright chromium browser
-    - yarn playwright:test # Run Playwright tests
+    - |
+      # Debug parallel job information
+      echo "Parallel job info - CI_NODE_INDEX: $CI_NODE_INDEX, CI_NODE_TOTAL: $CI_NODE_TOTAL"
+      
+      # Run Percy tests only on the first parallel job (CI_NODE_INDEX=1 for GitLab)
+      if [ "$CI_NODE_INDEX" = "1" ]; then
+        yarn percy:test &
+        PERCY_PID=$!
+      fi
+      
+      # Run Playwright tests split across parallel jobs (CI_NODE_INDEX is 1-based in GitLab)
+      echo "Running Playwright tests with shard: $CI_NODE_INDEX/$CI_NODE_TOTAL"
+      yarn playwright:test --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL &
+      PLAYWRIGHT_PID=$!
+      
+      # Wait for processes and capture exit codes
+      if [ "$CI_NODE_INDEX" = "1" ]; then
+        wait $PERCY_PID
+        PERCY_EXIT=$?
+      else
+        PERCY_EXIT=0
+      fi
+      
+      wait $PLAYWRIGHT_PID
+      PLAYWRIGHT_EXIT=$?
+      
+      # Fail if either test suite failed
+      if [ $PERCY_EXIT -ne 0 ] || [ $PLAYWRIGHT_EXIT -ne 0 ]; then
+        echo "Tests failed - Percy exit code: $PERCY_EXIT, Playwright exit code: $PLAYWRIGHT_EXIT"
+        exit 1
+      fi
+      
+      echo "All tests passed successfully"
   artifacts:
     when: always
     paths:
@@ -161,59 +192,6 @@ vitest:
   rules:
     - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
     - when: never
-
-component-tests:
-  stage: test
-  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
-  variables:
-    ENV: stage
-    REACT_APP_BASE_URL: http://localhost:5173
-    REACT_APP_API_URL: $REACT_APP_API_URL_STAGE
-    REACT_APP_GOOGLE_MAPS_KEY: $REACT_APP_GOOGLE_MAPS_KEY_STAGE
-    npm_config_cache: "$CI_PROJECT_DIR/.npm"
-    CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
-  rules:
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
-    - when: never
-  script:
-    - yarn install --frozen-lockfile --cache-folder .yarn-cache
-    - yarn start & # Start the application in the background
-    - yarn cypress:install # Install Cypress binary
-    - yarn cypress:component --reporter junit --reporter-options "mochaFile=results/component-[hash].xml,toConsole=true,testCaseSwitchClassnameAndName=true,testsuitesTitle=true,suiteTitleSeparatedBy='.'" # Run Cypress tests
-  artifacts:
-    when: always
-    paths:
-      - results/component-*.xml
-    reports:
-      junit: results/component-*.xml
-
-e2e-tests:
-  stage: test
-  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
-  parallel: 6
-  timeout: 2h
-  variables:
-    ENV: stage
-    REACT_APP_BASE_URL: http://localhost:5173
-    REACT_APP_API_URL: $REACT_APP_API_URL_STAGE
-    REACT_APP_GOOGLE_MAPS_KEY: $REACT_APP_GOOGLE_MAPS_KEY_STAGE
-    npm_config_cache: "$CI_PROJECT_DIR/.npm"
-    CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
-  rules:
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
-    - when: never
-  script:
-    - yarn install --frozen-lockfile --cache-folder .yarn-cache
-    - yarn start & # Start the application in the background
-    - yarn cypress:install # Install Cypress binary
-    - yarn cypress:split-e2e --reporter junit --reporter-options "mochaFile=results/e2e-[hash].xml,toConsole=true,testCaseSwitchClassnameAndName=true,testsuitesTitle=true,suiteTitleSeparatedBy='.'" # Run Cypress tests
-  artifacts:
-    when: always
-    paths:
-      - results/e2e-*.xml
-      - cypress/screenshots/**/*.png
-    reports:
-      junit: results/e2e-*.xml
 
 build-feature-branch:
   <<: *build-template

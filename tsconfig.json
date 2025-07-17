@@ -18,8 +18,12 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "sourceMap": true,
-    "types": ["@testing-library/jest-dom", "cypress-real-events"]
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom",
+      "@percy/playwright"
+    ]
   },
-  "include": ["src", "cypress.d.ts"],
+  "include": ["src", "./tests/vitest.setup.ts"],
   "exclude": ["node_modules", "build"]
 }

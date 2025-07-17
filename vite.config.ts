@@ -57,7 +57,7 @@ export default defineConfig(({mode}) => {
       tsconfigPaths(),
       istanbul({
         include: 'src/*',
-        exclude: ['node_modules', 'test/', 'cypress/'],
+        exclude: ['node_modules', 'test/'],
         extension: ['.js', '.ts', '.tsx'],
         requireEnv: false,
       }),
@@ -75,9 +75,8 @@ export default defineConfig(({mode}) => {
       exclude: [
         '**/node_modules/**',
         '**/dist/**',
-        '**/cypress/**',
         '**/.{idea,git,cache,output,temp}/**',
-        '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*',
+        '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,tsup,build,eslint,prettier}.config.*',
         '**/playwright/**',
       ],
       coverage: {

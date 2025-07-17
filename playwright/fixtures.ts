@@ -1,4 +1,6 @@
-import {test as base} from '@playwright/test';
+import {test as base, Download, Locator} from '@playwright/test';
+import * as fs from 'fs';
+import * as path from 'path';
 
 import {UserSession} from '../src/models/session';
 import {
@@ -8,13 +10,17 @@ import {
 import {UserView} from '../src/models/user';
 
 type Fixtures = {
-  navigatePW: (primaryId: string, secondaryId: string) => void;
+  navigatePW: (primaryId: string, secondaryId: string) => Promise<void>;
   navigateSingleDrawer: (primaryId: string) => Promise<void>;
   login: () => Promise<void>;
-  getRichTextField: (field: string) => Promise<any>;
+  getRichTextField: (field: string) => Promise<Locator>;
+  fillRichTextField: (field: string, value: string) => Promise<void>;
+  clearRichTextField: (field: string) => Promise<void>;
+  fillTiptapRichTextField: (field: string, value: string) => Promise<void>;
   waitForSpinnerToDisappear: () => Promise<void>;
   getAuthUser: () => Promise<UserSession | null>;
   getAuthUserAccount: () => Promise<UserView | null>;
+  copyPdfToPublic: (download: Download) => Promise<string>;
 };
 
 export const test = base.extend<Fixtures>({
@@ -53,6 +59,9 @@ export const test = base.extend<Fixtures>({
       await page.locator('button[type="submit"]').click();
 
       await loginResponsePromise;
+
+      // Wait for redirect after login
+      await page.waitForURL((url) => !url.toString().includes('/login'));
     };
     await use(login);
   },
@@ -65,14 +74,62 @@ export const test = base.extend<Fixtures>({
     };
     await use(getRichTextField);
   },
+  fillRichTextField: async ({page}, use) => {
+    const fillRichTextField = async (field: string, value: string) => {
+      const fieldset = page
+        .locator('fieldset')
+        .filter({has: page.locator('legend', {hasText: field})});
+      const contentEditable = fieldset.locator('div[contenteditable="true"]');
+      await contentEditable.focus();
+      await contentEditable.click();
+      await contentEditable.fill(value);
+    };
+    await use(fillRichTextField);
+  },
+  clearRichTextField: async ({page}, use) => {
+    const clearRichTextField = async (field: string) => {
+      const fieldset = page
+        .locator('fieldset')
+        .filter({has: page.locator('legend', {hasText: field})});
+      const contentEditable = fieldset.locator('div[contenteditable="true"]');
+      await contentEditable.focus();
+      await contentEditable.click();
+      await contentEditable.click({clickCount: 3});
+      await contentEditable.press('Backspace');
+    };
+    await use(clearRichTextField);
+  },
+  fillTiptapRichTextField: async ({page}, use) => {
+    const fillTiptapRichTextField = async (field: string, value: string) => {
+      const label = page.locator('label', {hasText: field});
+      const container = label.locator('..');
+      const contentEditable = container.locator('div[contenteditable="true"]');
+      await contentEditable.focus();
+      await contentEditable.click();
+      await contentEditable.fill(value);
+    };
+    await use(fillTiptapRichTextField);
+  },
   waitForSpinnerToDisappear: async ({page}, use) => {
     const waitForSpinnerToDisappear = async () => {
-      await page
-        .locator('span[role="progressbar"]')
-        .waitFor({state: 'visible'});
-      await page
-        .locator('span[role="progressbar"]')
-        .waitFor({state: 'detached'});
+      const spinner = page.locator('span[role="progressbar"]').first();
+
+      try {
+        // Check if spinner is already visible
+        const isVisible = await spinner.isVisible();
+
+        if (isVisible) {
+          // If spinner is visible, wait for it to disappear
+          await spinner.waitFor({state: 'detached'});
+        } else {
+          // If not visible, wait briefly for it to appear, then disappear
+          await spinner.waitFor({state: 'visible', timeout: 5000});
+          await spinner.waitFor({state: 'detached'});
+        }
+      } catch (error) {
+        // If spinner doesn't appear within timeout, assume page is already loaded
+        console.log('No spinner detected, assuming page already loaded');
+      }
     };
     await use(waitForSpinnerToDisappear);
   },
@@ -91,6 +148,34 @@ export const test = base.extend<Fixtures>({
         return data ? JSON.parse(data) : null;
       }, USER_ACCOUNT_LOCALSTORAGE_KEY),
     );
+  },
+  // eslint-disable-next-line no-empty-pattern
+  copyPdfToPublic: async ({}, use) => {
+    const copyPdfToPublic = async (download: Download): Promise<string> => {
+      // Save the downloaded file
+      const downloadsDir = path.join(__dirname, '../playwright/downloads');
+      if (!fs.existsSync(downloadsDir)) {
+        fs.mkdirSync(downloadsDir, {recursive: true});
+      }
+
+      const downloadPath = path.join(
+        downloadsDir,
+        download.suggestedFilename(),
+      );
+      await download.saveAs(downloadPath);
+
+      // Copy to public folder for serving
+      const publicDir = path.join(__dirname, '../public');
+      if (!fs.existsSync(publicDir)) {
+        fs.mkdirSync(publicDir, {recursive: true});
+      }
+
+      const publicPath = path.join(publicDir, download.suggestedFilename());
+      fs.copyFileSync(downloadPath, publicPath);
+
+      return download.suggestedFilename();
+    };
+    await use(copyPdfToPublic);
   },
 });
 

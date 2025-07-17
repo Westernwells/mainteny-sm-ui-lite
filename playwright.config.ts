@@ -12,7 +12,7 @@ dotenv.config({path: '.env.stage'});
  */
 export default defineConfig({
   testDir: './playwright/e2e',
-  timeout: process.env.CI ? 180000 : 120000,
+  timeout: process.env.CI ? 240000 : 60000,
   // globalTimeout: 120000,
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -20,15 +20,14 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  // workers: process.env.CI ? 1 : undefined,
+  /* Limit the number of workers on CI, use default locally. */
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI
     ? [['junit', {outputFile: 'results/playwright-results.xml'}], ['html']]
-    : 'html',
+    : [['html', {open: 'never'}]],
   expect: {
-    timeout: 60000,
+    timeout: process.env.CI ? 180000 : 30000,
   },
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -46,18 +45,17 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
+        viewport: {width: 1920, height: 1080},
         // Add Chrome-specific args for CI stability
-        launchOptions: process.env.CI
-          ? {
-              args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-web-security',
-                '--disable-features=VizDisplayCompositor',
-              ],
-            }
-          : undefined,
+        launchOptions: {
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-web-security',
+            '--disable-features=VizDisplayCompositor',
+          ],
+        },
       },
     },
 

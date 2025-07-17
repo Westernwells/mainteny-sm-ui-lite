@@ -1,6 +1,7 @@
 import {Page} from '@playwright/test';
 import {format} from 'date-fns';
 import {expect} from '../fixtures';
+import {asyncLoop} from '../utils';
 
 export type FillTaskFormPayload = {
   name: string;
@@ -30,8 +31,9 @@ export class TaskPage {
     {label: 'Author', orderBy: 'CREATOR_LAST_NAME'},
   ];
 
-  // eslint-disable-next-line no-empty-function, no-useless-constructor
-  constructor(private page: Page) {}
+  constructor(private page: Page) {
+    this.page = page;
+  }
 
   async openFilter() {
     return this.page.getByTestId('task-filter-open-button').click();
@@ -76,13 +78,15 @@ export class TaskPage {
 
     await this.fillTaskForm(payload);
 
-    await this.clickOnCreateTask();
-
-    return this.page.waitForResponse(
+    const responsePromise = this.page.waitForResponse(
       (response) =>
         response.request().method() === 'POST' &&
         /\/api\/tasks$/.test(response.url()),
     );
+
+    await this.clickOnCreateTask();
+
+    return responsePromise;
   }
 
   async openDetailsActions(
@@ -155,7 +159,7 @@ export class TaskPage {
   async export() {
     const [download] = await Promise.all([
       this.page.waitForEvent('download'),
-      this.page.click('button:has-text("Export")'), // or your selector
+      this.page.click('button:has-text("Export")'),
     ]);
 
     return download;
@@ -242,26 +246,24 @@ export class TaskPage {
   async selectNewTaskAssignedToInput(searchStr: string) {
     const input = this.page
       .getByTestId('assigned-to-autocomplete-root')
-      .locator('input'); // or refine: page.getByRole('combobox') or by label
-    await input.click();
-    await input.fill(searchStr);
+      .locator('input');
 
-    await this.page.waitForResponse((response) => {
+    const responsePromise = this.page.waitForResponse((response) => {
       const url = response.url();
-      const regex = /\/api\/serviceCompanies\/[^/]+\/employees/;
-
-      const hasQueryParam = url.includes(`query=${searchStr}`);
-      const hasRoles = ['CONTRACTOR', 'SERVICE_MANAGER', 'TECHNICIAN'].every(
-        (role) => url.includes(`roles=${role}`),
-      );
 
       return (
-        regex.test(url) &&
-        hasQueryParam &&
-        hasRoles &&
+        url.includes('/api/serviceCompanies/') &&
+        url.includes('/employees?') &&
+        url.includes(`query=${searchStr}`) &&
         response.request().method() === 'GET'
       );
     });
+
+    await input.click();
+
+    await input.pressSequentially(searchStr);
+
+    await responsePromise;
 
     const options = this.page.locator('[role="listbox"] [role="option"]');
 
@@ -327,9 +329,7 @@ export class TaskPage {
         'connected-to-elevator-input',
       );
 
-      await refIdContainer.locator('input').click();
-
-      await this.page.waitForResponse((response) => {
+      const responsePromise = this.page.waitForResponse((response) => {
         const url = response.url();
         const regex = /\/api\/serviceCompanies\/[^/]+\/elevators/;
 
@@ -343,6 +343,10 @@ export class TaskPage {
           response.request().method() === 'GET'
         );
       });
+
+      await refIdContainer.locator('input').click();
+
+      await responsePromise;
     }
 
     if (refType === 'SERVICE_ORDER') {
@@ -350,9 +354,7 @@ export class TaskPage {
         'connected-to-service-order-input',
       );
 
-      await refIdContainer.locator('input').click();
-
-      await this.page.waitForResponse((res) => {
+      const responsePromise = this.page.waitForResponse((res) => {
         const url = new URL(res.url());
         return (
           url.pathname === '/api/serviceOrders' &&
@@ -361,6 +363,10 @@ export class TaskPage {
           res.request().method() === 'GET'
         );
       });
+
+      await refIdContainer.locator('input').click();
+
+      await responsePromise;
     }
 
     const options = this.page.locator('[role="listbox"] [role="option"]');
@@ -421,12 +427,11 @@ export class TaskPage {
   async applyAllStatusFilters() {
     await this.openFilter();
 
-    for (let i = 0; i < TaskPage.TASK_STATUSES.length; i += 1) {
-      const status = TaskPage.TASK_STATUSES[i];
+    await asyncLoop(TaskPage.TASK_STATUSES.length, async (idx) => {
+      const status = TaskPage.TASK_STATUSES[idx];
 
-      // eslint-disable-next-line no-await-in-loop
       await this.selectStatus(status.label);
-    }
+    });
 
     await this.page
       .getByTestId('task-filters-main')

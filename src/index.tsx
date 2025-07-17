@@ -43,8 +43,8 @@ const queryClient = new QueryClient({
 
 const isProduction = import.meta.env.MODE === 'prod';
 
-// disable Sentry in Cypress e2e tests
-if (!window.Cypress) {
+// disable Sentry in playwright e2e tests
+if (!navigator.webdriver) {
   Sentry.init({
     dsn: import.meta.env.REACT_APP_SENTRY_DSN,
     environment: isProduction ? 'production' : import.meta.env.MODE,
@@ -92,7 +92,7 @@ root.render(
             </PdfStylesProvider>
           </UserCompanyProvider>
         </SnackbarProvider>
-        {window.Cypress ? null : <ReactQueryDevtools />}
+        {navigator.webdriver ? null : <ReactQueryDevtools />}
       </QueryClientProvider>
       <CssBaseline />
     </LanguageProvider>

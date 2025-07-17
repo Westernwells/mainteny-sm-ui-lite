@@ -33,7 +33,7 @@ export const ContactPersonDropdown = ({
 
   const contactOptions: Option[] = useMemo(
     () =>
-      contactPersonsResource?.data.map((contact) => ({
+      contactPersonsResource?.data?.map((contact) => ({
         label: contact.userAccount.firstName
           ? `${contact.userAccount.firstName} ${contact.userAccount.lastName}`
           : contact.userAccount.lastName,
@@ -45,7 +45,7 @@ export const ContactPersonDropdown = ({
   const contactPersonById = useMemo(
     () =>
       new Map(
-        contactPersonsResource?.data.map((contact) => [contact.id, contact]) ||
+        contactPersonsResource?.data?.map((contact) => [contact.id, contact]) ||
           [],
       ),
     [contactPersonsResource],

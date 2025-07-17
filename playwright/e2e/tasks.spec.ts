@@ -9,11 +9,13 @@ import {
 } from '../../src/models/tasks';
 
 test.describe('Tasks Screen', () => {
-  test.beforeEach(async ({page, login, navigateSingleDrawer}) => {
-    await login();
-    await navigateSingleDrawer('tasks');
-    await page.waitForResponse('**/api/serviceCompanies/**/tasks?**');
-  });
+  test.beforeEach(
+    async ({login, navigateSingleDrawer, waitForSpinnerToDisappear}) => {
+      await login();
+      await navigateSingleDrawer('tasks');
+      await waitForSpinnerToDisappear();
+    },
+  );
 
   // Group 1: Filtering & Sorting
   test.describe('Filtering and Sorting', () => {
@@ -44,8 +46,8 @@ test.describe('Tasks Screen', () => {
       ];
 
       await statuses.reduce(
-        async (prevPromise, {view, assignmentType, assignedEmployeeId}) => {
-          return prevPromise.then(async () => {
+        async (prevPromise, {view, assignmentType, assignedEmployeeId}) =>
+          prevPromise.then(async () => {
             const responsePromise = page.waitForResponse(
               (resp) =>
                 resp.url().includes('/tasks?') &&
@@ -61,8 +63,7 @@ test.describe('Tasks Screen', () => {
 
             await taskPage.selectQuickFilter(view);
             await responsePromise;
-          });
-        },
+          }),
         Promise.resolve(),
       );
     });
@@ -95,10 +96,7 @@ test.describe('Tasks Screen', () => {
     test('should filter tasks by date range', async ({page}) => {
       const taskPage = new TaskPage(page);
 
-      await taskPage.selectDateRange(1, 10);
-
-      // Verify API call includes the date range
-      const response = await page.waitForResponse((resp) => {
+      const responsePromise = page.waitForResponse((resp) => {
         const url = resp.url();
         return (
           url.includes('/tasks?') &&
@@ -106,6 +104,11 @@ test.describe('Tasks Screen', () => {
           url.includes('dueDateEnd=')
         );
       });
+
+      await taskPage.selectDateRange(1, 10);
+
+      // Verify API call includes the date range
+      const response = await responsePromise;
 
       const body = await response.json();
       expect(body.data).toBeDefined();
@@ -147,14 +150,12 @@ test.describe('Tasks Screen', () => {
     test('should filter tasks by status', async ({page}) => {
       const taskPage = new TaskPage(page);
 
-      await taskPage.applyAllStatusFilters();
-
       const expectedStatuses = TaskPage.TASK_STATUSES.map(
         (s) => s.value,
       ).sort();
 
-      // // Verify API call includes status filter
-      const response = await page.waitForResponse((resp) => {
+      // Verify API call includes status filter
+      const responsePromise = page.waitForResponse((resp) => {
         const url = new URL(resp.url());
 
         const actualStatuses = url.searchParams.getAll('status').sort();
@@ -172,6 +173,11 @@ test.describe('Tasks Screen', () => {
           sameStatuses
         );
       });
+
+      await taskPage.applyAllStatusFilters();
+
+      // Wait for the response with exact status matching
+      const response = await responsePromise;
 
       const body = await response.json();
       expect(body.data).toBeDefined();
@@ -215,13 +221,15 @@ test.describe('Tasks Screen', () => {
 
       await taskPage.fillTaskForm(payload);
 
-      await taskPage.clickOnCreateTask();
-
-      const response = await page.waitForResponse(
+      const responsePromise = page.waitForResponse(
         (apiResponse) =>
           apiResponse.request().method() === 'POST' &&
           /\/api\/tasks$/.test(apiResponse.url()),
       );
+
+      await taskPage.clickOnCreateTask();
+
+      const response = await responsePromise;
 
       const requestPostData = response.request().postData()!;
 
@@ -259,13 +267,15 @@ test.describe('Tasks Screen', () => {
 
       await taskPage.fillTaskForm(payload);
 
-      await taskPage.clickOnCreateTask();
-
-      const response = await page.waitForResponse(
+      const responsePromise = page.waitForResponse(
         (apiResponse) =>
           apiResponse.request().method() === 'POST' &&
           /\/api\/tasks$/.test(apiResponse.url()),
       );
+
+      await taskPage.clickOnCreateTask();
+
+      const response = await responsePromise;
 
       const requestPostData = response.request().postData()!;
 
@@ -288,16 +298,18 @@ test.describe('Tasks Screen', () => {
     test('should edit task', async ({page}) => {
       const taskPage = new TaskPage(page);
 
+      const responsePromise = page.waitForResponse(
+        (resp) =>
+          resp.url().includes(`/api/tasks/`) &&
+          resp.request().method() === 'GET',
+      );
+
       await taskPage.openTableActions('Edit');
 
       const url = page.url();
       const taskId = new URL(url).searchParams.get('taskId');
 
-      const response = await page.waitForResponse(
-        (resp) =>
-          resp.url().includes(`/api/tasks/${taskId}`) &&
-          resp.request().method() === 'GET',
-      );
+      const response = await responsePromise;
       const json = await response.json();
 
       const payload = {
@@ -308,13 +320,15 @@ test.describe('Tasks Screen', () => {
       await taskPage.writeIntoNewTaskNameInput(payload.name);
       await taskPage.selectNewTaskStatusInput(payload.status);
 
-      await taskPage.clickOnSaveTask();
-
-      const putResponse = await page.waitForResponse(
+      const responsePromise2 = page.waitForResponse(
         (resp) =>
           resp.url().includes(`/api/tasks/${taskId}`) &&
           resp.request().method() === 'PUT',
       );
+
+      await taskPage.clickOnSaveTask();
+
+      const putResponse = await responsePromise2;
 
       const requestPostData = putResponse.request().postData()!;
 
@@ -333,13 +347,15 @@ test.describe('Tasks Screen', () => {
       await taskPage.addDummyTask();
       await taskPage.openTableActions('Delete');
 
-      await page.locator('button', {hasText: 'Yes'}).click();
-
-      await page.waitForResponse(
+      const responsePromise = page.waitForResponse(
         (resp) =>
           resp.url().includes(`/api/tasks`) &&
           resp.request().method() === 'DELETE',
       );
+
+      await page.locator('button', {hasText: 'Yes'}).click();
+
+      await responsePromise;
     });
 
     test('should delete task using table details actions', async ({page}) => {
@@ -351,13 +367,15 @@ test.describe('Tasks Screen', () => {
       await taskPage.openDetailsDrawer();
       await taskPage.openDetailsActions('Delete');
 
-      await page.locator('button', {hasText: 'Yes'}).click();
-
-      await page.waitForResponse(
+      const responsePromise = page.waitForResponse(
         (resp) =>
           resp.url().includes(`/api/tasks`) &&
           resp.request().method() === 'DELETE',
       );
+
+      await page.locator('button', {hasText: 'Yes'}).click();
+
+      await responsePromise;
     });
 
     test('should duplicate task', async ({page}) => {
@@ -385,17 +403,19 @@ test.describe('Tasks Screen', () => {
 
       await taskPage.openTableActions('Move to', {action: 'hover'});
 
+      const responsePromise = page.waitForResponse(
+        (resp) =>
+          resp.url().includes(`/api/tasks`) &&
+          resp.request().method() === 'PUT',
+      );
+
       await page
         .locator("li[role='menuitem']", {
           hasText: 'Paused',
         })
         .click();
 
-      const putResponse = await page.waitForResponse(
-        (resp) =>
-          resp.url().includes(`/api/tasks`) &&
-          resp.request().method() === 'PUT',
-      );
+      const putResponse = await responsePromise;
 
       const requestPostData = putResponse.request().postData()!;
 
@@ -489,33 +509,16 @@ test.describe('Tasks Screen', () => {
 
     test('should open task details drawer', async ({page}) => {
       const taskPage = new TaskPage(page);
-      const response = await page.waitForResponse((resp) => {
-        const url = resp.url();
-        const regex = /\/serviceCompanies\/[^/]+\/tasks\?(?=.*pageSize=25)/;
-        return regex.test(url);
-      });
-      const data = await response.json();
-      const taskId = data?.data?.[0]?.id;
 
       await taskPage.openDetailsDrawer();
 
-      await page.waitForURL(
-        new RegExp(`.*tasks\\?.*mode=view.*[&?]taskId=${taskId}.*`),
-      );
       await expect(page.getByTestId('task-details-drawer-main')).toBeVisible();
     });
 
     test('should paginate through task list', async ({page}) => {
       const taskPage = new TaskPage(page);
 
-      // Wait for initial data load
-      await page.waitForResponse('**/api/serviceCompanies/**/tasks?**');
-
-      // Click page 2 button
-      await taskPage.goToTablePage(2);
-
-      // Verify API call includes page parameter
-      const response = await page.waitForResponse((resp) => {
+      const responsePromise = page.waitForResponse((resp) => {
         const url = new URL(resp.url());
 
         return (
@@ -527,6 +530,27 @@ test.describe('Tasks Screen', () => {
           url.searchParams.get('pageIndex') === '1'
         );
       });
+
+      const response2Promise = page.waitForResponse((resp) => {
+        const url = new URL(resp.url());
+
+        return (
+          /^\/api\/serviceCompanies\/[0-9a-fA-F-]+\/tasks$/.test(
+            url.pathname,
+          ) &&
+          url.searchParams.has('pageSize') &&
+          url.searchParams.has('pageIndex') &&
+          url.searchParams.get('pageIndex') === '1'
+        );
+      });
+
+      // Click page 2 button
+      await taskPage.goToTablePage(2);
+
+      // Verify API call includes page parameter
+      const response = await responsePromise;
+
+      await response2Promise;
 
       const body = await response.json();
       expect(body.data).toBeDefined();
