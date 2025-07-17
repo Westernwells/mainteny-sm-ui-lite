@@ -3297,7 +3297,7 @@
   "Attachment added successfully": "Anhang wurde erfolgreich hinzugefügt.",
   "Attachment was deleted": "Anhang wurde gelöscht",
   "Tasks": "Aufgaben",
-  "Enter folder name...": "Ordner bennen...",
+  "Enter folder name...": "Ordner benennen...",
   "{{numberOfFiles}} files": "{{numberOfFiles}} Anhänge",
   "Attachment has been moved successfully": "Anhang wurde erfolgreich verschoben",
   "Select a folder to move your {{selectedFilesCount}} selected files to.": "Wähle einen Ordner, in den du die {{selectedFilesCount}} ausgewählten Dateien verschieben möchtest.",
