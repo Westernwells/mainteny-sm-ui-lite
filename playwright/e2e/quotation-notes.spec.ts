@@ -127,6 +127,13 @@ test.describe('Quotation Notes', () => {
 
     await deleteResponse;
 
+    await page.waitForResponse(
+      (resp) =>
+        resp.url().includes('/api/serviceCompanies/') &&
+        resp.url().includes('/quotations') &&
+        resp.request().method() === 'GET',
+    );
+
     await expect(
       page.locator('text=No notes yet. They will appear here once added.'),
     ).toBeVisible();

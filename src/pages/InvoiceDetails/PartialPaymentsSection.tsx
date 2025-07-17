@@ -31,6 +31,7 @@ import {
   InvoiceType,
   InvoiceView,
   PaymentType,
+  EditableInvoiceItem,
 } from 'models/invoice';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
@@ -360,15 +361,35 @@ export const PartialPaymentsSection = ({
           firstInvoicePaymentType === PaymentType.PER_ITEM ||
           (!articlesAreSame && firstInvoicePaymentType !== PaymentType.LUMP_SUM)
         ) {
-          const getItemOverallPercentage = (name: string): number =>
-            previousInvoices
-              ?.map((i) => i.items)
-              ?.flat()
-              ?.filter((i) => i.article?.name && i.article?.name === name)
-              ?.reduce(
-                (acc, i) => acc + (i.additionalInfo?.payment?.percentage ?? 0),
-                0,
-              );
+          const getItemOverallPercentage = (
+            item: EditableInvoiceItem,
+          ): number => {
+            const id = item.article?.id;
+            const name = item.article?.name;
+            if (id) {
+              return previousInvoices
+                ?.map((i) => i.items)
+                ?.flat()
+                ?.filter((i) => i.article?.id === id)
+                ?.reduce(
+                  (acc, i) =>
+                    acc + (i.additionalInfo?.payment?.percentage ?? 0),
+                  0,
+                );
+            }
+            if (name) {
+              return previousInvoices
+                ?.map((i) => i.items)
+                ?.flat()
+                ?.filter((i) => i.article?.name === name)
+                ?.reduce(
+                  (acc, i) =>
+                    acc + (i.additionalInfo?.payment?.percentage ?? 0),
+                  0,
+                );
+            }
+            return 0;
+          };
 
           // Set payment type first
           setValue('payment', {
@@ -378,8 +399,7 @@ export const PartialPaymentsSection = ({
           });
 
           const updatedItems = getValues('items')?.map((item) => {
-            const itemName = item.article?.name ?? '';
-            const overallPercentage = getItemOverallPercentage(itemName);
+            const overallPercentage = getItemOverallPercentage(item);
             const remainingPercentage = 100 - (overallPercentage || 0);
 
             return {
@@ -472,19 +492,35 @@ export const PartialPaymentsSection = ({
   ];
 
   const renderPerItemSection = () => {
-    const getItemOverallPercentage = (id: string) =>
-      previousInvoices
-        ?.map((i) => i.items)
-        ?.flat()
-        ?.filter((i) => i.article?.id && i.article?.id === id)
-        ?.reduce(
-          (acc, i) => acc + (i.additionalInfo?.payment?.percentage ?? 0),
-          0,
-        );
+    const getItemOverallPercentage = (item: EditableInvoiceItem): number => {
+      const id = item.article?.id;
+      const name = item.article?.name;
+      if (id) {
+        return previousInvoices
+          ?.map((i) => i.items)
+          ?.flat()
+          ?.filter((i) => i.article?.id === id)
+          ?.reduce(
+            (acc, i) => acc + (i.additionalInfo?.payment?.percentage ?? 0),
+            0,
+          );
+      }
+      if (name) {
+        return previousInvoices
+          ?.map((i) => i.items)
+          ?.flat()
+          ?.filter((i) => i.article?.name === name)
+          ?.reduce(
+            (acc, i) => acc + (i.additionalInfo?.payment?.percentage ?? 0),
+            0,
+          );
+      }
+      return 0;
+    };
 
     const isAllowedPortionField = (
       values: NumberFormatValues,
-      itemId?: string,
+      item: EditableInvoiceItem,
     ) => {
       const {floatValue} = values;
       if (!floatValue) {
@@ -495,12 +531,12 @@ export const PartialPaymentsSection = ({
         return false;
       }
 
-      const prevInvoicesItemPercentage = getItemOverallPercentage(itemId ?? '');
+      const prevInvoicesItemPercentage = getItemOverallPercentage(item);
       const maxPercentage = isEditing
         ? 100 -
           (prevInvoicesItemPercentage -
-            (invoice.items.find((i) => i.article?.id === itemId)?.additionalInfo
-              ?.payment?.percentage ?? 0))
+            (invoice.items.find((i) => i.article?.id === item.article?.id)
+              ?.additionalInfo?.payment?.percentage ?? 0))
         : 100 - prevInvoicesItemPercentage;
 
       return floatValue <= maxPercentage;
@@ -547,7 +583,7 @@ export const PartialPaymentsSection = ({
                             prevInvoice.id === invoice?.id;
 
                           return isEditingCurrentItem
-                            ? getItemOverallPercentage(item.article?.id ?? '') -
+                            ? getItemOverallPercentage(item) -
                                 (item.additionalInfo?.payment?.percentage ??
                                   0) <
                                 100
@@ -668,10 +704,7 @@ export const PartialPaymentsSection = ({
                                     allowLeadingZeros: false,
                                     decimalScale: 0,
                                     isAllowed: (values) =>
-                                      isAllowedPortionField(
-                                        values,
-                                        item.article?.id,
-                                      ),
+                                      isAllowedPortionField(values, item),
                                     disabled: prevInvoice.id !== invoice?.id,
                                   }}
                                 />
@@ -738,8 +771,7 @@ export const PartialPaymentsSection = ({
                     {watchedItems
                       ?.filter(
                         // if item already paid 100% full, don't render it
-                        (i) =>
-                          getItemOverallPercentage(i.article?.id ?? '') < 100,
+                        (i) => getItemOverallPercentage(i) < 100,
                       )
                       ?.map((item, index) => {
                         // Calculate base amount before discounts
@@ -824,10 +856,7 @@ export const PartialPaymentsSection = ({
                                   allowLeadingZeros: false,
                                   decimalScale: 0,
                                   isAllowed: (values) =>
-                                    isAllowedPortionField(
-                                      values,
-                                      item.article?.id,
-                                    ),
+                                    isAllowedPortionField(values, item),
                                 }}
                               />
                             </TableCell>
