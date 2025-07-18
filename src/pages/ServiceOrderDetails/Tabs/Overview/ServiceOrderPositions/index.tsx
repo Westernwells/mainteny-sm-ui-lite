@@ -34,6 +34,7 @@ import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmatio
 import {Dialog} from 'components/Dialog';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import * as Sentry from '@sentry/react';
+import {useVats} from 'hooks/reactQuery/useVats';
 import ServiceOrderPositionTable from './ServiceOrderPositionTable';
 
 type Props = {
@@ -51,6 +52,8 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
   const [openMode, setOpenMode] = useState<OpenMode>(null);
 
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+
+  const {data: taxRates, isLoading: isLoadingTaxRates} = useVats();
 
   const {
     data: serviceOrderArticles,
@@ -168,6 +171,7 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
           currentItems || [],
           currentCurrency,
           currentValues.discount,
+          taxRates,
         );
 
         const detail = await calculateServiceOrderAmount({
@@ -285,7 +289,8 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
     }
   }, [watchedItems.length]);
 
-  if (isLoadingSubItems || isLoadingServiceOrderArticles) return <Progress />;
+  if (isLoadingSubItems || isLoadingServiceOrderArticles || isLoadingTaxRates)
+    return <Progress />;
 
   return (
     <InfoCard
