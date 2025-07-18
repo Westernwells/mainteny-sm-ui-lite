@@ -2591,5 +2591,6 @@
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Εάν έχετε πληρώσει, ενημερώστε μας. Εάν όχι, κάντε το σύντομα για να αποφύγετε επιπλέον χρεώσεις.",
   "Questions? Contact us at {{contactEmail}}": "Ερωτήσεις; Επικοινωνήστε μαζί μας στο {{contactEmail}}.",
   "Thanks, {{companyName}}": "Ευχαριστώ, {{companyName}}",
-  "Serial number": "Αριθμός εργοστασίου"
+  "Serial number": "Αριθμός εργοστασίου",
+  "Multiple days": "Πολλαπλές Ημέρες"
 }

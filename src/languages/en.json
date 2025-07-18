@@ -2601,5 +2601,6 @@
   "Questions? Contact us at {{contactEmail}}": "Questions? Contact us at {{contactEmail}}",
   "Thanks, {{companyName}}": "Thanks, {{companyName}}",
   "press_enter_to_create_tag": "Press <Image></Image> Enter to create a new tag",
-  "Serial number": "Serial Number"
+  "Serial number": "Serial Number",
+  "Multiple days": "Multiple Days"
 }
