@@ -2663,5 +2663,6 @@
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Hvis du har betalt, så lad os det vide. Hvis ikke, bedes du gøre det snarest for at undgå ekstra gebyrer.",
   "Questions? Contact us at {{contactEmail}}": "Spørgsmål? Kontakt os på {{contactEmail}}",
   "Thanks, {{companyName}}": "Tak, {{companyName}}",
-  "Serial number": "Serienummer"
+  "Serial number": "Serienummer",
+  "Multiple days": "Flere dage"
 }
