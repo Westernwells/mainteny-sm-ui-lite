@@ -76,7 +76,6 @@ import {
   applyVatToItems,
   formatAddressFullname,
   formatSearchParams,
-  getUniqueId,
   getUserFullName,
   isNumber,
 } from 'utils/utils';
@@ -255,8 +254,6 @@ export const InvoiceForm = ({
   const {search} = useLocation();
 
   const {data: taxRates, isLoading: isLoadingTaxRates} = useVats();
-
-  const defaultVat = taxRates?.find((tR) => tR.isDefault);
 
   const {fontStyles, primaryColor, secondaryColor} =
     useContext(PdfStylesContext);

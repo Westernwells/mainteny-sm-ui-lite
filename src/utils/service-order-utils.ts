@@ -10,6 +10,7 @@ import {getAddressString} from 'utils/address';
 import {ArticleType} from 'models/article';
 import {Discount, DiscountType} from 'models/invoice';
 import {AmountRecord, Currency} from 'models/misc';
+import {VatView} from 'models/vat';
 import {
   AUTO_GENERATED_TO_PAYMENT_STATUS,
   DateCellParts,
@@ -34,6 +35,7 @@ import {
 import {formatDate, toDate, toRestDateTime} from './datetime';
 import {moneyToCents} from './currency';
 import {convertUserAccountsToSimpleView} from './user';
+import {resolveVatFromBackend} from './utils';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
@@ -677,75 +679,160 @@ export const buildServiceOrderPayload = (
   items: NewServiceOrderItemRecord[],
   currentCurrency: Currency,
   discount?: Discount,
+  taxRates?: VatView[],
 ) => ({
-  articles: items.map((item) => ({
-    id: undefined,
-    article: {
+  articles: items.map((item) => {
+    // resolve VAT on the line‑item amount
+    const {percentageVat, vatName} = resolveVatFromBackend(
+      item.unitAmount?.vatId,
+      item.unitAmount?.percentageVat,
+      item.unitAmount?.vatName,
+      taxRates,
+    );
+
+    const {percentageVat: purchaseVat, vatName: purchaseVatName} =
+      resolveVatFromBackend(
+        item.article?.unitPurchaseAmount?.vatId,
+        item.article?.unitPurchaseAmount?.percentageVat,
+        item.article?.unitPurchaseAmount?.vatName,
+        taxRates,
+      );
+
+    const {percentageVat: sellingVat, vatName: sellingVatName} =
+      resolveVatFromBackend(
+        item.article?.unitSellingAmount?.vatId,
+        item.article?.unitSellingAmount?.percentageVat,
+        item.article?.unitSellingAmount?.vatName,
+        taxRates,
+      );
+
+    return {
       id: undefined,
-      name: item.article?.name,
-      externalId: item.article?.externalId,
-      type: item.article?.type,
-      unit: item.article?.unit,
-      unitSellingAmount: item.article?.unitSellingAmount,
-      unitPurchaseAmount: item.article?.unitPurchaseAmount,
-      costPackage: item.article?.costPackage,
-    },
-    name: item.name,
-    description: item.description,
-    unitAmount: {
-      currency: item.unitAmount?.currency || currentCurrency.code,
-      netAmount:
-        item.unitAmount?.netAmount !== undefined
-          ? Number(item.unitAmount.netAmount)
-          : 0,
-      percentageVat: item.unitAmount?.percentageVat || 0,
-      vatId: item.unitAmount?.vatId || '',
-      vatName: item.unitAmount?.vatName || '',
-    },
-    quantity: Number.isNaN(Number(item.quantity)) ? 0 : Number(item.quantity),
-    discount:
-      item.discount?.type === DiscountType.AMOUNT
-        ? {
-            type: DiscountType.AMOUNT,
-            amount: {
-              ...item.discount?.amount,
-              value: (item.discount?.amount?.value ?? 0) * 100,
-              currency: item.discount?.amount?.currency || currentCurrency.code,
-            },
-          }
-        : {
-            type: DiscountType.PERCENTAGE,
-            percentage: item.discount?.percentage || 0,
-          },
-    subItemsConfig: item.subItemsConfig,
-    subArticles: item?.subItems?.map((sub) => ({
       article: {
         id: undefined,
-        name: sub.article?.name,
-        externalId: sub.article?.externalId,
-        type: sub.article?.type,
-        unit: sub.article?.unit,
-        unitSellingAmount: sub.article?.unitSellingAmount,
-        unitPurchaseAmount: sub.article?.unitPurchaseAmount,
-        costPackage: sub.article?.costPackage,
+        name: item.article?.name,
+        externalId: item.article?.externalId,
+        type: item.article?.type,
+        unit: item.article?.unit,
+        unitSellingAmount: {
+          ...item.article?.unitSellingAmount,
+          currency:
+            item.article?.unitSellingAmount?.currency || currentCurrency.code,
+          percentageVat: sellingVat,
+          vatName: sellingVatName,
+        },
+        unitPurchaseAmount: {
+          ...item.article?.unitPurchaseAmount,
+          currency:
+            item.article?.unitPurchaseAmount?.currency || currentCurrency.code,
+          percentageVat: purchaseVat,
+          vatName: purchaseVatName,
+        },
+        costPackage: item.article?.costPackage,
       },
-      id: undefined,
-      name: sub.name,
-      unitPurchaseAmount: sub.unitPurchaseAmount,
-      unitAmount: sub.unitAmount,
-      quantity: Number.isNaN(Number(sub.quantity)) ? 0 : Number(sub.quantity),
-      description: sub.description,
-      userSeqNumber: undefined,
-    })),
-    userSeqNumber: item.userSeqNumber || undefined,
-  })),
+      name: item.name,
+      description: item.description,
+      unitAmount: {
+        currency: item.unitAmount?.currency || currentCurrency.code,
+        netAmount:
+          item.unitAmount?.netAmount !== undefined
+            ? Number(item.unitAmount.netAmount)
+            : 0,
+        percentageVat,
+        vatId: item.unitAmount?.vatId || '',
+        vatName,
+      },
+      quantity: Number.isNaN(Number(item.quantity)) ? 0 : Number(item.quantity),
+      discount:
+        item.discount?.type === DiscountType.AMOUNT
+          ? {
+              type: DiscountType.AMOUNT,
+              amount: {
+                ...item.discount.amount!,
+                value: (item.discount.amount?.value ?? 0) * 100,
+                currency:
+                  item.discount.amount?.currency || currentCurrency.code,
+              },
+            }
+          : {
+              type: DiscountType.PERCENTAGE,
+              percentage: item.discount?.percentage || 0,
+            },
+      subItemsConfig: item.subItemsConfig,
+      subArticles: item.subItems?.map((sub) => {
+        const {percentageVat: subPercentageVat, vatName: subVatName} =
+          resolveVatFromBackend(
+            sub.unitAmount?.vatId,
+            sub.unitAmount?.percentageVat,
+            sub.unitAmount?.vatName,
+            taxRates,
+          );
+        const {percentageVat: subPurchaseVat, vatName: subPurchaseVatName} =
+          resolveVatFromBackend(
+            sub.article?.unitPurchaseAmount?.vatId,
+            sub.article?.unitPurchaseAmount?.percentageVat,
+            sub.article?.unitPurchaseAmount?.vatName,
+            taxRates,
+          );
+        const {percentageVat: subSellingVat, vatName: subSellingVatName} =
+          resolveVatFromBackend(
+            sub.article?.unitSellingAmount?.vatId,
+            sub.article?.unitSellingAmount?.percentageVat,
+            sub.article?.unitSellingAmount?.vatName,
+            taxRates,
+          );
+
+        return {
+          article: {
+            id: undefined,
+            name: sub.article?.name,
+            externalId: sub.article?.externalId,
+            type: sub.article?.type,
+            unit: sub.article?.unit,
+            unitSellingAmount: {
+              ...sub.article?.unitSellingAmount,
+              currency:
+                sub.article?.unitSellingAmount?.currency ||
+                currentCurrency.code,
+              percentageVat: subSellingVat,
+              vatName: subSellingVatName,
+            },
+            unitPurchaseAmount: {
+              ...sub.article?.unitPurchaseAmount,
+              currency:
+                sub.article?.unitPurchaseAmount?.currency ||
+                currentCurrency.code,
+              percentageVat: subPurchaseVat,
+              vatName: subPurchaseVatName,
+            },
+            costPackage: sub.article?.costPackage,
+          },
+          id: undefined,
+          name: sub.name,
+          unitPurchaseAmount: sub.unitPurchaseAmount,
+          unitAmount: {
+            ...sub.unitAmount,
+            currency: sub.unitAmount?.currency || currentCurrency.code,
+            percentageVat: subPercentageVat,
+            vatName: subVatName,
+          },
+          quantity: Number.isNaN(Number(sub.quantity))
+            ? 0
+            : Number(sub.quantity),
+          description: sub.description,
+          userSeqNumber: sub.userSeqNumber,
+        };
+      }),
+      userSeqNumber: item.userSeqNumber,
+    };
+  }),
   globalDiscount:
     discount?.type === DiscountType.AMOUNT
       ? {
           type: DiscountType.AMOUNT,
           amount: {
             value: moneyToCents(
-              currentCurrency?.code,
+              currentCurrency.code,
               discount.amount?.value ?? 0,
             ),
             currency: discount.amount?.currency || currentCurrency.code,
