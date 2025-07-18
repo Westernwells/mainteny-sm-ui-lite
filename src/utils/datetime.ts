@@ -24,6 +24,7 @@ import {de, enUS, srLatn} from 'date-fns/locale';
 import * as datePickerLocales from '@mui/x-date-pickers/locales';
 import {companyLanguageToUppercaseMap} from 'utils/language';
 import {TimeWindowType} from 'models/employee';
+import {MONTH_NUMBER_TO_NAME} from './month-constants';
 import {Language} from '../models/misc';
 
 export const DEFAULT_DATE_FORMAT = 'dd.MM.yyyy';
@@ -398,4 +399,14 @@ export const getPastDateRange = (dateFrom?: string, dateTo?: string) => {
     pastFrom: format(pastFrom, 'yyyy-MM-dd'),
     pastTo: format(pastTo, 'yyyy-MM-dd'),
   };
+};
+
+export const getMonthYearFromDate = (value: string) => {
+  const {t} = useTranslation();
+
+  const date = new Date(value);
+  const monthNumber = date.getMonth() + 1;
+  const year = date.getFullYear();
+
+  return `${t(MONTH_NUMBER_TO_NAME[monthNumber])} ${year}`;
 };

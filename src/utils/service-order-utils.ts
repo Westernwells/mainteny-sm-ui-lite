@@ -10,11 +10,13 @@ import {getAddressString} from 'utils/address';
 import {ArticleType} from 'models/article';
 import {Discount, DiscountType} from 'models/invoice';
 import {AmountRecord, Currency} from 'models/misc';
+import {t} from 'i18next';
 import {VatView} from 'models/vat';
 import {
   AUTO_GENERATED_TO_PAYMENT_STATUS,
   DateCellParts,
   EditableServiceOrderItem,
+  GetServiceTypeProps,
   NewServiceOrderItemRecord,
   SearchParameters,
   SERVICE_ORDER_PAYMENT_STATUS_VIEW,
@@ -578,6 +580,7 @@ export function getServiceOrderDateParts(
 
   return {label, date};
 }
+
 export const serviceOrderItemToServiceOrderItemRecord = (
   serviceOrderItem: ServiceOrderArticleView,
   subItemsMap: Record<string, ServiceOrderSubArticleRecord[]> = {},
@@ -965,3 +968,26 @@ export function convertEmployeesToServiceOrderEmployees(
     online: employee.online,
   }));
 }
+
+export const getDisplayJobType = ({
+  value,
+  dynamicJobTypes = [],
+  oldJobTypes = [],
+}: GetServiceTypeProps) => {
+  if (!value) return '-';
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes.filter(
+    (oldJobType) =>
+      !dynamicJobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...dynamicJobTypes, ...filteredOldJobTypes];
+
+  const foundOldJob = getJobTypeGivenName(value, filteredOldJobTypes);
+
+  if (foundOldJob !== '-') return t(foundOldJob);
+
+  return getJobTypeGivenName(value, allJobTypes);
+};
