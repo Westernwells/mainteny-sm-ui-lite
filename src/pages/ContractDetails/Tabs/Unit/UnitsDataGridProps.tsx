@@ -28,7 +28,7 @@ export const getAutoJobStatus = (
 export const columns = (contractId?: string): GridColDef[] => [
   getColumnProps({
     field: ElevatorOrderField.EXTERNAL_ID,
-    headerName: 'serial number',
+    headerName: 'Unit ID',
     align: 'left',
     flex: 1,
     sortable: true,

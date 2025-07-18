@@ -710,6 +710,7 @@ export interface ServiceOrderSubArticlesConfig {
   subItemsVisible?: boolean;
   priceVisible?: boolean;
 }
+
 export interface ServiceOrderArticleAdditionalInfo {
   discount?: Discount;
   owner?: {
@@ -720,6 +721,7 @@ export interface ServiceOrderArticleAdditionalInfo {
   subArticlesConfig?: ServiceOrderSubArticlesConfig;
   userSeqNumber?: string;
 }
+
 export interface ServiceOrderArticleView {
   id: string;
   name: string;
@@ -848,6 +850,7 @@ export interface DateCellParts {
   label: string;
   date?: string | null;
 }
+
 export interface ServiceOrderSubItemRecord {
   article?: ArticleInfoRecord;
   id?: string;
@@ -895,6 +898,7 @@ export interface UpdateServiceOrderAmountRecord {
   articles: ServiceOrderArticleRecord[];
   globalDiscount?: Discount;
 }
+
 export interface ServiceOrderArticleRecord {
   articleId?: string;
   article?: ArticleInfoRecord;
@@ -975,4 +979,10 @@ export const statusLabelMap: Record<ServiceOrderStatus, string> = {
   [ServiceOrderStatus.SCHEDULING]: '',
   [ServiceOrderStatus.INVOICE_ISSUED]: '',
   [ServiceOrderStatus.ARTICLES_ORDERED]: '',
+};
+
+export type GetServiceTypeProps = {
+  value?: string;
+  dynamicJobTypes?: ServiceOrderTypeRecord[];
+  oldJobTypes?: ServiceOrderTypeRecord[];
 };

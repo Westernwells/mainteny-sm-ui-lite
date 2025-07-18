@@ -184,6 +184,7 @@ export const getViewFrequency = (job?: JobTimeUnit): string => {
     case ContractTimeUnit.BIENNIALLY:
     case ContractTimeUnit.TRIENNIALLY:
     case ContractTimeUnit.QUADRENNIALLY:
+    case ContractTimeUnit.EVERY_5_YEARS:
       frequencySet.add(TimeUnitYearView[job.timeUnit]);
       break;
     default:
@@ -194,7 +195,11 @@ export const getViewFrequency = (job?: JobTimeUnit): string => {
     .sort((a, b) => a - b)
     .forEach((unit) => frequencySet.add(monthNames[unit - 1]));
 
-  return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
+  return frequencySet.size
+    ? Array.from(frequencySet)
+        .map((month) => t(month))
+        .join(', ')
+    : '-';
 };
 
 export const inspectionCycleLabels = {

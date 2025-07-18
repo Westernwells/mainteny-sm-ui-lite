@@ -16,9 +16,9 @@ import {ElevatorDataSchemaItem} from 'models/elevator';
 import {Theme} from '@mui/system';
 import {VatView} from 'models/vat';
 import {EditableQuotationItem} from 'models/quotation';
-import {MONTH_NUMBER_TO_NAME} from 'models/jobFrequency';
 import {ContractServiceFormElevator, ContractTimeUnit} from 'models/contract';
 import {FileWithPreview} from 'models/files';
+import {MONTH_NUMBER_TO_NAME} from './month-constants';
 import {
   Address,
   AddressRecord,

@@ -78,7 +78,7 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
     align?: TableCellProps['align'];
     width?: TableCellProps['width'];
   }[] = [
-    {name: 'Serial Number', align: 'left', width: '15%'},
+    {name: 'Unit ID', align: 'left', width: '15%'},
     {name: 'Building', width: '12%'},
     {name: 'Unit Address', width: '25%'},
     {name: 'Job Frequency', align: 'left', width: '15%'},
