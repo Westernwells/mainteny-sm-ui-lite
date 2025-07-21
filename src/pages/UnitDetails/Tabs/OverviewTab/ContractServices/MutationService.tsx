@@ -301,7 +301,7 @@ export const MutationService = ({
     align?: TableCellProps['align'];
     width?: TableCellProps['width'];
   }[] = [
-    {name: 'Serial Number', align: 'left', width: '20%'},
+    {name: 'Unit ID', align: 'left', width: '20%'},
     {name: 'Building', width: '10%'},
     {
       name: 'Unit Address',
