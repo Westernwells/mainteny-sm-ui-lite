@@ -5,6 +5,8 @@ import {test, expect} from '../fixtures';
 const baseUrl = 'http://localhost:5173';
 const pdfViewerUrl = `${baseUrl}/pdf-viewer?filename=`;
 
+// skip test if we are not running in percy
+// because these tests also run if we are running playwright tests
 if (!process.env.PERCY_SERVER_ADDRESS) {
   test.skip();
 }
@@ -56,6 +58,9 @@ test.describe('PDF Visual testing', () => {
         pdfDocument.locator(`text=${assertText}`).first(),
       ).toBeVisible();
     }
+
+    // wait for 2 seconds to make sure the page is fully loaded
+    await page.waitForTimeout(2000);
 
     await percySnapshot(page, name, {
       widths: [1280],
