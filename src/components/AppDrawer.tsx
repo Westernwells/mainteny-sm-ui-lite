@@ -656,7 +656,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
               ) => {
                 if (!access) return null;
                 return (
-                  <>
+                  <Fragment key={text}>
                     <ListItemButton
                       onClick={(e) => onClick(e, index)}
                       selected={
@@ -712,7 +712,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                           },
                         },
                       }}
-                      key={text}
                       data-testid={`${lowerCaseAndJoinByHyphen(
                         text,
                       )}-nav-item`}>
@@ -871,7 +870,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                         </List>
                       </Collapse>
                     )}
-                  </>
+                  </Fragment>
                 );
               },
             )}

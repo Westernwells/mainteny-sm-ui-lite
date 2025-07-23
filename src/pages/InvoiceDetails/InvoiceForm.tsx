@@ -1393,8 +1393,9 @@ export const InvoiceForm = ({
       setValue('dueDate', newDueDate);
       // Trigger DatePicker reset to update the UI
       setResetDueDatePicker(true);
+    } else {
+      setValue(fieldName, newValue || undefined);
     }
-    setValue(fieldName, newValue || undefined);
   };
 
   const checkValidQrCode = useCallback(
@@ -1799,8 +1800,8 @@ export const InvoiceForm = ({
         firstInvoiceType === InvoiceType.UPFRONT &&
         isFinalInvoice));
   const paymentTypeTooltip = isPartialInvoice
-    ? 'Choose a payment type for the partial invoice from Lump-Sum, Percentage or per Article, You can’t change your selection later.'
-    : 'Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can’t change your selection later for the subsequent invoices.';
+    ? "Choose a payment type for the partial invoice from Lump-Sum, Percentage or per Article. You can't change your selection later."
+    : "Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can't change your selection later for the subsequent invoices.";
 
   const checkIfLaborOrMaterialIsSelected = (items: EditableInvoiceItem[]) => {
     const isLaborOrMaterial = items.some((item) => {
@@ -2396,72 +2397,95 @@ export const InvoiceForm = ({
             </Grid>
 
             <Grid item xs={6} md={3}>
-              <DatePicker
-                defaultDate={
-                  getValues('sentDate')
-                    ? new Date(getValues('sentDate') as Date)
-                    : undefined
-                }
-                getSelectedDate={(newValue) =>
-                  handleDateFieldChange('sentDate', newValue)
-                }
-                textFieldProps={{
-                  label: (
-                    <Box display="flex" alignItems="center" gap={0.5}>
-                      {t('Invoice Date')}
-                      <Tooltip
-                        title={t(
-                          "The invoice date is set automatically when you send the invoice. If you prefer to enter a date yourself, remember that you'll also need to set the payment due date manually.",
-                        )}
-                        placement="top">
-                        <IconButton sx={{p: 0}}>
-                          <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0.5}} />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  ),
-                  ...register('sentDate'),
-                }}
+              <Controller
+                name="sentDate"
+                control={control}
+                render={({field, fieldState: {error}}) => (
+                  <DatePicker
+                    defaultDate={
+                      field.value ? new Date(field.value) : undefined
+                    }
+                    getSelectedDate={(newValue) => {
+                      field.onChange(newValue);
+                      handleDateFieldChange('sentDate', newValue);
+                    }}
+                    textFieldProps={{
+                      name: 'sentDate',
+                      label: (
+                        <Box display="flex" alignItems="center" gap={0.5}>
+                          {t('Invoice Date')}
+                          <Tooltip
+                            title={t(
+                              "The invoice date is set automatically when you send the invoice. If you prefer to enter a date yourself, remember that you'll also need to set the payment due date manually.",
+                            )}
+                            placement="top">
+                            <IconButton sx={{p: 0}}>
+                              <InfoOutlinedIcon
+                                sx={{fontSize: '16px', mb: 0.5}}
+                              />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      ),
+                      error: !!error,
+                      helperText: error?.message,
+                    }}
+                  />
+                )}
               />
             </Grid>
 
             <Grid item xs={6} md={3}>
-              <DatePicker
-                defaultDate={
-                  watchedDueDate ? new Date(watchedDueDate as Date) : undefined
-                }
-                reset={resetDueDatePicker}
-                getReset={(_reset) => {
-                  if (_reset) setResetDueDatePicker(false);
-                }}
-                errorMessage={dueDateError}
-                getSelectedDate={(newValue) => {
-                  setDueDateError('');
-                  handleDateFieldChange('dueDate', newValue);
-                }}
-                textFieldProps={{
-                  label: (
-                    <Box display="flex" alignItems="center" gap={0.5}>
-                      {t('Payment Due Date')}
-                      <Tooltip
-                        title={t(
-                          getValues('paymentTerm')?.id
-                            ? 'The payment due date of this invoice is controlled by your payment terms. It will update itself automatically upon editing and sending. If you want to manually control the payment due date, please remove the payment terms.'
-                            : 'The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.',
-                        )}
-                        placement="top">
-                        <IconButton sx={{p: 0}}>
-                          <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0.5}} />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  ),
-                  ...register('dueDate'),
-                }}
-                disabled={!!getValues('paymentTerm')?.id}
-                inputTestId="payment-due-date"
-                popupTestId="payment-due-date-popup"
-              />
+              {(() => {
+                const dueDateTooltip = getValues('paymentTerm')?.id
+                  ? 'The payment due date of this invoice is controlled by your payment terms. It will update itself automatically upon editing and sending. If you want to manually control the payment due date, please remove the payment terms.'
+                  : "The payment due date updates automatically if you've added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don't use payment terms, you can set the due date manually.";
+                return (
+                  <Controller
+                    name="dueDate"
+                    control={control}
+                    render={({field, fieldState: {error}}) => (
+                      <DatePicker
+                        defaultDate={
+                          field.value ? new Date(field.value) : undefined
+                        }
+                        reset={resetDueDatePicker}
+                        getReset={(_reset) => {
+                          if (_reset) setResetDueDatePicker(false);
+                        }}
+                        errorMessage={dueDateError}
+                        getSelectedDate={(newValue) => {
+                          setDueDateError('');
+                          field.onChange(newValue);
+                          handleDateFieldChange('dueDate', newValue);
+                        }}
+                        textFieldProps={{
+                          name: 'dueDate',
+                          label: (
+                            <Box display="flex" alignItems="center" gap={0.5}>
+                              {t('Payment Due Date')}
+                              <Tooltip
+                                title={t(dueDateTooltip)}
+                                placement="top">
+                                <IconButton sx={{p: 0}}>
+                                  <InfoOutlinedIcon
+                                    sx={{fontSize: '16px', mb: 0.5}}
+                                  />
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
+                          ),
+                          error: !!error,
+                          helperText: error?.message,
+                        }}
+                        disabled={!!getValues('paymentTerm')?.id}
+                        inputTestId="payment-due-date"
+                        popupTestId="payment-due-date-popup"
+                      />
+                    )}
+                  />
+                );
+              })()}
             </Grid>
           </Grid>
 
