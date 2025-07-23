@@ -28,6 +28,7 @@ import {
   useAllJobs,
   useServiceOrders,
   useServiceOrdersStatistics,
+  useUpdateServiceOrder,
 } from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
 import {useNavigate} from 'react-router-dom';
@@ -110,6 +111,8 @@ import {
   CommentType,
   QueryCommentsParams,
 } from 'models/comment';
+import TagCell from 'components/Tag/TagCell';
+import {TagEntityType, TagRecord} from 'models/tag';
 import Actions from './Actions';
 
 const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] =
@@ -338,6 +341,10 @@ export const ServiceOrderList = ({menu}: Props) => {
     },
   );
 
+  const {mutate: updateServiceOrder} = useUpdateServiceOrder(
+    'Service Order updated successfully',
+  );
+
   const filteredJobTypes = useMemo(
     () =>
       filterServiceOrderTypes({
@@ -493,6 +500,20 @@ export const ServiceOrderList = ({menu}: Props) => {
       isWithNote,
     ],
   );
+
+  const handleUpdateTags = (serviceOrderId: string) => (tagIds: string[]) => {
+    updateServiceOrder({
+      serviceOrderId,
+      body: {
+        tags: tagIds,
+      },
+    });
+  };
+
+  const handleUpdateServiceOrderTags =
+    (serviceOrderId: string) => (tags: TagRecord[]) => {
+      handleUpdateTags(serviceOrderId)(tags.map((tag) => tag.id));
+    };
 
   const {emptyTable, noMatchingData} = useMemo(() => {
     if (!isFetched) return {emptyTable: false, noMatchingData: false};
@@ -791,6 +812,20 @@ export const ServiceOrderList = ({menu}: Props) => {
             </Cell>
           );
         },
+      },
+      {
+        headerName: 'Tag',
+        key: 'service-order-cell-tag',
+        width: '212px',
+        renderCell: (serviceOrder, cellProps) => (
+          <Cell {...cellProps}>
+            <TagCell
+              tags={serviceOrder.tags || []}
+              entity={TagEntityType.SERVICE_ORDER}
+              onChange={handleUpdateServiceOrderTags(serviceOrder.id)}
+            />
+          </Cell>
+        ),
       },
       {
         headerName: 'NOTES',

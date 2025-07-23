@@ -411,6 +411,7 @@ export const aggregateServiceOrderRow = (
     hasSchedule: order.schedules.length > 0,
     scheduleDate:
       order.schedules.length > 0 ? order.schedules[0]?.startTime : '',
+    tags: order.additionalInfo.tags ?? [],
   }));
 
 export const createSearchQuery = ({search, orderNumber}: SearchParameters) => {
