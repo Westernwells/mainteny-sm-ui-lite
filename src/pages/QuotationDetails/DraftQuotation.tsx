@@ -15,9 +15,9 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {FormInput} from 'components/form/FormInput';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
-  useRecalculateQuotationAmount,
   useCreateQuotation,
   useQuotations,
+  useRecalculateQuotationAmount,
   useUpdateQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {
@@ -1523,8 +1523,7 @@ export const DraftQuotation = ({
                     modalHeader="Edit Billing Address"
                     addressType="billingAddress"
                     translate={translateCompanyLanguage}
-                    setValue={setValue}
-                    getValues={getValues}
+                    formMethods={formMethods}
                   />
                 </Grid>
                 <Grid item xs={6} pl={2}>
@@ -1540,8 +1539,7 @@ export const DraftQuotation = ({
                     modalHeader="Edit Beneficiary Address"
                     addressType="beneficiaryAddress"
                     translate={translateCompanyLanguage}
-                    setValue={setValue}
-                    getValues={getValues}
+                    formMethods={formMethods}
                   />
                 </Grid>
 
@@ -1586,8 +1584,7 @@ export const DraftQuotation = ({
                     modalHeader="Edit Alternative Address"
                     addressType="alternativeAddress"
                     translate={translateCompanyLanguage}
-                    setValue={setValue}
-                    getValues={getValues}
+                    formMethods={formMethods}
                   />
                 </Grid>
               </>
