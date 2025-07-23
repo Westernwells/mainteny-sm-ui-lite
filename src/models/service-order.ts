@@ -32,6 +32,7 @@ import {Order} from './pagination';
 import {PropertyOwnerSimpleView} from 'models/propertyManager';
 import {CommentRecord} from './comment';
 import {ArticleInfoRecord, SubItemsConfig} from './quotation';
+import {TagRecord} from 'models/tag';
 
 export enum Priority {
   A = 'A',
@@ -325,6 +326,7 @@ export interface ServiceOrderAdditionalInfo {
   candidateTechnicians?: EmployeesSimpleView[];
   generationInfo?: GenerationInfo;
   notificationChannels?: ContactChannel[];
+  tags?: TagRecord[];
 }
 
 export interface ServiceOrderConfirmationInfo {
@@ -461,6 +463,7 @@ export interface UpdateServiceOrderBody {
   checkListId: string;
   documents: FileResourceRecord[];
   pictures: FileResourceRecord[];
+  tags: string[];
 }
 
 export interface UpdateJobSchedule {
@@ -799,6 +802,7 @@ export type ServiceOrderTableRow = {
   lastActivityAt: string;
   hasSchedule: boolean;
   scheduleDate?: string;
+  tags: TagRecord[];
 };
 
 // used to indicate fields for the search parameter of service order endpoint

@@ -629,6 +629,7 @@ export const useUpdateServiceOrder = (successMsg: string) => {
           variant: 'success',
         });
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
       },
       onError: (err) => {
         showError(err);
