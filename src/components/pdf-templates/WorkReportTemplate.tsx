@@ -481,6 +481,7 @@ const WorkReportTemplate = React.memo(
                 {translate('Work Report')} {report?.number}
               </PdfPageTitle>
 
+              <View minPresenceAhead={86} />
               {report?.description.trim() !== '' && (
                 <HtmlPDF
                   html={report?.description || ''}
@@ -491,9 +492,9 @@ const WorkReportTemplate = React.memo(
                 />
               )}
 
-              <Text style={styles.sectionHeading}>{translate('Hours')} </Text>
-
+              <View minPresenceAhead={86} />
               <View style={styles.table}>
+                <Text style={styles.sectionHeading}>{translate('Hours')} </Text>
                 <View style={styles.tableBody}>
                   <View style={styles.tableRow}>
                     <Text
@@ -552,6 +553,7 @@ const WorkReportTemplate = React.memo(
                       {translate('Engineer')}
                     </Text>
                   </View>
+
                   {report?.additionalInfo.workTimeInfo?.timeSlots.map(
                     (s, index) => (
                       <BookedHoursRow
@@ -618,6 +620,7 @@ const WorkReportTemplate = React.memo(
                 </Text>
               )}
 
+              <View minPresenceAhead={86} />
               {serviceOrder?.articles.length && (
                 <View style={styles.tableBody}>
                   <View style={styles.table}>
@@ -751,6 +754,8 @@ const WorkReportTemplate = React.memo(
                   </View>
                 )}
 
+              <View minPresenceAhead={86} />
+
               <View style={styles.signatureWrapper} wrap={false}>
                 <View>
                   {technicianSignatureImage && (
@@ -791,6 +796,7 @@ const WorkReportTemplate = React.memo(
                     </View>
                   )}
                 </View>
+
                 <View>
                   {customerSignatureImage && (
                     <View
@@ -832,6 +838,8 @@ const WorkReportTemplate = React.memo(
                   )}
                 </View>
               </View>
+
+              <View minPresenceAhead={86} />
               {!!report?.additionalInfo.customerName && (
                 <View
                   style={{
