@@ -285,7 +285,6 @@ const RichTextEditor = ({
           '& .ProseMirror ul, .ProseMirror ol': {
             marginLeft: '20px',
             listStylePosition: 'outside',
-            lineHeight: 0,
           },
           '& .ProseMirror ul': {
             listStyleType: 'disc',
@@ -297,6 +296,7 @@ const RichTextEditor = ({
             display: 'block',
             margin: 0,
             padding: 0,
+            lineHeight: '1.5em',
           },
           '& .ProseMirror a': {
             color: '#0092B2 !important',
