@@ -10,8 +10,9 @@ import {QuotationFormData} from 'models/quotation';
 import {EditCustomerForm} from 'pages/QuotationDetails/EditCustomerForm';
 import AddIcon from '@mui/icons-material/Add';
 import {TFunction} from 'i18next';
-import {UseFormGetValues, UseFormSetValue} from 'react-hook-form';
+import {FormProvider, UseFormReturn} from 'react-hook-form';
 import cloneDeep from 'lodash/cloneDeep';
+import EditCustomerBillingAddressForm from 'components/BillingAddress/EditForm';
 import {FormLabel} from './form/FormLabel';
 import {SelectCard} from './SelectCard';
 import {SelectButton} from './SelectButton';
@@ -29,8 +30,7 @@ interface Props {
   addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
   address?: AddressRecord;
   translate?: TFunction<'translation', 'translation'>;
-  setValue?: UseFormSetValue<QuotationFormData>;
-  getValues?: UseFormGetValues<QuotationFormData>;
+  formMethods: UseFormReturn<QuotationFormData>;
 }
 
 export const QuotationSelectAndEditCombined = ({
@@ -44,12 +44,13 @@ export const QuotationSelectAndEditCombined = ({
   addressType,
   address,
   translate,
-  setValue,
-  getValues,
+  formMethods,
 }: Props) => {
   const {t} = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const theme = useTheme();
+
+  const {getValues, setValue} = formMethods;
 
   const [savedInitialAddress, setSavedInitialAddress] = useState<
     AddressRecord | undefined
@@ -176,11 +177,18 @@ export const QuotationSelectAndEditCombined = ({
           maxWidth: 'md',
           open: isModalOpen || false,
         }}>
-        <EditCustomerForm
-          setValue={setValue}
-          getValues={getValues}
-          address={addressType}
-        />
+        {addressType === 'billingAddress' && (
+          <FormProvider {...formMethods}>
+            <EditCustomerBillingAddressForm />
+          </FormProvider>
+        )}
+        {addressType !== 'billingAddress' && (
+          <EditCustomerForm
+            setValue={setValue}
+            getValues={getValues}
+            address={addressType}
+          />
+        )}
       </Dialog>
     </Box>
   );

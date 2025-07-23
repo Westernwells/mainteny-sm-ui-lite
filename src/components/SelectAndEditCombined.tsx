@@ -11,8 +11,9 @@ import {formatAddressFullname} from 'utils/utils';
 import {TFunction} from 'i18next';
 import AddIcon from '@mui/icons-material/Add';
 import {getCountryCode} from 'utils/countries';
-import {UseFormReturn} from 'react-hook-form';
+import {FormProvider, UseFormReturn} from 'react-hook-form';
 import cloneDeep from 'lodash/cloneDeep';
+import EditCustomerBillingAddressForm from 'components/BillingAddress/EditForm';
 import {FormLabel} from './form/FormLabel';
 import {SelectCard} from './SelectCard';
 import {SelectButton} from './SelectButton';
@@ -174,11 +175,18 @@ export const SelectAndEditCombined = ({
           maxWidth: 'md',
           open: isModalOpen || false,
         }}>
-        <EditCustomerForm
-          formMethods={formMethods}
-          address={addressType}
-          customerName={customerName}
-        />
+        {addressType === 'billingAddress' && (
+          <FormProvider {...formMethods}>
+            <EditCustomerBillingAddressForm />
+          </FormProvider>
+        )}
+        {addressType !== 'billingAddress' && (
+          <EditCustomerForm
+            formMethods={formMethods}
+            address={addressType}
+            customerName={customerName}
+          />
+        )}
       </Dialog>
     </Box>
   );

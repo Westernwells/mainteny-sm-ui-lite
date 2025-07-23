@@ -1,12 +1,19 @@
 import React from 'react';
-import {render, screen, fireEvent, waitFor} from '@testing-library/react';
-import {describe, it, expect, vi, beforeEach} from 'vitest';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {QueryClient, QueryClientProvider} from 'react-query';
 import {I18nextProvider} from 'react-i18next';
 import {QuotationSelectAndEditCombined} from 'components/QuotationSelectAndEditCombined';
 import {AddressRecord} from 'models/misc';
 import {QuotationFormData} from 'models/quotation';
-import {UseFormGetValues, UseFormSetValue} from 'react-hook-form';
+import {
+  Control,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormReturn,
+  UseFormSetValue,
+  UseFormWatch,
+} from 'react-hook-form';
 import {SnackbarProvider} from 'notistack';
 import i18n from './config/i18n';
 
@@ -43,12 +50,87 @@ const testFormData: Partial<QuotationFormData> = {
 
 let testGetValues: UseFormGetValues<QuotationFormData>;
 let testSetValue: UseFormSetValue<QuotationFormData>;
+let mockedFormMethod: UseFormReturn<QuotationFormData>;
 
 beforeEach(() => {
   testGetValues = vi.fn(
     (): QuotationFormData => ({...testFormData} as QuotationFormData),
   ) as unknown as UseFormGetValues<QuotationFormData>;
   testSetValue = vi.fn() as unknown as UseFormSetValue<QuotationFormData>;
+
+  const control = {
+    _subjects: {
+      array: {next: vi.fn(), subscribe: vi.fn()},
+      state: {next: vi.fn(), subscribe: vi.fn()},
+      watch: {next: vi.fn(), subscribe: vi.fn()},
+    },
+    _names: {
+      array: new Set(),
+      mount: new Set(),
+      unMount: new Set(),
+      watch: new Set(),
+      focus: '',
+    },
+    _state: {
+      mount: false,
+      action: false,
+      watch: false,
+    },
+    _fields: {},
+    _defaultValues: {},
+    _formValues: {},
+    _stateFlags: {
+      mount: false,
+      action: false,
+      watch: false,
+    },
+    _options: {
+      mode: 'onSubmit' as const,
+      reValidateMode: 'onChange' as const,
+      shouldFocusError: true,
+    },
+    _getDirty: vi.fn(),
+    _getWatch: vi.fn(),
+    _updateValid: vi.fn(),
+    _removeUnmounted: vi.fn(),
+    _updateFieldArray: vi.fn(),
+    register: vi.fn(() => ({})),
+    unregister: vi.fn(),
+    getFieldState: vi.fn(),
+    handleSubmit: vi.fn(),
+    setError: vi.fn(),
+    clearErrors: vi.fn(),
+    setValue: vi.fn(),
+    trigger: vi.fn(),
+    formState: {
+      isDirty: false,
+      isLoading: false,
+      isSubmitted: false,
+      isSubmitting: false,
+      isSubmitSuccessful: false,
+      isValid: false,
+      isValidating: false,
+      submitCount: 0,
+      defaultValues: {},
+      dirtyFields: {},
+      touchedFields: {},
+      errors: {},
+    },
+    _executeSchema: vi.fn(),
+    _getFieldArray: vi.fn(),
+    _reset: vi.fn(),
+    _resetDefaultValues: vi.fn(),
+    _setErrors: vi.fn(),
+    _updateDisabledField: vi.fn(),
+  } as unknown as Control<QuotationFormData>;
+
+  mockedFormMethod = {
+    getValues: testGetValues,
+    setValue: testSetValue,
+    watch: vi.fn() as unknown as UseFormWatch<QuotationFormData>,
+    register: vi.fn() as unknown as UseFormRegister<QuotationFormData>,
+    control,
+  } as UseFormReturn<QuotationFormData>;
 });
 
 describe('QuotationSelectAndEditCombined', () => {
@@ -61,8 +143,7 @@ describe('QuotationSelectAndEditCombined', () => {
         editButtonText="Edit Billing Address"
         modalHeader="Edit Billing Address"
         addressType="billingAddress"
-        setValue={testSetValue}
-        getValues={testGetValues}
+        formMethods={mockedFormMethod}
       />,
     );
     expect(
@@ -79,8 +160,7 @@ describe('QuotationSelectAndEditCombined', () => {
         editButtonText="Edit Billing Address"
         modalHeader="Edit Billing Address"
         addressType="billingAddress"
-        setValue={testSetValue}
-        getValues={testGetValues}
+        formMethods={mockedFormMethod}
       />,
     );
     const addButton = screen.getByRole('button', {
@@ -106,9 +186,6 @@ describe('QuotationSelectAndEditCombined', () => {
       ...testFormData,
       billingAddress: emptyNameAddress,
     };
-    testGetValues = vi.fn(
-      (): QuotationFormData => ({...modifiedFormData} as QuotationFormData),
-    ) as unknown as UseFormGetValues<QuotationFormData>;
 
     renderWithProviders(
       <QuotationSelectAndEditCombined
@@ -118,8 +195,13 @@ describe('QuotationSelectAndEditCombined', () => {
         editButtonText="Edit Billing Address"
         modalHeader="Edit Billing Address"
         addressType="billingAddress"
-        setValue={testSetValue}
-        getValues={testGetValues}
+        formMethods={{
+          ...mockedFormMethod,
+          getValues: vi.fn(
+            (): QuotationFormData =>
+              ({...modifiedFormData} as QuotationFormData),
+          ) as unknown as UseFormGetValues<QuotationFormData>,
+        }}
       />,
     );
 
@@ -140,8 +222,7 @@ describe('QuotationSelectAndEditCombined', () => {
         editButtonText="Edit Billing Address"
         modalHeader="Edit Billing Address"
         addressType="billingAddress"
-        setValue={testSetValue}
-        getValues={testGetValues}
+        formMethods={mockedFormMethod}
       />,
     );
 
@@ -180,8 +261,10 @@ describe('QuotationSelectAndEditCombined', () => {
         editButtonText="Edit Billing Address"
         modalHeader="Edit Billing Address"
         addressType="billingAddress"
-        setValue={testSetValue}
-        getValues={testGetValues}
+        formMethods={{
+          ...mockedFormMethod,
+          getValues: testGetValues,
+        }}
       />,
     );
 
@@ -207,9 +290,8 @@ describe('QuotationSelectAndEditCombined', () => {
         editButtonText="Edit Billing Address"
         modalHeader="Edit Billing Address"
         addressType="billingAddress"
-        setValue={testSetValue}
-        getValues={testGetValues}
         translate={identityTranslate}
+        formMethods={mockedFormMethod}
       />,
     );
     const addButton = screen.getByRole('button', {

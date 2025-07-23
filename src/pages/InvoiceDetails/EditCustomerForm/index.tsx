@@ -5,6 +5,7 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {InvoiceFormData} from 'models/invoice';
 import {Controller, UseFormReturn} from 'react-hook-form';
+import NameFields from 'components/BillingAddress/NameFields';
 
 export const EditCustomerForm = ({
   formMethods,
@@ -15,9 +16,13 @@ export const EditCustomerForm = ({
   address: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
   customerName?: string;
 }) => {
-  const {getValues, register, setValue, control} = formMethods;
+  const {getValues, register, setValue, control, watch} = formMethods;
   const value = getValues(address);
   const didInit = useRef(false);
+
+  const watchName = watch(`${address}.component.name`);
+  const watchName2 = watch(`${address}.component.name2`);
+  const watchName3 = watch(`${address}.component.name3`);
 
   useEffect(() => {
     if (didInit.current) return;
@@ -35,13 +40,32 @@ export const EditCustomerForm = ({
   return (
     <Grid container spacing={3}>
       <Grid item md={3}>
-        <FormInput
-          fieldProps={{
-            size: 'small',
-            label: 'Name',
-            ...register(`${address}.component.name`),
-          }}
-        />
+        {address === 'billingAddress' && (
+          <NameFields
+            name={watchName}
+            name2={watchName2}
+            name3={watchName3}
+            fieldWidth="28%"
+            setName={(name: string | null) =>
+              setValue('billingAddress.component.name', name ?? undefined)
+            }
+            setName2={(name2: string | null) =>
+              setValue('billingAddress.component.name2', name2 ?? undefined)
+            }
+            setName3={(name3: string | null) =>
+              setValue('billingAddress.component.name3', name3 ?? undefined)
+            }
+          />
+        )}
+        {address !== 'billingAddress' && (
+          <FormInput
+            fieldProps={{
+              size: 'small',
+              label: 'Name',
+              ...register(`${address}.component.name`),
+            }}
+          />
+        )}
       </Grid>
       <Grid item md={4.5}>
         <FormInput
