@@ -86,6 +86,7 @@ const deleteArticle = async (page: Page) => {
     )
     .first()
     .click();
+  await page.waitForTimeout(300);
   await expect(
     page.locator('[data-testid="DeleteOutlineOutlinedIcon"]').first(),
   ).toBeVisible();
@@ -93,6 +94,7 @@ const deleteArticle = async (page: Page) => {
     .locator('[data-testid="DeleteOutlineOutlinedIcon"]')
     .first()
     .click({force: true});
+  await page.waitForTimeout(300);
   await expect(page.locator('button:has-text("Yes")')).toBeVisible();
   await page.locator('button:has-text("Yes")').click();
 };

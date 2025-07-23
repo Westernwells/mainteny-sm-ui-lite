@@ -1032,7 +1032,12 @@ export const Actions = ({
   const hasPaymentTerm = typeof paymentTerm?.id === 'string';
   const paymentTermDueDays = paymentTerm?.data?.dueDays || 0;
   const dueDate = hasPaymentTerm
-    ? dateToString(addDays(new Date(), paymentTermDueDays))
+    ? dateToString(
+        addDays(
+          invoice?.sentDate ? new Date(invoice?.sentDate) : new Date(),
+          paymentTermDueDays,
+        ),
+      )
     : invoice?.dueDate || dateToString(new Date());
   const invoiceWithUpdatedDueDate = {
     ...invoice,
