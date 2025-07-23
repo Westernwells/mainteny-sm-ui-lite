@@ -756,39 +756,36 @@ export const ViewInvoice = ({
       invoiceFormat === InvoiceFormat.XML ||
       invoiceFormat === InvoiceFormat.PDF_AND_XML;
     if (invoice.status === InvoiceStatus.DRAFT) {
-      const response = await getXInvoiceByInvoiceId({
-        invoiceId: invoice.id,
-        params: {
-          dueDate: invoice.dueDate!,
-          sentDate: invoice.sentDate ?? formatDate(new Date(), 'yyyy-MM-dd')!,
-          externalId: invoice.externalId ?? companyNextNumber?.value!,
-        },
-      });
-
-      const xmlBlob = new Blob([response], {type: 'application/xml'});
       const blob = await generateBlobUrl({
         invoiceData: invoice,
         setInState: false,
       });
 
       const blobURL = URL.createObjectURL(blob!);
-      const xmlBlobURL = URL.createObjectURL(xmlBlob!);
 
       downloadFile(blobURL); // pdf
       if (shouldDownloadXML) {
+        const response = await getXInvoiceByInvoiceId({
+          invoiceId: invoice.id,
+          params: {
+            dueDate: invoice.dueDate!,
+            sentDate: invoice.sentDate ?? formatDate(new Date(), 'yyyy-MM-dd')!,
+            externalId: invoice.externalId ?? companyNextNumber?.value!,
+          },
+        });
+        const xmlBlob = new Blob([response], {type: 'application/xml'});
+        const xmlBlobURL = URL.createObjectURL(xmlBlob!);
         downloadFile(xmlBlobURL, {extensionArg: '.xml'});
       }
     } else {
-      const [downloadUrlData, xmlDownloadUrlData] = await Promise.all([
-        refetchDownloadUrl(),
-        refetchXMLDownloadUrl(),
-      ]);
+      const downloadUrlData = await refetchDownloadUrl();
 
       downloadFile(
         downloadUrlData.data?.[invoice.additionalInfo?.pdfPath ?? ''],
       ); // pdf
 
       if (shouldDownloadXML && invoice.additionalInfo.xmlPath) {
+        const xmlDownloadUrlData = await refetchXMLDownloadUrl();
         downloadFile(
           xmlDownloadUrlData.data?.[invoice.additionalInfo.xmlPath],
           {extensionArg: '.xml'},
@@ -1118,26 +1115,25 @@ export const ViewInvoice = ({
     const PDFDownloadURL =
       PDFDownloadURLResponse.data?.[invoice.additionalInfo?.pdfPath ?? ''];
 
-    const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
-    const XMLDownloadURL =
-      XMLDownloadURLResponse.data?.[invoice.additionalInfo.xmlPath!];
-
-    let xmlText = '';
-    if (XMLDownloadURL) {
-      const response = await fetch(XMLDownloadURL);
-      xmlText = await response.text();
-    }
-
     printJS({
       printable: PDFDownloadURL,
       type: 'pdf',
       showModal: true,
-      onPrintDialogClose: () => {
+      onPrintDialogClose: async () => {
         const {invoiceFormat} = invoice.propertyOwner.additionalInfo;
         if (
           invoiceFormat === InvoiceFormat.PDF_AND_XML ||
           invoiceFormat === InvoiceFormat.XML
         ) {
+          const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
+          const XMLDownloadURL =
+            XMLDownloadURLResponse.data?.[invoice.additionalInfo.xmlPath!];
+
+          let xmlText = '';
+          if (XMLDownloadURL) {
+            const response = await fetch(XMLDownloadURL);
+            xmlText = await response.text();
+          }
           setXmlHtmlContent(xmlText);
         }
       },
