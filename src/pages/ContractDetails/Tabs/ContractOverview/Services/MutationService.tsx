@@ -271,6 +271,7 @@ export const MutationService = ({
             ? null
             : {...elevator.orderGenerationJob},
         orderType: values?.orderType,
+        serviceDeliveryType: values?.serviceDeliveryType,
       }));
 
     const existingData = componentsToMutate(updatedComponentsToSave);
