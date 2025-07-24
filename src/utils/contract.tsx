@@ -170,6 +170,7 @@ export const componentsToMutate = (
     costType: c.additionalInfo?.costType,
     elevators: c.additionalInfo?.elevators,
     orderType: c.additionalInfo.orderType,
+    serviceDeliveryType: c.additionalInfo.serviceDeliveryType,
   })) as UpdateContractComponents[];
 
 export const calculateContractInvoiceRowPrice = (
