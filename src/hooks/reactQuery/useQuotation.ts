@@ -599,7 +599,7 @@ export const useRecalculateQuotationAmount = () =>
 
 export const fetchQuotationAmountDetail = async (quotationId: string) => {
   const response = await axiosClient.get(
-    `/api/quotations/${quotationId}/amount/`,
+    `/api/quotations/${quotationId}/amount`,
   );
   return response.data;
 };

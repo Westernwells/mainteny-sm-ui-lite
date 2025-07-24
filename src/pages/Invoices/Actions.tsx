@@ -73,7 +73,6 @@ import {
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import {fetchAndConvertImageToBase64} from 'hooks/useFetchAndConvertImage';
-import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {ServiceOrderReportView} from 'models/service-order';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import {getJobTypeGivenName, getSignatureKeys} from 'utils/service-order-utils';
@@ -1065,7 +1064,10 @@ export const Actions = ({
       try {
         setIsLoadingFiles(true);
         setIsSendEmailDialogOpen(true);
-        await refetchPDFs(companyNextId);
+        const nextId = companyNextId || companyNextNumber?.value;
+        await refetchPDFs(nextId);
+      } catch (err) {
+        setIsSendEmailDialogOpen(false);
       } finally {
         setIsLoadingFiles(false);
       }
@@ -1093,7 +1095,7 @@ export const Actions = ({
     if (companyNextNumber) {
       handleOpenSendEmail(companyNextNumber.value);
     }
-  }, [invoice, companyNextNumber, generateBlobUrl]);
+  }, [invoice, companyNextNumber]);
 
   const handleOpenPrintDialog = () => {
     setIsConfirmPrintDialogOpen(true);
@@ -1559,19 +1561,6 @@ export const Actions = ({
       setReport(reportToUpdate);
     }
   }, [reportToUpdate]);
-
-  useEffectAfterMount(() => {
-    (async () => {
-      if (companyNextNumber?.value) {
-        try {
-          setIsLoadingFiles(true);
-          await refetchPDFs(companyNextNumber.value);
-        } finally {
-          setIsLoadingFiles(false);
-        }
-      }
-    })();
-  }, [companyNextNumber?.value]);
 
   return (
     <Box
