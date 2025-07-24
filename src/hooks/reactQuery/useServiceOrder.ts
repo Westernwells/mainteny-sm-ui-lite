@@ -1159,7 +1159,7 @@ export const useCalculateServiceOrderAmount = () =>
 
 export const fetchServiceOrderAmountDetail = async (serviceOrder: string) => {
   const response = await axiosClient.get(
-    `/api/serviceOrders/${serviceOrder}/amount/`,
+    `/api/serviceOrders/${serviceOrder}/amount`,
   );
   return response.data;
 };
