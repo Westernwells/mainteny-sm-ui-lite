@@ -888,17 +888,16 @@ export const ViewInvoice = ({
 
   const getXInvoiceOperation = async (
     invoiceData: InvoiceView,
-    options?: {forceGet?: boolean; invoiceNumber?: string},
+    options?: {invoiceNumber?: string},
   ) => {
-    const {forceGet = false, invoiceNumber} = options ?? {};
+    const {invoiceNumber} = options ?? {};
 
     // If XML is not opted then do nothing
     if (
       invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
         InvoiceFormat.XML &&
       invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
-        InvoiceFormat.PDF_AND_XML &&
-      !forceGet
+        InvoiceFormat.PDF_AND_XML
     ) {
       return Promise.resolve([]);
     }
@@ -1205,7 +1204,6 @@ export const ViewInvoice = ({
               const invoiceXML = await getXInvoiceOperation(
                 updatedInvoiceData?.data!,
                 {
-                  forceGet: true,
                   invoiceNumber: updatedInvoiceData?.data?.externalId,
                 },
               );
@@ -1259,7 +1257,6 @@ export const ViewInvoice = ({
         const invoiceXML = await getXInvoiceOperation(
           invoiceWithUpdatedDueDate,
           {
-            forceGet: true,
             invoiceNumber: invoice.externalId,
           },
         );
@@ -1811,9 +1808,7 @@ export const ViewInvoice = ({
                   invoiceDownloadUrl,
                   nextNumber: companyNextNumber?.value,
                 }),
-                getXInvoiceOperation(invoiceWithUpdatedDueDate, {
-                  forceGet: true,
-                }),
+                getXInvoiceOperation(invoiceWithUpdatedDueDate),
               ]);
 
               await uploadFiles({
