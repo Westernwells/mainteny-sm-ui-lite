@@ -62,6 +62,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
     reset,
     watch,
     setValue,
+    control,
     formState: {errors},
   } = useForm<GeneralFormModel>({
     defaultValues: getDefaultValues(elevator),
@@ -164,6 +165,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
           register={register}
           watch={watch}
           setValue={setValue}
+          control={control}
         />
       </Dialog>
     </InfoCard>
