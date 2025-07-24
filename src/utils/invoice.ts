@@ -1734,3 +1734,17 @@ export const getInvoiceFrequencyValuesFromTimeUnit = (
       };
   }
 };
+
+export function getXmlPath({
+  invoiceFormat,
+  xmlPath,
+}: {
+  invoiceFormat?: InvoiceFormat;
+  xmlPath?: string;
+}): string | undefined {
+  const XML_ENABLED = [InvoiceFormat.XML, InvoiceFormat.PDF_AND_XML];
+  if (!XML_ENABLED.includes(invoiceFormat ?? InvoiceFormat.PDF))
+    return undefined;
+
+  return xmlPath ?? undefined;
+}
