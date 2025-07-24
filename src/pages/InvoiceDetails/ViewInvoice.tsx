@@ -126,6 +126,7 @@ import {CANCEL_ACTION} from 'models/status';
 import {useVats} from 'hooks/reactQuery/useVats';
 import {
   getInvoiceStatusStyles,
+  getXmlPath,
   invoiceItemToInvoiceItemRecord,
 } from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
@@ -1221,7 +1222,12 @@ export const ViewInvoice = ({
                   uploadPath,
                 });
                 const pdfPath = `${uploadPath}/${updatedInvoiceData.data?.id}.pdf`;
-                const xmlPath = `${uploadPath}/${updatedInvoiceData.data?.id}.xml`;
+                const xmlPath = getXmlPath({
+                  invoiceFormat:
+                    updatedInvoiceData.data?.propertyOwner.additionalInfo
+                      .invoiceFormat,
+                  xmlPath: `${uploadPath}/${updatedInvoiceData.data?.id}.xml`,
+                });
 
                 await printInvoice(
                   {
@@ -1267,7 +1273,10 @@ export const ViewInvoice = ({
           const files = await createFilesFromBlobArray([blobFile!], fileNames);
           await uploadFiles({files: [...files, ...invoiceXML], uploadPath});
           const pdfPath = `${uploadPath}/${invoice.id}.pdf`;
-          const xmlPath = `${uploadPath}/${invoice.id}.xml`;
+          const xmlPath = getXmlPath({
+            invoiceFormat: invoice.propertyOwner.additionalInfo.invoiceFormat,
+            xmlPath: `${uploadPath}/${invoice.id}.xml`,
+          });
 
           await printInvoice(
             {
@@ -1289,12 +1298,16 @@ export const ViewInvoice = ({
         }
       }
     } else {
+      const xmlPath = getXmlPath({
+        invoiceFormat: invoice.propertyOwner.additionalInfo.invoiceFormat,
+        xmlPath: invoice.additionalInfo?.xmlPath,
+      });
       await printInvoice(
         {
           id: invoice.id!,
           body: {
             pdfPath: invoice.additionalInfo?.pdfPath ?? '',
-            xmlPath: invoice.additionalInfo.xmlPath,
+            xmlPath,
             externalId: invoice.externalId!,
             dueDate: invoice.dueDate || dateToString(new Date()),
             sentDate: invoice.sentDate || dateToString(new Date()),
@@ -1868,15 +1881,21 @@ export const ViewInvoice = ({
             );
 
             const sendEmail = async (invoiceData: InvoiceView) => {
+              const xmlPath = getXmlPath({
+                invoiceFormat:
+                  invoiceData?.propertyOwner.additionalInfo.invoiceFormat,
+                xmlPath: isDraftInvoice
+                  ? `${invoiceUploadPath}/${fileNames[1]}`
+                  : invoiceData?.additionalInfo?.xmlPath,
+              });
+
               await sendInvoice({
                 id: invoiceData?.id!,
                 body: {
                   pdfPath: isDraftInvoice
                     ? `${invoiceUploadPath}/${fileNames[0]}`
                     : invoiceData?.additionalInfo?.pdfPath!,
-                  xmlPath: isDraftInvoice
-                    ? `${invoiceUploadPath}/${fileNames[1]}`
-                    : invoiceData?.additionalInfo?.xmlPath!,
+                  xmlPath,
                   externalId:
                     invoiceData?.externalId || companyNextNumber?.value || '',
                   dueDate,
