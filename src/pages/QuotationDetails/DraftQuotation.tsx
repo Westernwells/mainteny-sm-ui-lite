@@ -149,7 +149,7 @@ const alternativeInvoiceDestinationTooltip =
 
 const localStorageQuotationDataKey = 'QUOTATION_DATA';
 
-export const DraftQuotation = ({
+const DraftQuotation = ({
   formType = 'new',
   quotation,
   serviceCompanyType,
@@ -649,6 +649,7 @@ export const DraftQuotation = ({
     row: PropertyOwnerView | PropertyOwnerSimpleView,
   ) => {
     setCustomer(row);
+    setValue('propertyOwnerId', row.id);
 
     if (skipInitialCustomerSelect.current) {
       skipInitialCustomerSelect.current = false;
@@ -665,34 +666,16 @@ export const DraftQuotation = ({
         );
         setValue('items', patched, {shouldDirty: true});
       }
-    }
 
-    const emptyAddressState = {fullName: null};
-    const quotationCustomer = quotation?.propertyOwner;
-    const isNewCustomer = row.id !== quotationCustomer?.id;
+      const emptyAddressState = {fullName: null};
 
-    if (isNewCustomer) {
       setValue('billingAddress', row.billingAddress || emptyAddressState);
       setValue(
         'beneficiaryAddress',
         row.beneficiaryAddress || emptyAddressState,
       );
       setValue('alternativeAddress', row.otherAddress || emptyAddressState);
-    } else if (formType === 'edit') {
-      setValue(
-        'billingAddress',
-        quotation?.additionalInfo.billingAddress || emptyAddressState,
-      );
-      setValue(
-        'beneficiaryAddress',
-        quotation?.additionalInfo.beneficiaryAddress || emptyAddressState,
-      );
-      setValue(
-        'alternativeAddress',
-        quotation?.additionalInfo.alternativeAddress || emptyAddressState,
-      );
     }
-    setValue('propertyOwnerId', row.id);
 
     if (
       formType === 'new' &&
