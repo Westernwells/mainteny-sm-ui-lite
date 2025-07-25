@@ -325,6 +325,7 @@ export const MutationService = ({
         costType: values?.costType,
         elevators: elevatorsToSave || [],
         orderType: values?.orderType,
+        serviceDeliveryType: values?.serviceDeliveryType,
       },
       ...componentsToMutate(updatedComponentsToSave),
     ];
