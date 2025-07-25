@@ -50,7 +50,7 @@ interface OrderInfoProps {
 }
 
 const customerDetailCells = ['customer', 'purchaseOrderNumber', 'calledBy'];
-const unitDetailCells = ['unitAddress', 'unitNumber'];
+const unitDetailCells = ['unitAddress', 'unitNumber', 'tags'];
 const contractDetailCells = ['contractNumber', 'contractName', 'contractType'];
 const jobDetailCells = ['technicians', 'dueDate', 'dateScheduled'];
 

@@ -342,7 +342,7 @@ export const ServiceOrderList = ({menu}: Props) => {
   );
 
   const {mutate: updateServiceOrder} = useUpdateServiceOrder(
-    'Service Order updated successfully',
+    'Service Job updated successfully.',
   );
 
   const filteredJobTypes = useMemo(
