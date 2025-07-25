@@ -416,7 +416,10 @@ export const aggregateServiceOrderRow = (
 
 export const createSearchQuery = ({search, orderNumber}: SearchParameters) => {
   const elements = [];
-  if (search) elements.push(search);
+  const [firstSearch, ...tags] = (search || '').split('#');
+
+  if (firstSearch) elements.push(firstSearch);
+  if (tags.length > 0) tags.forEach((tag) => elements.push(`[tag:*${tag}*]`));
   if (orderNumber) elements.push(`[externalid:*${orderNumber}*]`);
   return elements.length ? elements.join(' ') : '';
 };
