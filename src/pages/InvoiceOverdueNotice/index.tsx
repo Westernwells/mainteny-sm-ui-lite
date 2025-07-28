@@ -1,6 +1,6 @@
-import {useMemo, useState} from 'react';
+import {useContext, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import useTheme from '@mui/material/styles/useTheme';
@@ -36,7 +36,6 @@ import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {createFilesFromBlobArray, dateToString} from 'utils/utils';
 import printJS from 'print-js';
 import {useUuid} from 'hooks/reactQuery/useUuid';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {EmailRecord} from 'models/misc';
 import {CreateInvoiceOverdueNoticeRecord} from 'models/invoice';
@@ -53,6 +52,9 @@ import {companyLanguageContextMap} from 'utils/language';
 import RichTextField from 'components/RichTextField';
 import DialogPdfPreview from 'components/pdf-templates/DialogPdfPreview';
 import {Dialog} from 'components/Dialog';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {FileWithPreview} from 'models/files';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 import InvoiceOverduePdfPreview from './InvoiceOverduePdfPreview';
 
 const validationSchema = Yup.object().shape({
@@ -85,6 +87,9 @@ export const InvoiceOverdueNotice = () => {
   const {mutateAsync: uploadFiles, isLoading: isUploadLoading} = useUploadFiles(
     'The document was sent successfully.',
   );
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const currentCurrency = useCurrentCurrency();
 
@@ -211,6 +216,11 @@ export const InvoiceOverdueNotice = () => {
     onSubmit: () => {},
   });
 
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    formik.values.description,
+  );
+
   const factor = currencyFactor({
     currency: invoice?.totalAmount.currency ?? '',
   });
@@ -234,6 +244,9 @@ export const InvoiceOverdueNotice = () => {
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
   const handlePreviewInvoiceOverdueNotice = async () => {
@@ -470,9 +483,8 @@ export const InvoiceOverdueNotice = () => {
             fieldProps={{
               name: 'customerAddress',
               label: t('Customer Address'),
-              placeholder: t(
+              placeholder:
                 'e.g. 2118 Thornridge Cir. Syracuse, Connecticut 35624',
-              ),
               variant: 'outlined',
               value: formik.values.customerAddress,
               error: !!(
@@ -501,7 +513,7 @@ export const InvoiceOverdueNotice = () => {
             fieldProps={{
               name: 'subject',
               label: t('Subject'),
-              placeholder: t('e.g. Late payment'),
+              placeholder: 'e.g. Late payment',
               variant: 'outlined',
               value: formik.values.subject,
               error: !!(formik.touched.subject && formik.errors.subject),
@@ -701,7 +713,7 @@ export const InvoiceOverdueNotice = () => {
           invoice?.propertyOwner?.contact.email
         }
         subject={formik.values.subject}
-        content={formik.values.description}
+        content={emailBody}
         callback={(values) => onSubmitHandler(values)}
         existingFiles={existingFiles}
         isLoadingFiles={isLoadingFiles}

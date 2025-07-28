@@ -24,11 +24,11 @@ import {
   MixedPositionRow,
   SubPositionFormValues,
   SubPositionRow,
-  UpdateArticleRecord,
   UpdateArticleSubAssociationBody,
   UpdateArticleSubAssociationRecord,
 } from 'models/article';
 import {
+  centsToMoney,
   convertNumberToAmountNumber,
   formatCurrency,
   getDecimalSeparator,
@@ -62,6 +62,8 @@ import {useTheme} from '@mui/material/styles';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {removeHtmlTags} from 'utils/rich-field-string';
 import {ACTION_CELL_WIDTH} from 'models/table';
+import {useCompanyNextNumber} from 'hooks/reactQuery/useCompanies';
+import {ServiceCompanyNumberType} from 'models/service-company';
 import {DeleteEventState, getIconByType} from '.';
 import {Actions} from './Actions';
 
@@ -144,17 +146,20 @@ const SubPositionRowComponent = ({
 
   const {data: taxRates} = useVats();
 
+  const {data: companyNextNumber} = useCompanyNextNumber(
+    {type: ServiceCompanyNumberType.ARTICLE},
+    serviceCompanyId,
+  );
+
   const {mutateAsync: createArticleSubPosition} =
     useCreateArticleSubAssociation('Sub-position created successfully');
 
   const {mutateAsync: updateArticleSubPosition, isLoading: isUpdating} =
     useUpdateArticleSubAssociation('');
 
-  const {
-    control: subPositionControl,
-    setValue: setSubPositionValue,
-    watch: watchSubPositionValues,
-  } = useForm<Record<string, Partial<SubPositionFormValues>>>({
+  const {control: subPositionControl} = useForm<
+    Record<string, Partial<SubPositionFormValues>>
+  >({
     shouldUnregister: false,
     defaultValues: {},
   });
@@ -193,7 +198,7 @@ const SubPositionRowComponent = ({
   };
 
   const handleSaveType = async (
-    newType: ArticleType,
+    newType?: ArticleType,
     subPositionId?: string,
   ) => {
     if (!subPositionId) return;
@@ -240,72 +245,143 @@ const SubPositionRowComponent = ({
 
   const handleSubPositionArticle = async (
     subPositionId: string,
-    updatedBody: CreateArticleRecord | UpdateArticleRecord,
+    selectedArticle: ArticleView | string,
+    isFreeText: boolean,
   ) => {
-    const parentId = Object.keys(subRows).find((key) =>
-      subRows[key]?.some((sub) => sub.id === subPositionId),
-    );
+    try {
+      const parentId = Object.keys(subRows).find((key) =>
+        subRows[key]?.some((sub) => sub.id === subPositionId),
+      );
 
-    if (!parentId) return;
+      if (!parentId) return;
 
-    if (
-      subPositionEditState.id === subPositionId &&
-      !subPositionId.includes('sub')
-    ) {
-      const articleToUpdate =
-        subPositionEditState.values.name !== updatedBody.name && !updatedBody.id
-          ? ({name: updatedBody.name} as UpdateArticleSubAssociationBody)
-          : (updatedBody as UpdateArticleSubAssociationBody);
+      if (subPositionId.includes('sub')) {
+        let newArticleData: CreateArticleRecord = {
+          serviceCompanyId,
+          externalId: companyNextNumber?.value || '',
+          name:
+            typeof selectedArticle === 'string'
+              ? selectedArticle
+              : selectedArticle.name || '',
+          type: ArticleType.MATERIAL,
+          unitPurchaseAmount: {
+            currency: currentCurrency.code || 'EUR',
+            netAmount: 0,
+            percentageVat: 0,
+          },
+          unitSellingAmount: {
+            currency: currentCurrency.code || 'EUR',
+            netAmount: 0,
+            percentageVat: 0,
+          },
+          stock: {
+            currentStock: 1,
+            maxStock: 1,
+            minOrderQuantity: 1,
+            minStock: 1,
+          },
+          description: '',
+          model: '',
+          category: '',
+          subCategory: '',
+          manufacturer: '',
+          unit: '',
+          storageLocation: '',
+          contractName: '',
+        };
 
-      try {
+        if (!isFreeText) {
+          const selectedArticleView = selectedArticle as ArticleView;
+          newArticleData = {
+            ...newArticleData,
+            id: selectedArticleView.id || '',
+            name: selectedArticleView.name || '',
+            type: selectedArticleView.type,
+            unitPurchaseAmount: selectedArticleView.unitPurchaseAmount,
+            unitSellingAmount: selectedArticleView.unitSellingAmount,
+            stock: selectedArticleView.stock || newArticleData.stock,
+            description: selectedArticleView.description || '',
+            model: selectedArticleView.model!,
+            category: selectedArticleView.category || '',
+            subCategory: selectedArticleView.subCategory!,
+            manufacturer: selectedArticleView.manufacturer || '',
+            unit: selectedArticleView.unit || '',
+            storageLocation: selectedArticleView.storageLocation || '',
+            contractName:
+              selectedArticleView.additionalInfo?.contractName || '',
+            costPackage:
+              selectedArticleView.additionalInfo?.costPackage || undefined,
+          };
+        }
+
+        const currentSubAssociations = await fetchArticleSubAssociations(
+          parentId,
+        );
+
+        await createArticleSubPosition({
+          articleId: parentId,
+          body: {
+            articleId: newArticleData.id,
+            article: {
+              ...newArticleData,
+              model: newArticleData.model || '',
+              subCategory: newArticleData.subCategory || '',
+              unitSellingAmount: newArticleData.unitSellingAmount!,
+              documents: [],
+              pictures: [],
+            },
+            quantity: 1,
+            seqNumber: currentSubAssociations.length || 0,
+          },
+        });
+
+        await resetAndUpdateSubRows(parentId);
+        return;
+      }
+
+      if (isFreeText) {
         await updateArticleSubPosition({
           articleId: parentId,
           associationId: subPositionId,
-          article: articleToUpdate,
+          article: {name: selectedArticle as string},
         });
-        await resetAndUpdateSubRows(parentId);
-      } catch (error) {
-        showError(error);
-      }
-    } else {
-      const isCreateArticleRecord = (
-        body: CreateArticleRecord | UpdateArticleRecord,
-      ): body is CreateArticleRecord => 'serviceCompanyId' in body;
-
-      // Make a deep copy of updatedBody for creation and remove the id property.
-      const articleBody = JSON.parse(JSON.stringify(updatedBody));
-      delete articleBody.id;
-
-      if (isCreateArticleRecord(updatedBody)) {
-        try {
-          const currentSubAssociations = await fetchArticleSubAssociations(
-            parentId,
-          );
-          await createArticleSubPosition({
-            articleId: parentId,
-            body: {
-              articleId: updatedBody.id!,
-              article: articleBody,
-              quantity: 1,
-              seqNumber: currentSubAssociations.length || 0,
-            },
-          });
-        } catch (error) {
-          showError(error);
-        }
+        resetEditState();
         await resetAndUpdateSubRows(parentId);
       } else {
-        try {
-          await updateArticleSubPosition({
-            articleId: parentId,
-            associationId: subPositionId,
-            article: updatedBody as UpdateArticleSubAssociationBody,
-          });
-        } catch (error) {
-          showError(error);
-        }
+        const selectedArticleView = selectedArticle as ArticleView;
+        const updateData: UpdateArticleSubAssociationBody = {
+          name: selectedArticleView.name || '',
+          unitPurchaseAmount: selectedArticleView.unitPurchaseAmount,
+          unitSellingAmount: selectedArticleView.unitSellingAmount,
+          stock: selectedArticleView.stock || {
+            currentStock: 1,
+            maxStock: 1,
+            minOrderQuantity: 1,
+            minStock: 1,
+          },
+          description: selectedArticleView.description || '',
+          model: selectedArticleView.model || '',
+          category: selectedArticleView.category || '',
+          subCategory: selectedArticleView.subCategory || '',
+          manufacturer: selectedArticleView.manufacturer || '',
+          unit: selectedArticleView.unit || '',
+          storageLocation: selectedArticleView.storageLocation || '',
+          contractName: selectedArticleView.additionalInfo?.contractName || '',
+          costPackage:
+            selectedArticleView.additionalInfo?.costPackage || undefined,
+        };
+
+        await updateArticleSubPosition({
+          articleId: parentId,
+          associationId: subPositionId,
+          article: updateData,
+        });
+
         resetEditState();
+        await resetAndUpdateSubRows(parentId);
       }
+    } catch (error) {
+      showError(error);
     }
   };
 
@@ -328,7 +404,7 @@ const SubPositionRowComponent = ({
     );
 
     const updatedUnitSellingAmount: AmountRecord = {
-      netAmount: subPosition.article.unitSellingAmount.netAmount,
+      netAmount: subPosition.unitAmount.netAmount,
       currency: currentCurrency.code || 'EUR',
       vatId: selectedVatId,
       vatName: taxRate?.name || '',
@@ -387,8 +463,8 @@ const SubPositionRowComponent = ({
         margin: newMargin,
         unitSellingAmount: {
           netAmount: Number(newSellingPrice) ?? 0,
-          percentageVat: subPosition?.article.unitSellingAmount?.percentageVat,
-          currency: subPosition?.article.unitSellingAmount?.currency || 'EUR',
+          percentageVat: subPosition?.unitAmount?.percentageVat,
+          currency: subPosition?.unitAmount?.currency || 'EUR',
         },
       },
     });
@@ -408,8 +484,8 @@ const SubPositionRowComponent = ({
         margin: newMargin,
         unitSellingAmount: {
           netAmount: Number(newSellingPrice) ?? 0,
-          percentageVat: subPosition?.article.unitSellingAmount?.percentageVat,
-          currency: subPosition?.article.unitSellingAmount?.currency || 'EUR',
+          percentageVat: subPosition?.unitAmount?.percentageVat,
+          currency: subPosition?.unitAmount?.currency || 'EUR',
         },
       },
     });
@@ -484,8 +560,8 @@ const SubPositionRowComponent = ({
             newSellingPrice ?? 0,
             currentCurrency,
           ),
-          percentageVat: subPosition?.article.unitSellingAmount?.percentageVat,
-          currency: subPosition?.article.unitSellingAmount?.currency || 'EUR',
+          percentageVat: subPosition?.unitAmount?.percentageVat,
+          currency: subPosition?.unitAmount?.currency || 'EUR',
         };
       } else if (field === 'margin') {
         const newSellingPrice =
@@ -496,8 +572,8 @@ const SubPositionRowComponent = ({
             newSellingPrice ?? 0,
             currentCurrency,
           ),
-          percentageVat: subPosition?.article.unitSellingAmount?.percentageVat,
-          currency: subPosition?.article.unitSellingAmount?.currency || 'EUR',
+          percentageVat: subPosition?.unitAmount?.percentageVat,
+          currency: subPosition?.unitAmount?.currency || 'EUR',
         };
       }
 
@@ -531,6 +607,11 @@ const SubPositionRowComponent = ({
       handleSaveSubPosition(activeRow.id, field);
     }
   };
+
+  const subPositions = subRows[row.id] || [];
+  const activeSubPosition = subPositions?.find(
+    (sub) => sub?.id === subPosition?.id,
+  );
 
   return (
     <TableRow
@@ -590,13 +671,19 @@ const SubPositionRowComponent = ({
         {subPositionEditState.field === 'name' &&
         subPositionEditState.id === subPosition.id ? (
           <NewArticleAutoComplete
-            onBlur={() =>
-              handleSaveSubPosition(subPosition.id, subPositionEditState.field!)
-            }
-            initialValue={subPosition.article}
-            onArticleSelect={handleSubPositionArticle}
-            rowId={subPosition.id!}
-            serviceCompanyId={serviceCompanyId}
+            initialValue={activeSubPosition}
+            onArticleSelect={(selectedArticle) => {
+              if (typeof selectedArticle === 'string') {
+                handleSubPositionArticle(subPosition.id, selectedArticle, true);
+              } else if (selectedArticle) {
+                handleSubPositionArticle(
+                  subPosition.id,
+                  selectedArticle,
+                  false,
+                );
+              }
+            }}
+            excludeTypes={[ArticleType.MIX]}
           />
         ) : (
           <Box
@@ -722,14 +809,11 @@ const SubPositionRowComponent = ({
                 },
               }}>
               <NewArticleTypeCard
-                control={subPositionControl}
-                setValue={setSubPositionValue}
                 onClose={handleClosePopover}
-                onSave={handleSaveType}
-                subPositionId={subPositionEditState.id!}
-                selectedType={
-                  (watchSubPositionValues('type') as unknown as ArticleType) ||
-                  subPosition.article.type
+                onSave={(newType) => handleSaveType(newType, subPosition.id)}
+                initialValue={
+                  subPositionEditState.values?.article?.type ||
+                  ArticleType.LABOR
                 }
               />
             </Popover>
@@ -853,30 +937,30 @@ const SubPositionRowComponent = ({
         ) : (
           <Typography sx={{paddingRight: '12px'}} variant="body2">
             {Number.isFinite(
-              (((subPosition.article.unitSellingAmount?.netAmount ?? 0) -
+              (((subPosition.unitAmount?.netAmount ?? 0) -
                 (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) /
                 (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) *
                 100,
             ) &&
-            (((subPosition.article.unitSellingAmount?.netAmount ?? 0) -
+            (((subPosition.unitAmount?.netAmount ?? 0) -
               (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) /
               (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) *
               100 !==
               0
               ? (
-                  (((subPosition.article.unitSellingAmount?.netAmount ?? 0) -
+                  (((subPosition.unitAmount?.netAmount ?? 0) -
                     (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) /
                     (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) *
                   100
                 ).toFixed(2)
               : '-'}
             {Number.isFinite(
-              (((subPosition.article.unitSellingAmount?.netAmount ?? 0) -
+              (((subPosition.unitAmount?.netAmount ?? 0) -
                 (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) /
                 (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) *
                 100,
             ) &&
-            (((subPosition.article.unitSellingAmount?.netAmount ?? 0) -
+            (((subPosition.unitAmount?.netAmount ?? 0) -
               (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) /
               (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) *
               100 !==
@@ -938,7 +1022,7 @@ const SubPositionRowComponent = ({
         ) : (
           <Typography sx={{paddingRight: '12px'}} variant="body2">
             {formatCurrency(
-              (subPosition?.article.unitSellingAmount?.netAmount ?? 0) /
+              (subPosition?.unitAmount?.netAmount ?? 0) /
                 10 ** currentCurrency.fractionDigits,
               {
                 currency: currentCurrency.code,
@@ -1089,7 +1173,7 @@ const SubPositionRowComponent = ({
         ) : (
           // Show VAT from mixedPosition (not from subPosition)
           <Typography sx={{paddingRight: '12px'}} variant="body2">
-            {`${row.data.unitSellingAmount?.percentageVat}%`}
+            {`${row.unitAmount?.percentageVat}%`}
           </Typography>
         )}
       </TableCell>
@@ -1146,8 +1230,10 @@ const SubPositionRowComponent = ({
         <Typography sx={{paddingRight: '12px'}} variant="body2">
           {formatCurrency(
             (subPosition.quantity ?? 0) *
-              ((subPosition.article.unitSellingAmount?.netAmount ?? 0) /
-                10 ** currentCurrency.fractionDigits),
+              centsToMoney(
+                currentCurrency.code,
+                subPosition.unitAmount?.netAmount,
+              ),
             {
               currency: currentCurrency.code,
             },

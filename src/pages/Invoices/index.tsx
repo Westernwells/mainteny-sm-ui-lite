@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   InvoiceFilterForm,
   InvoiceOrderField,
@@ -52,8 +52,7 @@ import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
 import {StatusChip} from 'components/StatusChip';
 import Box from '@mui/material/Box';
-import {theme} from 'theme';
-import {Checkbox, CircularProgress, Typography} from '@mui/material';
+import {Checkbox, CircularProgress, Collapse, Typography} from '@mui/material';
 import {Order, OrderByParams} from 'models/pagination';
 import {Actions} from 'pages/Invoices/Actions';
 import Filters from 'components/Filters';
@@ -109,10 +108,17 @@ import XMLViewer from 'react-xml-viewer';
 import printJS from 'print-js';
 import useInvoiceDownloadPreparation from 'hooks/reactQuery/useInvoiceDownloadPreparation';
 import {convertPropertyOwnerObjectToAvatar} from 'utils/account-utils';
+import {useTheme} from '@mui/system';
+import StatsToggle from 'components/StatsToggle';
+import DashboardMetrics from './DashboardMetrics';
 
 const pageSize = 25;
 
-type Props = {elevatorId?: string};
+type Props = {
+  elevatorId?: string;
+  customerId?: string;
+  elevatorExternalId?: string;
+};
 
 const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
   {value: InvoiceStatusFilter.DRAFT, labelKey: 'Draft'},
@@ -120,6 +126,9 @@ const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
   {value: InvoiceStatusFilter.PARTIALLY_PAID, labelKey: 'Partially Paid'},
   {value: InvoiceStatusFilter.PAID, labelKey: 'Paid'},
   {value: InvoiceStatusFilter.EXPIRED, labelKey: 'Overdue'},
+  {value: InvoiceStatusFilter.OVERDUE_NOTICE_1, labelKey: 'Dunning 1'},
+  {value: InvoiceStatusFilter.OVERDUE_NOTICE_2, labelKey: 'Dunning 2'},
+  {value: InvoiceStatusFilter.OVERDUE_NOTICE_3, labelKey: 'Dunning 3'},
   {value: InvoiceStatusFilter.CREDITED, labelKey: 'Credited'},
   {value: InvoiceStatusFilter.CANCELLED, labelKey: 'Cancelled'},
 ];
@@ -129,12 +138,14 @@ const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
   ...QUICK_FILTER_OPTIONS_WITHOUT_ALL,
 ];
 
-const Invoices = ({elevatorId}: Props) => {
+const Invoices = ({elevatorId, customerId, elevatorExternalId}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
   const currentCurrency = useCurrentCurrency();
+  const theme = useTheme();
+  const [showStats, setShowStats] = useState(false);
 
   const {
     values: {sortOrder, orderByField},
@@ -326,9 +337,7 @@ const Invoices = ({elevatorId}: Props) => {
     refetchOnWindowFocus: true,
   });
 
-  const {data: invoiceStatistics} = useInvoiceStatistics(filters, {
-    keepPreviousData: true,
-  });
+  const {data: invoiceStatistics} = useInvoiceStatistics(filters);
 
   const {refetch: refetchAllInvoices, isFetching: isFetchingAllInvoices} =
     useAllInvoices(filters, {
@@ -707,9 +716,17 @@ const Invoices = ({elevatorId}: Props) => {
     [invoiceResource],
   );
 
-  const navigateToNewInvoice = () => {
-    navigate('/invoices/new');
-  };
+  const navigateToNewInvoice = useCallback(() => {
+    const params = new URLSearchParams();
+    if (customerId) {
+      params.set('customerId', customerId);
+    }
+
+    if (elevatorExternalId)
+      params.set('elevatorExternalId', elevatorExternalId);
+    const qs = params.toString();
+    navigate(`/invoices/new${qs ? `?${qs}` : ''}`);
+  }, [navigate, customerId, elevatorExternalId]);
 
   const handleQuickFilterChange = (value: string) => {
     // when selecting ALL values remove all other selections
@@ -835,17 +852,17 @@ const Invoices = ({elevatorId}: Props) => {
   };
 
   const handleFilterReset = () => {
-    setValue('number', undefined);
-    setValue('customer', undefined);
-    setValue('customerId', undefined);
-    setValue('contractId', undefined);
-    setValue('unitId', undefined);
-    setValue('jobNumber', undefined);
-    setValue('orderNumber', undefined);
-    setValue('jobTypes', []);
-    setValue('grossAmountMin', undefined);
-    setValue('grossAmountMax', undefined);
-    setValue('hasComment', undefined);
+    setSelectedInvoiceNumber(undefined);
+    setSelectedCustomer(undefined);
+    setSelectedCustomerId(undefined);
+    setSelectedContract(undefined);
+    setSelectedUnitId(undefined);
+    setSelectedJobNumber(undefined);
+    setSelectedOrderNumber(undefined);
+    setSelectedJobTypes([]);
+    setGrossAmountMin(undefined);
+    setGrossAmountMax(undefined);
+    setIsWithNote(undefined);
   };
 
   const appliedFilterNumber = useMemo(
@@ -950,6 +967,10 @@ const Invoices = ({elevatorId}: Props) => {
   const showXeroInfoRender = () => (
     <Box>{xeroInfoData?.enabled ? lastSyncedText : ''}</Box>
   );
+
+  const toggleStats = () => {
+    setShowStats(!showStats);
+  };
 
   useEffect(() => {
     if (xmlHtmlContent) {
@@ -1200,6 +1221,7 @@ const Invoices = ({elevatorId}: Props) => {
             </Filters>
           </Box>
           <Box display="flex" gap={2}>
+            <StatsToggle onClick={toggleStats} show={showStats} />
             {rows.length > 0 && (
               <Button
                 buttonProps={{
@@ -1230,6 +1252,15 @@ const Invoices = ({elevatorId}: Props) => {
             onChange={handleQuickFilterChange}
           />
         </Box>
+        {/* sx={{mb: showStats ? 5 : 0}} */}
+        <Collapse in={showStats} timeout="auto">
+          <Box mt={2} mb={15}>
+            <DashboardMetrics
+              filters={filters}
+              invoiceStatistics={invoiceStatistics}
+            />
+          </Box>
+        </Collapse>
         <TableContainer
           showNoMatchWarning={noMatchingData}
           containerRef={containerRef}

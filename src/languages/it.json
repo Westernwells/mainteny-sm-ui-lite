@@ -1071,8 +1071,6 @@
   "Create Job": "Crea lavoro",
   "Search job type, customer, address etc.": "Cerca tipo di lavoro, cliente, indirizzo ecc.",
   "New Job": "Nuovo lavoro",
-  "Regular": "Regolare",
-  "REGULAR": "REGOLARE",
   "Ongoing": "In corso",
   "All": "Tutto",
   "Init": "Dentro",
@@ -1477,7 +1475,7 @@
   "Initial amount": "Importo iniziale",
   "Handling fee": "Commissione di gestione",
   "The invoice is overdue [XX] days. We remind you to please pay the outstanding amount.": "La fattura è in ritardo [xx] giorni. Ti ricordiamo di pagare l'importo in sospeso.",
-  "©2023 Mainteny. All rights reserved.": "© 2023 Mainteny. Tutti i diritti riservati.",
+  "Mainteny. All rights reserved.": "© 2025 Mainteny. Tutti i diritti riservati.",
   "Mainteny® is a registered trademark.": "Mainteny® è un marchio registrato.",
   "This ID is already taken. Please enter a different one.": "Questo ID è già preso. Si prega di inserirne uno diverso.",
   "CONTRACT NAME": "Nome del contratto",
@@ -1893,5 +1891,7 @@
   "Amount Due: {{amountDue}}": "Importo dovuto: {{quantitàdue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Se hai pagato, faccelo sapere. In caso contrario, fai così presto per evitare commissioni extra.",
   "Questions? Contact us at {{contactEmail}}": "Domande? Contattaci a {{contactEmail}}",
-  "Thanks, {{companyName}}": "Grazie, {{CompanyName}}"
+  "Thanks, {{companyName}}": "Grazie, {{CompanyName}}",
+  "Serial number": "Numero di serie",
+  "Multiple days": "Più giorni"
 }

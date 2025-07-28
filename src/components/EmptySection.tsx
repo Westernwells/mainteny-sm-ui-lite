@@ -26,6 +26,8 @@ import {ReactComponent as InvoiceIcon} from 'assets/icons/Invoice.svg';
 import {ReactComponent as BasicInfoIcon} from 'assets/icons/BasicInfoIcon.svg';
 import {ReactComponent as HierarchyIcon} from 'assets/icons/Hierarchy.svg';
 import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
+import {ReactComponent as TaskListIllustration} from 'assets/illustrations/TaskList.svg';
+import {ButtonProps} from '@mui/material';
 import {Button} from './Button';
 
 export interface Props extends BoxProps {
@@ -58,16 +60,19 @@ export interface Props extends BoxProps {
     | 'quotation'
     | 'hierarchy'
     | 'emailSignature'
-    | 'mixedPositions';
+    | 'mixedPositions'
+    | 'tasks';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
+  buttonVariant?: ButtonProps['variant'];
   actionButtonIcon?: JSX.Element;
   actionButtonEndIcon?: JSX.Element;
   subLabel?: string;
   subLabelProps?: TypographyProps;
   illustrationColor?: string;
   disableActionBtn?: boolean;
+  buttonComponent?: JSX.Element;
 }
 
 export const EmptySection = ({
@@ -81,12 +86,14 @@ export const EmptySection = ({
   btnLabel = '',
   showActionBtn = false,
   btnAction,
+  buttonVariant,
   actionButtonIcon,
   actionButtonEndIcon,
   subLabel = '',
   subLabelProps = {},
   disableActionBtn = false,
   illustrationColor,
+  buttonComponent,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -185,6 +192,12 @@ export const EmptySection = ({
             style={{width: '100%', height: '100%', color: illustrationColor}}
           />
         );
+      case 'tasks':
+        return (
+          <TaskListIllustration
+            style={{width: '100%', height: '100%', color: illustrationColor}}
+          />
+        );
       default:
         return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
     }
@@ -215,18 +228,21 @@ export const EmptySection = ({
           </Typography>
         )}
       </Box>
-      {showActionBtn ? (
+      {buttonComponent && buttonComponent}
+      {!buttonComponent && showActionBtn ? (
         <Button
           label="Create Service Job"
           buttonProps={{
             disabled: disableActionBtn,
             onClick: btnAction,
-            variant: 'contained',
+            variant: buttonVariant || 'contained',
             size: btnSize || 'small',
             startIcon: actionButtonIcon || <AddIcon />,
             endIcon: actionButtonEndIcon || null,
             style: {
-              backgroundColor: theme.palette.primary.dark,
+              backgroundColor: buttonVariant
+                ? 'inherit'
+                : theme.palette.primary.dark,
             },
             sx: {
               '& .MuiButton-startIcon': {

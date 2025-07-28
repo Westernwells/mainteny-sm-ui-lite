@@ -9,11 +9,11 @@ import {Dialog} from 'components/Dialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {
   useCreateServiceCompanyContactPerson,
   useUpdateServiceCompanyContactPerson,
 } from 'hooks/reactQuery/useContacts';
+import {FileWithPreview} from 'models/files';
 import Form from './Form';
 
 interface Props {

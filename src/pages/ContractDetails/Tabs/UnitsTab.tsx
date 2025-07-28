@@ -31,7 +31,7 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
               (elevator) =>
                 ({
                   ...elevator.elevator,
-                } as ElevatorView),
+                } as unknown as ElevatorView),
             ),
           },
           formatDate,

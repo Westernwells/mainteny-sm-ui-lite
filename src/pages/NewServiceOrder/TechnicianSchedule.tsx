@@ -85,11 +85,12 @@ export const TechnicianSchedule = ({
   const [lookupTechnician, setLookupTechnician] = useState<{
     [key: string]: EmployeesView[];
   }>({});
-  const defaultVisibleItemsSize = 2;
+  const defaultVisibleItemsSize = 10;
   const [showAll, setShowAll] = useState(false);
   const [visibleItems, setVisibleItems] = useState(defaultVisibleItemsSize);
   useEffect(() => {
     const result: ScheduledItemGroup = {};
+
     Object.keys(scheduleItems).forEach((key) => {
       const items = scheduleItems[key];
       result[key] = {};
@@ -97,18 +98,25 @@ export const TechnicianSchedule = ({
 
       items.forEach((item) => {
         if (previousOrder) {
-          const previousEndTime = new Date(previousOrder.schedules[0].endTime);
-          const currentOrderStartTime = new Date(item.schedules[0].startTime);
-          if (isBefore(currentOrderStartTime, previousEndTime)) {
-            const previousOrderNextLevel = result[key][previousOrder.id];
-            result[key][item.id] = previousOrderNextLevel + 1;
+          const startTime = item.schedules[0]?.startTime;
+          const endTime = previousOrder?.schedules[0]?.endTime;
+
+          if (startTime && endTime) {
+            const previousEndTime = new Date(endTime);
+            const currentOrderStartTime = new Date(startTime);
+
+            if (isBefore(currentOrderStartTime, previousEndTime)) {
+              const previousOrderNextLevel = result[key][previousOrder.id];
+              result[key][item.id] = previousOrderNextLevel + 1;
+            } else {
+              result[key][item.id] = 1;
+            }
           } else {
             result[key][item.id] = 1;
           }
-        } else {
-          result[key][item.id] = 1;
+
+          previousOrder = item;
         }
-        previousOrder = item;
       });
     });
 

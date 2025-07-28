@@ -1,10 +1,11 @@
 import {AxiosError} from 'axios';
-import {clearStoredUser} from 'userStorage';
+import {clearStoredUser, clearStoredUserAccount} from 'userStorage';
 
 export const queryErrorHandler = (error: unknown) => {
   const err = error as AxiosError;
   if (err.response?.status === 401) {
     clearStoredUser();
+    clearStoredUserAccount();
     window.location.replace('/login');
   }
 };

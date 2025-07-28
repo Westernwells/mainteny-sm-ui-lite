@@ -8,7 +8,7 @@ export const NoteCardSkeleton = ({length = 10}: {length?: number}) => {
       {Array(length)
         .fill(0)
         .map((_, index) => (
-          <Box key={index}>
+          <Box key={index} data-testid="note-card-skeleton">
             <Grid
               container
               flexDirection="column"

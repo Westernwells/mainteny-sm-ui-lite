@@ -14,11 +14,14 @@ import {
   LocalLibrary,
   LocationOn,
   PersonOutline,
-  Tag,
+  Tag as TagIcon,
 } from '@mui/icons-material';
 import {Box, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {getUserFullName} from 'utils/utils';
+import {TagEntityType} from 'models/tag';
+import TagGroup from 'components/Tag/TagGroup';
+import Tag from 'components/Tag';
 
 interface OrderInfoProps {
   serviceOrderDetails: ServiceOrderView;
@@ -31,6 +34,13 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
 
   const schedule =
     serviceOrderDetails.schedules.filter((item) => !!item.technician) ?? [];
+
+  const [firstTag, secondTag, ...groupTags] =
+    serviceOrderDetails.additionalInfo?.tags || [];
+  const showTags = [
+    ...(firstTag ? [firstTag] : []),
+    ...(secondTag ? [secondTag] : []),
+  ];
 
   const renderSection = () => {
     switch (label) {
@@ -56,6 +66,15 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
                 <Typography variant="body2">
                   {serviceOrderDetails.additionalInfo.callerInfo?.name || '-'}
                 </Typography>
+                {!!serviceOrderDetails.additionalInfo.callerInfo
+                  ?.phoneNumber && (
+                  <Typography
+                    variant="body2"
+                    sx={{paddingTop: '0.2em'}}
+                    color={theme.palette.text.secondary}>
+                    {serviceOrderDetails.additionalInfo.callerInfo?.phoneNumber}
+                  </Typography>
+                )}
                 {!!serviceOrderDetails.additionalInfo.callerInfo?.calledAt && (
                   <Typography
                     variant="body2"
@@ -80,7 +99,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
       case 'purchaseOrderNumber':
         return (
           <CardProps
-            icon={<Tag sx={{color: theme.palette.info.main}} />}
+            icon={<TagIcon sx={{color: theme.palette.info.main}} />}
             label={t('Purchase Order Number').toLocaleUpperCase()}
             bodyText={
               serviceOrderDetails.additionalInfo.purchaseOrderNumber || '-'
@@ -241,6 +260,35 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
             iconMaxHeight="3em"
             bodyStyle={{color: theme.palette.primary.main, paddingTop: '0.2em'}}
           />
+        );
+      case 'tags':
+        return (
+          <Box>
+            <Typography
+              component="div"
+              variant="caption"
+              color={theme.palette.text.secondary}>
+              {t('Tags')}
+            </Typography>
+
+            <Box
+              sx={{
+                display: 'flex',
+                gap: theme.spacing(0.5),
+                alignItems: 'center',
+              }}>
+              {showTags.map((tag) => (
+                <Tag
+                  key={`service-order-tag-${tag.id}`}
+                  {...tag}
+                  entity={TagEntityType.ARTICLE}
+                />
+              ))}
+              {groupTags.length > 0 && (
+                <TagGroup tags={groupTags} showGroupTagsPopover />
+              )}
+            </Box>
+          </Box>
         );
       default:
         return null;

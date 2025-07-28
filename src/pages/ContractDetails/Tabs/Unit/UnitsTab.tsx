@@ -52,12 +52,9 @@ export const UnitsTab: FC<Props> = ({
     useSearchValues<OrderByParams<ElevatorOrderField>>();
   const {sortOrder, orderByField} = values;
 
-  const totalUnitsRef = useRef(0);
-
   const [page, setPage] = useQueryState('page', {
     defaultValue: makePage(0, pageSize),
   });
-  const [pageCount, setPageCount] = useState(0);
 
   const [search, setSearch] = useQueryState('searchUnits');
   const textInput = useRef<HTMLInputElement>(null);
@@ -98,7 +95,6 @@ export const UnitsTab: FC<Props> = ({
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
     isLoading,
-    isFetched,
     isFetching,
     isIdle,
     refetch,
@@ -129,8 +125,6 @@ export const UnitsTab: FC<Props> = ({
     {keepPreviousData: true},
   );
 
-  totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
-
   useEffect(() => {
     refetch();
   }, [elevatorsLength]);
@@ -156,20 +150,7 @@ export const UnitsTab: FC<Props> = ({
     }
   }, [isFetching]);
 
-  useEffect(() => {
-    if (elevatorResponse.total > 0 && elevatorResponse.data.length === 0) {
-      setPage({
-        ...page,
-        pageIndex: 0,
-      });
-    }
-  }, [search, elevatorResponse]);
-
-  useEffect(() => {
-    if (elevatorResponse.data.length) {
-      setPageCount(Math.ceil(elevatorResponse.data.length / page.pageSize));
-    }
-  }, [elevatorResponse.data.length, page]);
+  const pageCount = Math.ceil(elevatorResponse.total / page.pageSize);
 
   useEffect(() => {
     if (textInput.current && !textInput.current.value) {
@@ -282,32 +263,19 @@ export const UnitsTab: FC<Props> = ({
     return <Progress />;
   }
 
-  if (isFetched && !totalUnitsRef.current) {
-    return (
-      <EmptySection
-        label="No units yet. They will appear here once added!"
-        containerStyle={{
-          height: '100%',
-          mb: '10em',
-        }}
-        illustration="clipboard"
-        size="tiny"
-        btnSize="medium"
-        showActionBtn
-        actionButtonIcon={<AddIcon />}
-        btnAction={() => setOpenSelectUnitModal(true)}
-        btnLabel="Add Unit"
-      />
-    );
-  }
-
   return (
     <PageListingLayout
       renderWidget={
         <Widget
           containerStyles={{mt: 2}}
           searchPlaceholder="Search by number, customer, service type etc."
-          getSearchValue={(val: string) => setSearch(val)}
+          getSearchValue={(val: string) => {
+            setPage({
+              ...page,
+              pageIndex: 0,
+            });
+            setSearch(val);
+          }}
           refInput={textInput}
           btnLabel="New Invoice"
           filterItems={renderFilterItems()}
@@ -362,6 +330,22 @@ export const UnitsTab: FC<Props> = ({
         }
         pageCount={pageCount}
         totalRows={elevatorResponse?.total}
+        noRowsEmptySection={
+          <EmptySection
+            label="No units yet. They will appear here once added!"
+            containerStyle={{
+              height: '100%',
+              mb: '10em',
+            }}
+            illustration="clipboard"
+            size="tiny"
+            btnSize="medium"
+            showActionBtn
+            actionButtonIcon={<AddIcon />}
+            btnAction={() => setOpenSelectUnitModal(true)}
+            btnLabel="Add Unit"
+          />
+        }
       />
     </PageListingLayout>
   );

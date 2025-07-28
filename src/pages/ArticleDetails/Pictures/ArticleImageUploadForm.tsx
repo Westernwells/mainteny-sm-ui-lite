@@ -1,9 +1,7 @@
 import {useState} from 'react';
 import _ from 'lodash';
-import {
-  FileWithPreview,
-  MyDropZone,
-} from '../../../components/MyDropZone/MyDropzone';
+import MyDropzone from 'components/MyDropZone';
+import {FileWithPreview} from 'models/files';
 import {Dialog} from '../../../components/Dialog';
 import {useUploadFiles} from '../../../hooks/reactQuery/useUploadSignedUrl';
 import {FileResourceRecord} from '../../../models/media';
@@ -59,7 +57,7 @@ export const ArticleImageUploadForm = ({
         maxWidth: 'md',
         open: true,
       }}>
-      <MyDropZone
+      <MyDropzone
         hint={hint}
         acceptedFileTypes={[
           'application/pdf',

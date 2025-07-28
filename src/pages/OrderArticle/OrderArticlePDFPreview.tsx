@@ -1,4 +1,4 @@
-import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
+import {Document, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {FormikProps} from 'formik';
 import {CreateArticleOrderRecord} from 'models/article';
 import {UserAccount} from 'models/user';
@@ -15,46 +15,34 @@ import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
 import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
 import {getServiceCompanyInfo} from 'utils/company-utils';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
+import {ServiceCompanyItem} from 'models/service-company';
+import {isSwissAddress} from 'utils/address';
 import {calculateTotal, calculateTotalVAT} from './utils';
 import {ArticleSupplierView} from '../../models/supplier';
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
+type StyleProps = {
+  isSwissOffset?: boolean;
+} & PdfConfigurationStyles;
 
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  secondaryColor,
+  isSwissOffset = false,
+}: StyleProps) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
       flexDirection: 'column',
+      paddingTop: '20px',
+      ...(isSwissOffset && {
+        paddingTop: '50px', // make offset be about 55mm
+        paddingLeft: '6px', // make offset be about 22mm
+      }),
     },
     rightAddressContent: {
       display: 'flex',
@@ -67,12 +55,12 @@ const getStyles = (
     tag: {
       ...boldFontStyle,
       fontSize: 10,
-      color: '#212121',
+      color: primaryColor,
       width: '43%',
     },
     tagContent: {
       fontSize: 10,
-      color: '#616161',
+      color: secondaryColor,
       width: '57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -85,6 +73,7 @@ const getStyles = (
       marginBottom: 10,
       paddingTop: 25,
       maxWidth: '95%',
+      color: primaryColor,
     },
     notesSection: {
       paddingBottom: 6,
@@ -99,13 +88,13 @@ const getStyles = (
       padding: 0,
       lineHeight: 0,
       marginBottom: 6,
-      color: '#212121',
+      color: primaryColor,
       fontWeight: 'extrabold',
     },
     sectionBody: {
       fontSize: 10,
       fontWeight: 'light',
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -121,7 +110,7 @@ const getStyles = (
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 6,
     },
@@ -136,7 +125,7 @@ const getStyles = (
       width: '45%',
       display: 'flex',
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       paddingLeft: 20,
       letterSpacing: -0.15,
       marginTop: 2,
@@ -145,6 +134,7 @@ const getStyles = (
   });
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   supplier: ArticleSupplierView;
   formik: FormikProps<CreateArticleOrderRecord>;
   translate: (key: string) => string;
@@ -155,10 +145,11 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const OrderArticlePDFPreview = React.memo(
   ({
+    serviceCompany,
     supplier,
     formik,
     userInfo,
@@ -169,6 +160,9 @@ const OrderArticlePDFPreview = React.memo(
     headerPath,
     footerInfo,
     footerPath,
+    fontStyles,
+    primaryColor,
+    secondaryColor,
   }: Props) => {
     const uniqueVATPercentages = [
       ...new Set(
@@ -182,29 +176,29 @@ const OrderArticlePDFPreview = React.memo(
 
     const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
 
-    const boldFontStyle = {
-      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-    };
-
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
-
-    const styles = getStyles(boldFontStyle, regularFontStyle);
+    const styles = getStyles({
+      boldFontStyle: fontStyles.bold,
+      regularFontStyle: fontStyles.regular,
+      primaryColor,
+      secondaryColor,
+      isSwissOffset: isSwissAddress(serviceCompany?.businessAddress),
+    });
     return (
       <Document>
-        <PdfPageContainer selectedLng={selectedLng}>
+        <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
           <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
+                serviceCompany={serviceCompany}
                 serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={supplier?.name}
                 addressComponent={supplier?.address?.component}
-                selectedLng={selectedLng}
                 translate={translate}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
               />
 
               <View style={styles.rightAddress}>
@@ -245,7 +239,7 @@ const OrderArticlePDFPreview = React.memo(
             </TopSectionContainer>
 
             <View>
-              <PdfPageTitle selectedLng={selectedLng}>
+              <PdfPageTitle fontStyles={fontStyles} primaryColor={primaryColor}>
                 {translate('Article Order for')} {formik?.values?.externalId}
               </PdfPageTitle>
 
@@ -253,6 +247,7 @@ const OrderArticlePDFPreview = React.memo(
                 <HtmlPDF
                   html={formik?.values?.description || ''}
                   rootStyle={styles.contentBody}
+                  fontStyles={fontStyles}
                 />
               </View>
 
@@ -330,7 +325,7 @@ const OrderArticlePDFPreview = React.memo(
                             width: '2%',
                             textAlign: 'left',
                             marginRight: 10,
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {index + 1}
                         </Text>
@@ -338,14 +333,15 @@ const OrderArticlePDFPreview = React.memo(
                           html={articleOrderItem.articleName || '-'}
                           rootStyle={{
                             width: '43%',
-                            color: '#212121',
+                            color: primaryColor,
                           }}
+                          fontStyles={fontStyles}
                         />
                         <Text
                           style={{
                             width: '14%',
                             textAlign: 'left',
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {articleOrderItem.supplierArticleNumber || '-'}
                         </Text>
@@ -353,7 +349,7 @@ const OrderArticlePDFPreview = React.memo(
                           style={{
                             width: '8%',
                             textAlign: 'right',
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {articleOrderItem.quantity || '-'}
                         </Text>
@@ -362,7 +358,7 @@ const OrderArticlePDFPreview = React.memo(
                             width: '7%',
                             textAlign: 'center',
                             marginLeft: 10,
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {translate(articleOrderItem.unit) || '-'}
                         </Text>
@@ -370,7 +366,7 @@ const OrderArticlePDFPreview = React.memo(
                           style={{
                             width: '13%',
                             textAlign: 'right',
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {formatCurrency(
                             (articleOrderItem.unitPurchaseAmount?.netAmount ??
@@ -390,7 +386,7 @@ const OrderArticlePDFPreview = React.memo(
                           style={{
                             width: '15%',
                             textAlign: 'right',
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {formatCurrency(
                             ((articleOrderItem.unitPurchaseAmount?.netAmount ??
@@ -412,6 +408,7 @@ const OrderArticlePDFPreview = React.memo(
                         <HtmlPDF
                           html={articleOrderItem?.description || ''}
                           rootStyle={styles.descriptionText}
+                          fontStyles={fontStyles}
                         />
                       )}
                     </View>
@@ -424,7 +421,7 @@ const OrderArticlePDFPreview = React.memo(
                     <Text
                       style={{
                         width: '32%',
-                        color: '#616161',
+                        color: primaryColor,
                         fontSize: 10,
                         textAlign: 'right',
                       }}>
@@ -455,7 +452,7 @@ const OrderArticlePDFPreview = React.memo(
                         <Text
                           style={{
                             width: '32%',
-                            color: '#616161',
+                            color: primaryColor,
                             fontSize: 10,
                             textAlign: 'right',
                           }}>
@@ -483,10 +480,10 @@ const OrderArticlePDFPreview = React.memo(
                     <Text
                       style={{
                         width: '32%',
-                        color: '#212121',
+                        color: primaryColor,
                         fontSize: 10,
                         textAlign: 'right',
-                        ...boldFontStyle,
+                        ...fontStyles.bold,
                       }}>
                       {`${translate('Total incl. VAT')} (${
                         currentCurrency?.symbol
@@ -496,9 +493,9 @@ const OrderArticlePDFPreview = React.memo(
                       style={{
                         width: '24%',
                         textAlign: 'right',
-                        color: '#212121',
+                        color: primaryColor,
                         fontSize: 10,
-                        ...boldFontStyle,
+                        ...fontStyles.bold,
                       }}>
                       {formatCurrency(
                         calculateTotal(formik.values.items) +
@@ -522,10 +519,12 @@ const OrderArticlePDFPreview = React.memo(
 
           <PdfTemplateFooter
             userInfo={userInfo}
-            selectedLng={selectedLng}
             translate={translate}
             footerInfo={footerInfo}
             footerPath={footerPath}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         </PdfPageContainer>
       </Document>

@@ -30,3 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 
 .nyc_output
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

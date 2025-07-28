@@ -97,8 +97,8 @@ export const MarkAsPaidDialog = ({
         formik.resetForm();
         onClose();
       }}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
+      aria-labelledby="mark-as-paid-dialog-title"
+      aria-describedby="mark-as-paid-dialog-description"
       fullWidth
       maxWidth="xs"
       PaperProps={{
@@ -106,12 +106,12 @@ export const MarkAsPaidDialog = ({
           p: '1.5rem',
         },
       }}>
-      <DialogTitle id="alert-dialog-title" sx={{px: 0, pt: 0}}>
+      <DialogTitle id="mark-as-paid-dialog-title" sx={{px: 0, pt: 0}}>
         {t('Payment')}
       </DialogTitle>
       <DialogContent sx={{p: 0, pb: '0.5rem'}}>
         <DialogContentText
-          id="alert-dialog-description"
+          id="mark-as-paid-dialog-description"
           sx={{color: 'text.primary'}}
           component="div">
           <Typography>
@@ -128,7 +128,7 @@ export const MarkAsPaidDialog = ({
               formik.setFieldValue(values.name as string, values.value);
             }}
             fieldProps={{
-              placeholder: 'e.g. 200',
+              placeholder: t('e.g. 200'),
               label: t('Paid amount (incl. VAT)'),
               name: 'amount.value',
               id: 'amount.value',

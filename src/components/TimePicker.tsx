@@ -20,11 +20,12 @@ interface Props extends Partial<TimePickerProps<Date>> {
   cancel?: () => void;
   containerStyles?: {[key: string]: any};
   textFieldProps?: TextFieldProps;
+  inputTestId?: string;
+  popupTestId?: string;
   required?: boolean;
   resetValue?: Date;
   saveOnClose?: boolean;
-  inputTestId?: string;
-  popupTestId?: string;
+  disableInternalState?: boolean;
 }
 
 export const TimePicker = ({
@@ -32,26 +33,35 @@ export const TimePicker = ({
   getSelectedTime,
   containerStyles,
   textFieldProps,
+  inputTestId,
+  popupTestId,
   minTime,
   maxTime,
   confirm,
   resetValue,
   saveOnClose = false,
   required = false,
-  inputTestId,
-  popupTestId,
+  disableInternalState = false,
   ...props
 }: Props) => {
   const {t} = useTranslation();
   const [value, setValue] = useState<Date | null>(null);
   const [open, setOpen] = useState<boolean>(false);
 
+  const shouldDisableInternalState = disableInternalState && !!getSelectedTime;
+
+  const handleSetValue = (newValue: Date | null) => {
+    if (shouldDisableInternalState) {
+      getSelectedTime(newValue);
+    } else setValue(newValue);
+  };
+
   const handleOpen = () => {
     setOpen(true);
   };
 
   const handleClear = () => {
-    setValue(resetValue || null);
+    handleSetValue(resetValue || null);
     setOpen(false);
   };
 
@@ -70,7 +80,7 @@ export const TimePicker = ({
   }, [defaultTime?.getHours(), defaultTime?.getMinutes()]);
 
   useEffect(() => {
-    if (getSelectedTime) {
+    if (!shouldDisableInternalState && getSelectedTime) {
       getSelectedTime(value);
     }
   }, [value]);
@@ -272,9 +282,9 @@ export const TimePicker = ({
           value={value}
           onChange={(newValue) => {
             if (!newValue || Number.isNaN(newValue.getTime())) {
-              setValue(null);
+              handleSetValue(null);
             } else {
-              setValue(newValue);
+              handleSetValue(newValue);
             }
           }}
           minTime={minTime}

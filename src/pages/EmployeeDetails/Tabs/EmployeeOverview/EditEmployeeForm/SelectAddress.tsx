@@ -3,7 +3,8 @@ import {useFormikContext} from 'formik';
 import {Box} from '@mui/material';
 
 import {AddressAutoComplete} from 'components/AddressAutoComplete';
-import {EmployeeAccountData} from './model';
+
+import {EmployeeAccountData} from 'models/employee';
 
 export const SelectAddress = () => {
   const {setFieldValue, values, errors, touched, handleBlur} =

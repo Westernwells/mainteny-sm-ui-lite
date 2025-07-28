@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -10,9 +10,11 @@ import {Table, TableCellProps, useMediaQuery} from '@mui/material';
 import {
   calculateContractInvoicePriceTotal,
   ContractComponentView,
+  ContractServiceDeliveryType,
   ContractServiceForm,
   ContractSimpleView,
   ContractStatus,
+  ContractView,
 } from 'models/contract';
 import {EmptySection} from 'components/EmptySection';
 import Divider from '@mui/material/Divider';
@@ -34,7 +36,8 @@ import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {
   calculateContractInvoicePriceGrandTotal,
   componentsToMutate,
-  mergeElevators,
+  getAutoJobStatus,
+  mergeElevatorsByExisting,
   parsElevatorRecourses,
 } from 'utils/contract';
 import * as Yup from 'yup';
@@ -52,12 +55,13 @@ import {MutationService} from './MutationService';
 
 interface Props {
   elevator: ElevatorView;
+  contractDetails?: ContractView;
   containerStyles?: SxProps;
 }
 
 export interface Service extends ContractComponentView {
-  contractNumber: string;
-  contractId: string;
+  contractNumber?: string;
+  contractId?: string;
 }
 
 const serviceListingColumns: {
@@ -75,18 +79,6 @@ const serviceListingColumns: {
   {name: '', align: 'right', width: '5%'},
 ];
 
-export const getAutoJobStatus = (
-  firstInvoiceDate: Date | null,
-): {
-  label: string;
-  color: 'default' | 'darkSuccess';
-} => {
-  if (firstInvoiceDate) {
-    return {label: 'Yes', color: 'darkSuccess'};
-  }
-  return {label: 'No', color: 'default'};
-};
-
 const validationSchemaContractServices = Yup.object().shape({
   name: Yup.string().required('Service name cannot be empty'),
   firstInvoiceDate: Yup.date()
@@ -95,7 +87,11 @@ const validationSchemaContractServices = Yup.object().shape({
     .required('First invoice date is required'),
 });
 
-const ContractServices = ({elevator, containerStyles}: Props) => {
+const ContractServices = ({
+  elevator,
+  contractDetails,
+  containerStyles,
+}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const formatDate = useFormatDate();
@@ -116,12 +112,43 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [currentService, setCurrentService] = useState<Service>();
 
+  const elevatorResource =
+    contractDetails?.elevators
+      .filter(
+        (contractElevator) =>
+          contractElevator.contractId === contractDetails.id,
+      )
+      .map((contractElevator) => contractElevator.elevator) || [];
+
   useEffect(() => {
     refetchUniqueId();
   }, [isDialogOpen]);
 
-  const formikContractServiceInitialValues = useMemo(
-    () => ({
+  const formikContractServiceInitialValues = useMemo(() => {
+    const defaultCostPackage = {
+      laborPercentage: 50,
+      materialPercentage: 50,
+    };
+
+    if (isEditForm && currentService) {
+      return {
+        isChecked: false,
+        id: uuid,
+        name: currentService?.name || '',
+        group: currentService?.group || '',
+        firstInvoiceDate:
+          currentService?.additionalInfo?.firstInvoiceDate || null,
+        firstOrderDate: currentService?.additionalInfo?.firstOrderDate || null,
+        costType: currentService?.additionalInfo?.costType || ArticleType.LABOR,
+        costPackage:
+          currentService?.additionalInfo?.costPackage || defaultCostPackage,
+        isAutomaticJobCycle: !!currentService?.additionalInfo?.firstOrderDate,
+        elevators: mergeElevatorsByExisting(elevatorResource, currentService),
+        orderType: currentService?.additionalInfo?.orderType || '',
+      };
+    }
+
+    return {
       isChecked: false,
       id: uuid,
       name: '',
@@ -135,9 +162,9 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
       },
       isAutomaticJobCycle: false,
       elevators: [],
-    }),
-    [],
-  );
+      serviceDeliveryType: ContractServiceDeliveryType.CURRENT,
+    } as ContractServiceForm;
+  }, [isEditForm, currentService, uuid, elevatorResource]);
 
   const formikContractServiceComponent = useFormik<ContractServiceForm>({
     initialValues: formikContractServiceInitialValues,
@@ -202,12 +229,12 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
   const setAddFormData = () => {
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
-      elevators: parsElevatorRecourses([elevator]),
+      elevators: parsElevatorRecourses(elevatorResource),
     });
   };
 
   const setEditFormData = (row: ContractComponentView) => {
-    const allItems = mergeElevators([elevator], row);
+    const allItems = mergeElevatorsByExisting(elevatorResource, row);
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
       id: row.id,
@@ -220,6 +247,9 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
       isAutomaticJobCycle: !!row?.additionalInfo?.firstOrderDate,
       elevators: allItems,
       orderType: row?.additionalInfo?.orderType,
+      serviceDeliveryType:
+        row.additionalInfo.serviceDeliveryType ??
+        ContractServiceDeliveryType.CURRENT,
     });
   };
 
@@ -229,7 +259,7 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
     } else {
       setAddFormData();
     }
-  }, [elevator]);
+  }, [elevatorResource?.length]);
 
   const openViewDialog = (row: Service) => {
     setCurrentService(row);
@@ -354,12 +384,16 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
                       <StatusChip
                         label={
                           getAutoJobStatus(
-                            row.additionalInfo.firstOrderDate as Date,
+                            row.additionalInfo.firstOrderDate
+                              ? new Date(row.additionalInfo.firstOrderDate)
+                              : null,
                           ).label
                         }
                         color={
                           getAutoJobStatus(
-                            row.additionalInfo.firstOrderDate as Date,
+                            row.additionalInfo.firstOrderDate
+                              ? new Date(row.additionalInfo.firstOrderDate)
+                              : null,
                           ).color
                         }
                         maxChars={8}
@@ -575,7 +609,7 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
         showCancelButton={false}>
         <ServiceInformationReview
           service={currentService}
-          elevators={[elevator]}
+          elevators={elevatorResource}
         />
       </Dialog>
     </Grid>

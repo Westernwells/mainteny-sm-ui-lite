@@ -1,5 +1,6 @@
 import {
   addDays,
+  differenceInDays,
   endOfWeek,
   format,
   formatDistance,
@@ -8,16 +9,22 @@ import {
   isAfter,
   isToday,
   isTomorrow,
+  isValid,
   isYesterday,
   Locale,
   parseISO,
+  set,
+  startOfMonth,
   startOfWeek,
+  subDays,
   subWeeks,
 } from 'date-fns';
 import {useTranslation} from 'react-i18next';
 import {de, enUS, srLatn} from 'date-fns/locale';
 import * as datePickerLocales from '@mui/x-date-pickers/locales';
 import {companyLanguageToUppercaseMap} from 'utils/language';
+import {TimeWindowType} from 'models/employee';
+import {MONTH_NUMBER_TO_NAME} from './month-constants';
 import {Language} from '../models/misc';
 
 export const DEFAULT_DATE_FORMAT = 'dd.MM.yyyy';
@@ -30,6 +37,26 @@ interface DateFormatOptions {
   useAdditionalWeekYearTokens?: boolean | undefined;
   useAdditionalDayOfYearTokens?: boolean | undefined;
 }
+
+export const WEEK_DAYS_ARRAY = [
+  TimeWindowType.MONDAY,
+  TimeWindowType.TUESDAY,
+  TimeWindowType.WEDNESDAY,
+  TimeWindowType.THURSDAY,
+  TimeWindowType.FRIDAY,
+  TimeWindowType.SATURDAY,
+  TimeWindowType.SUNDAY,
+];
+
+export const WEEK_DAYS_WITHOUT_WEEKENDS = [
+  TimeWindowType.MONDAY,
+  TimeWindowType.TUESDAY,
+  TimeWindowType.WEDNESDAY,
+  TimeWindowType.THURSDAY,
+  TimeWindowType.FRIDAY,
+];
+
+export const WEEKEND_DAYS = [TimeWindowType.SATURDAY, TimeWindowType.SUNDAY];
 
 export function getDateObject(input: any): Date {
   const type = typeof input;
@@ -309,3 +336,77 @@ export const fromDateStringToDate = (
 
 export const toRestDateTimeFormat = (date: Date) =>
   format(date, "yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+/**
+ * Converts a time representation to the starting Date object with the given time
+ * @param value A string time stamp in the format HH:mm
+ * @return The corresponding Date object with the default date and updated time fields
+ */
+export const parseTimeFromHoursMinutesToDate = (value: string) =>
+  new Date(
+    0,
+    0,
+    0,
+    parseInt(value.split(':')[0] ?? '0', 10),
+    parseInt(value.split(':')[1] ?? '0', 10),
+  );
+
+export const getFirstDayOfMonthInFuture = (monthNumber: number): Date => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+
+  // Adjust to 0-based index for JavaScript Date
+  const targetMonth = monthNumber - 1;
+
+  const targetDateThisYear = set(new Date(), {
+    year: currentYear,
+    month: targetMonth,
+    date: 1,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    milliseconds: 0,
+  });
+
+  const finalDate =
+    targetDateThisYear > now
+      ? targetDateThisYear
+      : set(targetDateThisYear, {year: currentYear + 1});
+
+  return startOfMonth(finalDate);
+};
+
+export const getMonthNumberFromDate = (date?: Date | null) => {
+  if (!date) return undefined;
+
+  return date.getMonth() + 1;
+};
+
+export const getPastDateRange = (dateFrom?: string, dateTo?: string) => {
+  if (!dateFrom || !dateTo) return {pastFrom: undefined, pastTo: undefined};
+
+  const from = parseISO(dateFrom);
+  const to = parseISO(dateTo);
+
+  if (!isValid(from) || !isValid(to))
+    return {pastFrom: undefined, pastTo: undefined};
+
+  const diff = differenceInDays(to, from);
+  const pastTo = subDays(from, 1);
+  const pastFrom = subDays(pastTo, diff);
+
+  return {
+    pastFrom: format(pastFrom, 'yyyy-MM-dd'),
+    pastTo: format(pastTo, 'yyyy-MM-dd'),
+  };
+};
+
+export const getMonthYearFromDate = (value: string) => {
+  const {t} = useTranslation();
+
+  const date = new Date(value);
+  const monthNumber = date.getMonth() + 1;
+  const year = date.getFullYear();
+
+  return `${t(MONTH_NUMBER_TO_NAME[monthNumber])} ${year}`;
+};

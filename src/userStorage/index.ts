@@ -1,6 +1,8 @@
 import {UserSession} from 'models/session';
+import {UserView} from 'models/user';
 
-const USER_LOCALSTORAGE_KEY = 'mainteny_sm_user';
+export const USER_LOCALSTORAGE_KEY = 'mainteny_sm_user';
+export const USER_ACCOUNT_LOCALSTORAGE_KEY = 'mainteny_sm_user_account';
 const ADMIN_LOCALSTORAGE_KEY = 'mainteny_sm_admin';
 
 // helper to get user from localstorage
@@ -15,6 +17,19 @@ export function setStoredUser(user: UserSession): void {
 
 export function clearStoredUser(): void {
   localStorage.removeItem(USER_LOCALSTORAGE_KEY);
+}
+
+export function getStoredUserAccount(): UserView | null {
+  const storedUser = localStorage.getItem(USER_ACCOUNT_LOCALSTORAGE_KEY);
+  return storedUser ? JSON.parse(storedUser) : null;
+}
+
+export function setStoredUserAccount(user: UserView): void {
+  localStorage.setItem(USER_ACCOUNT_LOCALSTORAGE_KEY, JSON.stringify(user));
+}
+
+export function clearStoredUserAccount(): void {
+  localStorage.removeItem(USER_ACCOUNT_LOCALSTORAGE_KEY);
 }
 
 export function setStoredAdmin(user: UserSession): void {

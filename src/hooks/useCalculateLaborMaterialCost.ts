@@ -1,8 +1,13 @@
 import {ArticleType} from 'models/article';
-import {InvoiceItemRecord} from 'models/invoice';
+import {
+  EditableInvoiceItem,
+  InvoiceAmountDetail,
+  InvoiceItemRecord,
+} from 'models/invoice';
 import {Currency} from 'models/misc';
 import {useMemo} from 'react';
 import {centsToMoney} from 'utils/currency';
+import {calculateLaborMaterialTotals} from 'utils/invoice';
 
 type CostPackageKey = 'labor' | 'material';
 
@@ -20,10 +25,7 @@ const getPackageAmount = (
 };
 
 const getNetAmount = (item: InvoiceItemRecord, currencyCode: string): number =>
-  centsToMoney(
-    currencyCode,
-    item?.additionalInfo?.payment?.amount?.netAmount ?? 0,
-  );
+  centsToMoney(currencyCode, item?.payment?.amount?.netAmount ?? 0);
 
 export const calculateLaborMaterialCost = (
   articleItems: InvoiceItemRecord[],
@@ -48,18 +50,26 @@ export const calculateLaborMaterialCost = (
   }, 0);
 
 const useCalculateLaborMaterialCost = (
-  articleItems: InvoiceItemRecord[],
-  articleType: ArticleType,
+  invoiceItems: EditableInvoiceItem[],
+  invoiceAmountDetail?: InvoiceAmountDetail,
   currentCurrency?: Currency,
-): number =>
-  useMemo(
-    () =>
-      calculateLaborMaterialCost(
-        articleItems,
-        articleType,
-        currentCurrency?.code ?? '',
-      ),
-    [articleItems, articleType, currentCurrency],
-  );
+) =>
+  useMemo(() => {
+    if (!invoiceAmountDetail) {
+      return {labor: 0, material: 0};
+    }
+
+    const {laborNet, materialNet} = calculateLaborMaterialTotals(
+      invoiceItems,
+      invoiceAmountDetail.items,
+    );
+
+    const currency = currentCurrency?.code!;
+
+    return {
+      labor: centsToMoney(currency, laborNet),
+      material: centsToMoney(currency, materialNet),
+    };
+  }, [invoiceItems, invoiceAmountDetail]);
 
 export default useCalculateLaborMaterialCost;

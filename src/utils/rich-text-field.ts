@@ -3,10 +3,10 @@ import {
   Descendant,
   Editor,
   Element as SlateElement,
-  Text,
-  Transforms,
   Path,
   Range,
+  Text,
+  Transforms,
 } from 'slate';
 import escapeHtml from 'escape-html';
 import {jsx} from 'slate-hyperscript';
@@ -17,14 +17,69 @@ import {
   CustomEditor,
   DEFAULT_FONT_SIZE,
   ELEMENT_TAGS,
+  ELEMENT_TO_CHANGE,
   FONT_SIZE,
   FORMAT,
+  FORMAT_TO_ATTRIBUTE,
   GROUP_TYPES,
   HTML_PDF_FONT_SIZE,
+  INDENTATION_PIXEL_SIZE,
   Marks,
   NodeType,
+  PROPERTY_WITH_VALUE,
   TEXT_TAGS,
 } from 'models/richTextField';
+
+export const DEFAULT_RICH_TEXT_HTML = '<p></p>'; // fallback for empty Slate values
+
+const getNodeType = (isActive: boolean, isGroup: boolean) => {
+  if (isActive) return 'paragraph';
+  if (isGroup) return 'list-item';
+};
+
+export const recursiveNodeHasText = (node: BaseElement | BaseText): boolean => {
+  // If it's a direct text node
+  if (Text.isText(node)) {
+    return node.text !== undefined && node.text.trim() !== '';
+  }
+
+  // If it's an element without children
+  if (
+    SlateElement.isElement(node) &&
+    (!node.children || node.children.length === 0)
+  ) {
+    return false;
+  }
+
+  // Recursive case for node children
+  if (node.children && Array.isArray(node.children)) {
+    return node.children.some((child) =>
+      // Recursively check each child
+      recursiveNodeHasText(child),
+    );
+  }
+
+  return false;
+};
+
+const isAtFirstLineStart = (editor: Editor) => {
+  const {selection} = editor;
+
+  if (!selection || !Range.isCollapsed(selection)) return false; // isCollapsed means no text selected
+
+  const [_, path] = Editor.node(editor, selection);
+
+  const isFirstBlock = path[0] === 0;
+
+  if (!isFirstBlock) return false;
+
+  const start = Editor.start(editor, path);
+
+  return (
+    selection.anchor.offset === start.offset &&
+    Path.equals(selection.anchor.path, start.path)
+  );
+};
 
 export const isMarkActive = (editor: CustomEditor, format: string) => {
   const marks: Marks = Editor.marks(editor) || {};
@@ -70,12 +125,16 @@ export const toggleMark = (
   }
 };
 
-export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
-  const isActive = isBlockActive(editor, format);
-  const isGroup = GROUP_TYPES.includes(format);
-  const isAlignment = ALIGNMENT_TYPES.includes(format);
+export const removeMarks = (editor: CustomEditor, formats: string[]) => {
+  formats.forEach((format) => {
+    Editor.removeMark(editor, format);
+  });
+};
 
-  // Unwrap existing alignment blocks
+const removeBlock = (editor: CustomEditor, format: FORMAT) => {
+  const isAlignment = ALIGNMENT_TYPES.includes(format);
+  const isGroup = GROUP_TYPES.includes(format);
+
   if (isAlignment) {
     Transforms.unwrapNodes(editor, {
       match: (n) =>
@@ -86,7 +145,6 @@ export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
     });
   }
 
-  // Unwrap group types (like lists) if applicable
   if (isGroup) {
     Transforms.unwrapNodes(editor, {
       match: (n) =>
@@ -97,30 +155,65 @@ export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
     });
   }
 
-  // Set block type for non-alignment types
-  if (!isAlignment) {
-    const newProperties = {
-      type: isActive ? 'paragraph' : isGroup ? 'list-item' : format,
-    };
+  // keep node but remove format property
+  Transforms.unsetNodes(editor, format);
+};
 
-    // Set the node type for the selected block
-    Transforms.setNodes(editor, newProperties);
+export const removeBlocks = (editor: CustomEditor, formats: FORMAT[]) => {
+  formats.forEach((format) => removeBlock(editor, format));
+};
+
+export const toggleBlock = (
+  editor: CustomEditor,
+  format: FORMAT,
+  value?: string,
+) => {
+  const isActive = format !== FORMAT.color && isBlockActive(editor, format);
+  const isGroup = GROUP_TYPES.includes(format);
+  const isAlignment = ALIGNMENT_TYPES.includes(format);
+  const isProperty = PROPERTY_WITH_VALUE.includes(format);
+
+  if (isProperty && value === undefined) return;
+
+  const propertiesToAdd = {
+    [format]: value,
+  };
+
+  if (isAlignment) {
+    Transforms.unwrapNodes(editor, {
+      match: (n) =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        ALIGNMENT_TYPES.includes(n.type as FORMAT),
+      split: true,
+    });
   }
 
-  // If the block type is an alignment or group type and is not active, wrap nodes
+  if (isGroup) {
+    Transforms.unwrapNodes(editor, {
+      match: (n) =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        GROUP_TYPES.includes(n.type as FORMAT),
+      split: true,
+    });
+  }
+
+  if (!isAlignment) {
+    const type = getNodeType(isActive || isProperty, isGroup) ?? format;
+
+    Transforms.setNodes(editor, {type, ...propertiesToAdd});
+  }
+
   if ((!isActive && isGroup) || isAlignment) {
     const block = {type: format, children: [{text: ''}]};
-
-    // Wrap the current selection with the alignment or group block
     Transforms.wrapNodes(editor, block, {split: true});
 
-    // Ensure the block has at least one text node
     const selectedNodes = Array.from(
       Editor.nodes(editor, {match: (n) => SlateElement.isElement(n)}),
     );
 
     if (selectedNodes.length === 0) {
-      // Insert an empty text node inside the block if no valid text node exists
       Transforms.insertNodes(editor, {
         type: 'paragraph',
         children: [{text: ''}],
@@ -128,12 +221,156 @@ export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
     }
   }
 
-  // Ensure there's always a valid text node after transformations
   if (editor.children.length === 0 || Editor.string(editor, []) === '') {
     Transforms.insertNodes(editor, {
       type: 'paragraph',
       children: [{text: ''}],
     });
+  }
+};
+
+const convertNumberToPixelStringValue = (value: number) => `${value}px`;
+
+const convertPixelStringToNumber = (value: string) =>
+  Number(value.slice(0, -2));
+
+export const addAttributeToBlock = (editor: CustomEditor, format: FORMAT) => {
+  const {selection} = editor;
+  if (!selection) return false;
+
+  const markToUpdate = FORMAT_TO_ATTRIBUTE[format];
+  if (!markToUpdate) return;
+
+  const shouldChangeNode =
+    ELEMENT_TO_CHANGE[markToUpdate].type === 'node' || false;
+
+  if (shouldChangeNode) {
+    // Get all nodes in the selection as an array and iterate
+    const nodes = Array.from(
+      Editor.nodes(editor, {
+        at: selection,
+        match: (n) =>
+          !Editor.isEditor(n) &&
+          SlateElement.isElement(n) &&
+          n.type === ELEMENT_TO_CHANGE[markToUpdate].target,
+      }),
+    );
+
+    // update each node
+    nodes.forEach((nodeEntry) => {
+      const [node, path] = nodeEntry;
+
+      // @ts-ignore
+      const currentMarkValue = node[markToUpdate];
+      // currently uses only indentation logic
+      const newMarkValue = currentMarkValue
+        ? convertPixelStringToNumber(currentMarkValue as string) +
+          INDENTATION_PIXEL_SIZE
+        : INDENTATION_PIXEL_SIZE;
+
+      Transforms.setNodes(
+        editor,
+        {
+          [markToUpdate]: convertNumberToPixelStringValue(newMarkValue),
+        },
+        {at: path}, // This location of the current node to update
+      );
+    });
+  } else {
+    // implemented without use case. MAY NEED WORK before its production ready
+    const foundMarks: Marks = Editor.marks(editor) || {};
+    const currentMarkValue = foundMarks[markToUpdate];
+
+    // currently uses only indentation logic
+    const newMarkValue = currentMarkValue
+      ? convertPixelStringToNumber(currentMarkValue as string) +
+        INDENTATION_PIXEL_SIZE
+      : INDENTATION_PIXEL_SIZE;
+
+    Editor.addMark(
+      editor,
+      markToUpdate,
+      convertNumberToPixelStringValue(newMarkValue),
+    );
+  }
+};
+
+export const removeAttributeToBlock = (
+  editor: CustomEditor,
+  format: FORMAT,
+) => {
+  const {selection} = editor;
+  if (!selection) return false;
+
+  const markToUpdate = FORMAT_TO_ATTRIBUTE[format];
+  if (!markToUpdate) return;
+
+  const shouldChangeNode =
+    ELEMENT_TO_CHANGE[markToUpdate].type === 'node' || false;
+
+  if (shouldChangeNode) {
+    // Get all nodes in the selection as an array and iterate
+    const nodes = Array.from(
+      Editor.nodes(editor, {
+        at: selection,
+        match: (n) =>
+          !Editor.isEditor(n) &&
+          SlateElement.isElement(n) &&
+          n.type === ELEMENT_TO_CHANGE[markToUpdate].target,
+      }),
+    );
+
+    // update each node
+    nodes.forEach((nodeEntry) => {
+      const [node, path] = nodeEntry;
+
+      // @ts-ignore
+      const {[markToUpdate]: currentMarkValue, ...rest} = node;
+
+      // currently uses only indentation logic
+      const newMarkValue = currentMarkValue
+        ? convertPixelStringToNumber(currentMarkValue as string) -
+          INDENTATION_PIXEL_SIZE
+        : 0;
+
+      const isMarkValid = newMarkValue && newMarkValue > 0;
+
+      const updatedProps = {
+        ...rest, // keep not related fields
+        ...(isMarkValid
+          ? {[markToUpdate]: convertNumberToPixelStringValue(newMarkValue)}
+          : {[markToUpdate]: undefined}), // reset field needs to be passed with undefined
+      };
+
+      Transforms.setNodes(
+        editor,
+        updatedProps,
+        {at: path}, // This location of the current node to update
+      );
+    });
+
+    // currently uses only indentation logic
+  } else {
+    const foundMarks: Marks = Editor.marks(editor) || {};
+    const currentMarkValue = foundMarks[markToUpdate];
+
+    // currently uses only indentation logic
+    const newMarkValue = currentMarkValue
+      ? convertPixelStringToNumber(currentMarkValue as string) -
+        INDENTATION_PIXEL_SIZE
+      : INDENTATION_PIXEL_SIZE;
+
+    const isMarkValid = newMarkValue > 0;
+
+    if (isMarkValid) {
+      Editor.addMark(
+        editor,
+        markToUpdate,
+        convertNumberToPixelStringValue(newMarkValue),
+      );
+    } else {
+      Editor.removeMark(editor, markToUpdate);
+    }
   }
 };
 
@@ -152,6 +389,11 @@ export const serialize = (node: Descendant): string => {
         'font-size': node.fontSize,
       }
     : {};
+
+  const pStyle = {
+    ...(node.color ? {color: node.color} : undefined),
+    ...(node.textIndent ? {'text-indent': node.textIndent} : undefined),
+  };
 
   if (Text.isText(node)) {
     let string = escapeHtml(node.text);
@@ -174,15 +416,26 @@ export const serialize = (node: Descendant): string => {
   const children = node.children.map((n) => serialize(n)).join('');
 
   switch (node.type) {
-    case 'paragraph':
-      return `<p>${children}</p>`;
+    case 'paragraph': {
+      const styleString = Object.keys(pStyle).length
+        ? ` style="${getStyleString(pStyle)}"`
+        : '';
+      const realText = Text.isText(node)
+        ? node.text
+        : node.children.map((n) => (Text.isText(n) ? n.text : '')).join('');
+
+      const inner = realText.trim() === '' ? '&nbsp;' : children;
+      return `<p${styleString}>${inner}</p>`;
+    }
     case 'numbered-list':
       return `<ol>${children}</ol>`;
     case 'bulleted-list':
       return `<ul>${children}</ul>`;
     case 'list-item': {
       return node.fontSize
-        ? `<li style="${getStyleString(style)}">${children}</li>`
+        ? `<li style="${
+            Object.entries(style).length ? getStyleString(style) : undefined
+          }">${children}</li>`
         : `<li>${children}</li>`;
     }
     case 'left':
@@ -229,6 +482,7 @@ export const deserialize = (el: HTMLElement) => {
 
   if (TEXT_TAGS[nodeName]) {
     const attrs = TEXT_TAGS[nodeName](el);
+
     return children.map((child) =>
       jsx('text', attrs, typeof child === 'string' ? {text: child} : child),
     );
@@ -299,6 +553,25 @@ export const handleKeyDown = (
         return handleEnterOnListItem(editor, event, node);
       }
       break;
+    case 'Tab':
+      {
+        const format = FORMAT['text-indent'];
+        const attribute = FORMAT_TO_ATTRIBUTE[format];
+        if (node.type === ELEMENT_TO_CHANGE[attribute].target) {
+          event.preventDefault();
+          return addAttributeToBlock(editor, format);
+        }
+      }
+      break;
+    case 'Backspace':
+      {
+        const format = FORMAT['text-indent'];
+        const hasText = recursiveNodeHasText(node);
+        if (!hasText || isAtFirstLineStart(editor)) {
+          return removeAttributeToBlock(editor, format);
+        }
+      }
+      break;
     case ' ': {
       const {anchor} = selection;
       const start = Editor.start(editor, anchor.path);
@@ -352,6 +625,111 @@ export const modifyHTMLFontSizeForPDFRendering = (html: string) => {
   return doc.documentElement.outerHTML;
 };
 
+export const generateTextIndent = (html: string) => {
+  // Parse the HTML string
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // Select all elements with inline style containing text-indent
+  const elements = doc.querySelectorAll('[style*="text-indent"]');
+
+  // Loop through each element and set standard font sizes
+  elements.forEach((element) => {
+    const htmlElement = element as HTMLElement;
+    htmlElement.style.marginLeft = htmlElement.style.textIndent;
+  });
+
+  // Serialize the modified DOM back to HTML string
+  return doc.documentElement.outerHTML;
+};
+
+export const normalizePdfInlineStyles = (html: string): string => {
+  const EM_IN_PX = 16;
+
+  return html.replace(
+    /<([a-z]+)([^>]*?)\sstyle="([^"]*?)"([^>]*?)>/gi,
+    (
+      _match: string,
+      tag: string,
+      preAttrs: string,
+      styleAttr: string,
+      postAttrs: string,
+    ) => {
+      // build styleMap
+      const styleMap = styleAttr
+        .split(/;\s*/)
+        .map((r) => r.trim())
+        .filter((r) => !!r)
+        .reduce<Record<string, string>>((acc, rule) => {
+          const [k, v] = rule.split(/\s*:\s*/);
+          if (k && v) acc[k.toLowerCase()] = v;
+          return acc;
+        }, {});
+
+      // drop font-family etc.
+      delete styleMap['font-family'];
+
+      const outProps: string[] = [];
+
+      // Explicitly handle text-align (and your paddings)
+      (
+        ['padding-left', 'padding-right', 'text-align', 'color'] as const
+      ).forEach((prop) => {
+        const raw = styleMap[prop];
+        if (!raw) return;
+
+        if (prop === 'text-align') {
+          // preserve “left”, “right”, “center”
+          outProps.push(`text-align: ${raw}`);
+          return;
+        }
+
+        if (prop === 'color') {
+          outProps.push(`color: ${raw}`);
+          return;
+        }
+
+        // for padding-left / padding-right only: convert em → px or keep px
+        const em = raw.match(/^([\d.]+)em$/);
+        if (em) {
+          outProps.push(`${prop}: ${parseFloat(em[1]) * EM_IN_PX}px`);
+          return;
+        }
+        const px = raw.match(/^([\d.]+)px$/);
+        if (px) {
+          outProps.push(`${prop}: ${px[1]}px`);
+        }
+      });
+
+      // font-size logic remains unchanged
+      const fs = styleMap['font-size'];
+      if (fs) {
+        const em = fs.match(/^([\d.]+)em$/);
+        if (em) {
+          outProps.push(`font-size: ${parseFloat(em[1]) * EM_IN_PX}px`);
+        } else {
+          // px or whatever
+          outProps.push(`font-size: ${fs}`);
+        }
+      }
+
+      const styleString = outProps.length
+        ? ` style="${outProps.join('; ')}"`
+        : '';
+
+      return `<${tag}${preAttrs}${styleString}${postAttrs}>`;
+    },
+  );
+};
+
+export const flattenTableHtml = (html: string) =>
+  html
+    // 1) remove all table, colgroup, tbody, thead, tfoot, tr, td, th
+    .replace(/<(\/?)(table|colgroup|tbody|thead|tfoot|tr|td|th)[^>]*>/gi, '')
+    // 2) collapse any accidental blank lines
+    .replace(/\n\s*\n+/g, '\n\n')
+    .trim();
+
 export const hasMultipleParagraphs = (value: string) =>
   value.split('<p>').length > 2;
 
@@ -364,3 +742,21 @@ export const returnFirstParagraph = (value: string) => {
 
   return `<p>${firstString} ...</p>`; // encapsulate in single paragraph
 };
+
+export const ensureEmptyBlocksRender = (html: string): string =>
+  html.replace(/<div([^>]*)>\s*<\/div>/gi, '<div$1>&nbsp;</div>');
+
+export const ensureEmptyParagraphs = (html: string): string =>
+  html.replace(/<p([^>]*)>([\s\S]*?)<\/p>/gi, (_match, attrs, content) => {
+    // 1) strip only empty inline tags inside this paragraph
+    const stripped = content.replace(
+      /<(strong|em|u|span)[^>]*>\s*<\/\1>/gi,
+      '',
+    );
+    // 2) if after stripping there’s nothing (or only &nbsp;), inject a <br/>
+    if (/^\s*(?:&nbsp;)?\s*$/i.test(stripped)) {
+      return `<p${attrs}><br/></p>`;
+    }
+    // 3) otherwise leave the paragraph’s (stripped) content as-is
+    return `<p${attrs}>${stripped}</p>`;
+  });

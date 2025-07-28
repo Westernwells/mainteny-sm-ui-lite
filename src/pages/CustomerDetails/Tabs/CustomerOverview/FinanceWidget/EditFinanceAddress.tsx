@@ -14,6 +14,7 @@ import {
 } from 'react-hook-form';
 import {AddressRecord} from 'models/misc';
 import {CustomerFinanceFormModel} from 'models/customer';
+import {formatAutocompleteAddress} from 'utils/utils';
 
 export const EditFinanceAddress = ({
   control,
@@ -74,23 +75,12 @@ export const EditFinanceAddress = ({
           }}
           allowMap
           getAddress={(componentAddress) => {
-            if (!componentAddress) return;
-
             const currentValues = watch(address);
-            setValue(address, {
-              ...componentAddress,
-              ...(componentAddress?.component && {
-                component: {
-                  ...componentAddress.component,
-                  name:
-                    componentAddress.component.name?.trim() ||
-                    currentValues?.component?.name ||
-                    '',
-                },
-              }),
-              id: currentValues?.id!,
-              fullName: componentAddress?.fullName || '',
-            });
+
+            setValue(
+              address,
+              formatAutocompleteAddress(currentValues, componentAddress),
+            );
           }}
           shortAddress
         />
@@ -150,6 +140,7 @@ export const EditFinanceAddress = ({
             <FormSelect
               labelId={`${address}.component.country`}
               label="Country"
+              resetOption={{label: t('Select country')}}
               options={countriesOptions}
               errorText={errors?.[address]?.component?.country?.message || ''}
               selectProps={{
@@ -169,6 +160,7 @@ export const EditFinanceAddress = ({
             <FormSelect
               labelId={`${address}.component.state`}
               label="State/Province/Region"
+              resetOption={{label: t('Select state')}}
               options={statesByCountry(countryValue)}
               selectProps={{
                 ...field,

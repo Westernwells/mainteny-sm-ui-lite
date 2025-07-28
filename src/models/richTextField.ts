@@ -3,6 +3,8 @@ import {BaseEditor} from 'slate';
 import {HistoryEditor} from 'slate-history';
 import {ReactEditor} from 'slate-react';
 
+export const INDENTATION_PIXEL_SIZE = 41;
+
 export enum FONT_SIZE {
   SMALL = '12px',
   NORMAL = '16px',
@@ -14,10 +16,14 @@ export const DEFAULT_FONT_SIZE = FONT_SIZE.NORMAL;
 export enum HTML_PDF_FONT_SIZE {
   SMALL = '9px',
   NORMAL = '11px',
-  LARGE = '13px',
+  LARGE = '14px',
 }
 
-export const DEFAULT_HTML_PDF_FONT_SIZE = HTML_PDF_FONT_SIZE.NORMAL;
+export enum HTML_PDF_FONT_SIZE_DESCRIPTION {
+  SMALL = '7px',
+  NORMAL = '9px',
+  LARGE = '11px',
+}
 
 export enum FORMAT {
   'left' = 'left',
@@ -25,30 +31,49 @@ export enum FORMAT {
   'right' = 'right',
   'numbered-list' = 'numbered-list',
   'bulleted-list' = 'bulleted-list',
+  'color' = 'color',
+  'text-indent' = 'text-indent',
 }
+
+export const FORMAT_TO_ATTRIBUTE: Record<string, string> = {
+  'text-indent': 'textIndent',
+};
+
+// Some properties need to go to the wrapper component (node), other to the selected component (leaf)
+export const ELEMENT_TO_CHANGE: Record<
+  string,
+  {type: 'node' | 'leaf'; target: 'paragraph' | 'text'}
+> = {
+  textIndent: {type: 'node', target: 'paragraph'},
+};
+
 export const GROUP_TYPES = [FORMAT['numbered-list'], FORMAT['bulleted-list']];
 export const ALIGNMENT_TYPES = [FORMAT.left, FORMAT.center, FORMAT.right];
 export const BLOCK_TYPES = [...GROUP_TYPES, ...ALIGNMENT_TYPES];
+export const PROPERTY_WITH_VALUE = [FORMAT.color];
 
 export const ELEMENT_TAGS: Record<
   string,
-  (el: HTMLElement | HTMLDivElement) => {type: string} | undefined
+  (el: HTMLElement | HTMLDivElement) =>
+    | {
+        type: string;
+        textIndent?: string;
+        color?: string;
+      }
+    | undefined
 > = {
   P: (el: HTMLElement) => {
-    const style = el.style?.textAlign;
-    if (style) {
-      switch (style) {
-        case 'left':
-          return {type: 'left'};
-        case 'center':
-          return {type: 'center'};
-        case 'right':
-          return {type: 'right'};
-        default:
-          return {type: 'paragraph'};
-      }
-    }
-    return {type: 'paragraph'};
+    const style = ['left', 'right', 'center'].includes(el.style?.textAlign)
+      ? el.style?.textAlign
+      : 'paragraph'; // make 'paragraph' default for anything except align type
+    const color = el.style?.color;
+    const textIndent = el.style?.textIndent;
+
+    return {
+      type: style,
+      ...(color ? {color} : {}),
+      ...(textIndent ? {textIndent} : {}),
+    };
   },
   OL: () => ({type: 'numbered-list'}),
   UL: () => ({type: 'bulleted-list'}),
@@ -107,6 +132,8 @@ export interface BaseText {
   right?: boolean;
   bullet?: boolean;
   ordered?: boolean;
+  color?: string;
+  textIndent?: number;
 }
 
 export type BaseElement = {
@@ -114,10 +141,12 @@ export type BaseElement = {
   type: string;
   align?: 'left' | 'center' | 'right';
   fontSize?: FONT_SIZE;
+  color?: string;
+  textIndent?: number;
 };
 
 export type Marks = Omit<BaseText, 'text'> & {
-  [key: string]: boolean | undefined | string;
+  [key: string]: boolean | undefined | string | number;
 };
 
 export interface RenderElementProps {

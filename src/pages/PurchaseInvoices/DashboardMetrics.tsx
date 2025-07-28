@@ -135,7 +135,7 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
         <Metric
           title="Total cost"
           value={formatCurrency(totalAmount / 10 ** totalAmountFractionDigits, {
-            currencySymbol: currentCurrency.symbol,
+            currency: currentCurrency.code,
           })}
           icon={
             <PerformanceMoneyDecrease fontSize="2.5rem" style={iconStyles} />
@@ -165,7 +165,7 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
           value={formatCurrency(
             totalPendingAmount / 10 ** totalPendingFractionDigits,
             {
-              currencySymbol: currentCurrency.symbol,
+              currency: currentCurrency.code,
             },
           )}
           icon={<TimeClockHand fontSize="2.5rem" style={{color: '#828DA3'}} />}

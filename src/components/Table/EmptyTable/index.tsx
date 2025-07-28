@@ -14,7 +14,8 @@ type Props = {
     | 'quotation'
     | 'lift'
     | 'contacts'
-    | 'articles';
+    | 'articles'
+    | 'tasks';
   actionButton?: ReactNode;
   onClick?: () => void;
 };

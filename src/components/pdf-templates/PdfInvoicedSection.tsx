@@ -1,13 +1,11 @@
-import {View, Text, Font, StyleSheet} from '@react-pdf/renderer';
-import {InvoiceView, InvoiceType} from 'models/invoice';
+import {StyleSheet, Text, View} from '@react-pdf/renderer';
+import {InvoiceType, InvoiceView} from 'models/invoice';
 import {Currency} from 'models/misc';
 import {centsToMoney, formatCurrency} from 'utils/currency';
 import {formatDate, toDate} from 'utils/datetime';
-import {fixRounding} from 'utils/utils';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
+import {getInvoicedSectionColumns} from 'utils/pdfTemplates';
 
 type InvoicedSectionProps = {
   translate: (key: string) => string;
@@ -15,39 +13,16 @@ type InvoicedSectionProps = {
   selectedLng?: string;
   previousInvoices: InvoiceView[];
   amount: number;
-  currentInvoiceAmountPercentageVats: {
+  currentPercentageVats: {
     percentageVat: number;
     vat: number;
   }[];
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = () =>
+const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
     tableHeading: {
-      color: '#616161',
+      color: primaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
@@ -66,9 +41,11 @@ export const PdfInvoicedSection = ({
   selectedLng,
   previousInvoices,
   amount,
-  currentInvoiceAmountPercentageVats,
+  currentPercentageVats,
+  fontStyles,
+  primaryColor,
 }: InvoicedSectionProps) => {
-  const amountFormatted = formatCurrency(fixRounding(amount, 2), {
+  const amountFormatted = formatCurrency(amount, {
     currency: currentCurrency?.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -78,35 +55,12 @@ export const PdfInvoicedSection = ({
     companyLang: selectedLng,
   });
 
-  const invoicedSectionColumns: {
-    name: string;
-    align: 'left' | 'right' | 'center' | 'justify' | undefined;
-    width: string;
-  }[] = [
-    {name: 'Invoiced', align: 'left', width: '30%'},
-    {name: 'Date', align: 'right', width: '15%'},
-    {
-      name: `Total (${currentCurrency?.symbol})`,
-      align: 'right',
-      width: '18%',
-    },
-    {name: 'VAT (%)', align: 'right', width: '7%'},
-    {name: 'VAT', align: 'right', width: '12%'},
-    {
-      name: `Total incl. VAT (${currentCurrency?.symbol})`,
-      align: 'right',
-      width: '20%',
-    },
-  ];
+  const styles = getStyles({primaryColor});
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const styles = getStyles();
+  const columns = getInvoicedSectionColumns(translate, currentCurrency);
 
   return (
-    <View>
+    <View wrap={false}>
       <View
         style={{
           display: 'flex',
@@ -116,7 +70,7 @@ export const PdfInvoicedSection = ({
           marginTop: 15,
           marginBottom: 10,
         }}>
-        {invoicedSectionColumns.map((column) => (
+        {columns.map((column) => (
           <Text
             style={{
               ...styles.tableHeading,
@@ -124,53 +78,49 @@ export const PdfInvoicedSection = ({
               width: column.width,
             }}
             key={column.name}>
-            {translate(column.name)}
+            {column.name}
           </Text>
         ))}
       </View>
 
       <View>
-        {previousInvoices.map((i, index) => {
-          if (index === previousInvoices.length - 1) {
-            return null;
-          }
-          const invoiceTotalAmount = i.totalAmount;
+        {previousInvoices?.map((i) => {
+          const invoiceTotal = i.totalAmount!;
+          const sortedVats = (invoiceTotal.vats || [])
+            .slice()
+            .sort((a, b) => a.percentageVat - b.percentageVat);
+
           const description =
             i.type === InvoiceType.CREDIT_NOTE
               ? translate('Credit Note invoice')
-              : i.additionalInfo?.payment?.description || '';
-          const fractionDigits = invoiceTotalAmount?.fractionDigits ?? 2;
+              : i.additionalInfo?.payment?.description || '-';
+
+          const fractionDigits = invoiceTotal.fractionDigits ?? 2;
           const amountExclVat = Math.abs(
-            (invoiceTotalAmount?.netAmount ?? 0) / 10 ** fractionDigits,
+            centsToMoney(currentCurrency!.code, invoiceTotal.netAmount ?? 0),
           );
           const amountExclVatFormatted = formatCurrency(amountExclVat, {
-            currency: currentCurrency?.code,
+            currency: currentCurrency!.code,
             minimumFractionDigits: fractionDigits,
             maximumFractionDigits: fractionDigits,
-            roundingMode: 'floor',
             excludeCurrencySymbol: true,
             currencySymbol: currentCurrency?.symbol,
             companyLang: selectedLng,
           });
 
-          const totalAmountInclVat = Math.abs(
-            (invoiceTotalAmount?.grossAmount ?? 0) / 10 ** fractionDigits,
+          const totalInclVat = Math.abs(
+            centsToMoney(currentCurrency!.code, invoiceTotal.grossAmount ?? 0),
           );
+          const totalInclVatFormatted = formatCurrency(totalInclVat, {
+            currency: currentCurrency!.code,
+            minimumFractionDigits: fractionDigits,
+            maximumFractionDigits: fractionDigits,
+            excludeCurrencySymbol: true,
+            currencySymbol: currentCurrency?.symbol,
+            companyLang: selectedLng,
+          });
 
-          const totalAmountInclVatFormatted = formatCurrency(
-            totalAmountInclVat,
-            {
-              currency: currentCurrency?.code,
-              minimumFractionDigits: fractionDigits,
-              maximumFractionDigits: fractionDigits,
-              roundingMode: 'floor',
-              excludeCurrencySymbol: true,
-              currencySymbol: currentCurrency?.symbol,
-              companyLang: selectedLng,
-            },
-          );
-          const signBeforeNumber =
-            i.type === InvoiceType.CREDIT_NOTE ? '+' : '-';
+          const sign = i.type === InvoiceType.CREDIT_NOTE ? '+' : '-';
 
           return (
             <View
@@ -180,6 +130,8 @@ export const PdfInvoicedSection = ({
                 justifyContent: 'space-between',
                 flexDirection: 'row',
                 width: '100%',
+                alignItems: 'flex-start',
+                paddingBottom: 2,
               }}>
               <Text style={{...styles.tableRow, width: '30%'}}>
                 {description}
@@ -198,7 +150,7 @@ export const PdfInvoicedSection = ({
                   width: '18%',
                   textAlign: 'right',
                 }}>
-                {signBeforeNumber}
+                {sign}
                 {amountExclVatFormatted}
               </Text>
               <View
@@ -207,12 +159,9 @@ export const PdfInvoicedSection = ({
                   flexDirection: 'column',
                   width: '7%',
                   textAlign: 'right',
-                  display: 'flex',
                 }}>
-                {invoiceTotalAmount.vats.map((v, idx) => (
-                  <Text key={idx} style={{marginBottom: 3}}>
-                    {v.percentageVat}%
-                  </Text>
+                {sortedVats.map((v, idx) => (
+                  <Text key={idx}>{v.percentageVat}%</Text>
                 ))}
               </View>
               <View
@@ -220,27 +169,21 @@ export const PdfInvoicedSection = ({
                   ...styles.tableRow,
                   width: '12%',
                   textAlign: 'right',
-                  display: 'flex',
                   flexDirection: 'column',
                 }}>
-                {invoiceTotalAmount.vats.map((v, idx) => {
+                {sortedVats.map((v, idx) => {
                   const vatAmount = Math.abs(
-                    centsToMoney(currentCurrency?.code!, v.vat),
+                    centsToMoney(currentCurrency!.code, v.vat),
                   );
                   const vatAmountFormatted = formatCurrency(vatAmount, {
-                    currency: currentCurrency?.code,
+                    currency: currentCurrency!.code,
                     minimumFractionDigits: fractionDigits,
                     maximumFractionDigits: fractionDigits,
-                    roundingMode: 'floor',
                     excludeCurrencySymbol: true,
                     currencySymbol: currentCurrency?.symbol,
                     companyLang: selectedLng,
                   });
-                  return (
-                    <Text key={idx} style={{marginBottom: 3}}>
-                      -{vatAmountFormatted}
-                    </Text>
-                  );
+                  return <Text key={idx}>{vatAmountFormatted}</Text>;
                 })}
               </View>
               <Text
@@ -249,8 +192,8 @@ export const PdfInvoicedSection = ({
                   width: '20%',
                   textAlign: 'right',
                 }}>
-                {signBeforeNumber}
-                {totalAmountInclVatFormatted}
+                {sign}
+                {totalInclVatFormatted}
               </Text>
             </View>
           );
@@ -265,24 +208,28 @@ export const PdfInvoicedSection = ({
             borderTopColor: '#212121',
             paddingTop: 3,
           }}>
-          <Text style={{width: '30%', ...boldFontStyle}}>
+          <Text style={{width: '30%', ...fontStyles.bold, color: primaryColor}}>
             {`${translate('Invoice amount')} (${currentCurrency?.symbol})`}
           </Text>
           <Text style={{width: '15%', textAlign: 'right'}} />
-          <Text style={{width: '18%', textAlign: 'right', ...boldFontStyle}}>
+          <Text
+            style={{
+              width: '18%',
+              textAlign: 'right',
+              ...fontStyles.bold,
+              color: primaryColor,
+            }}>
             {amountFormatted}
           </Text>
           <View
             style={{
-              ...boldFontStyle,
+              ...fontStyles.bold,
               width: '7%',
               textAlign: 'right',
               alignItems: 'flex-end',
             }}>
-            {currentInvoiceAmountPercentageVats.map((v, idx) => (
-              <Text key={idx} style={{marginBottom: 3}}>
-                {v.percentageVat}%
-              </Text>
+            {currentPercentageVats?.map((v, idx) => (
+              <Text key={idx}>{v.percentageVat}%</Text>
             ))}
           </View>
           <View
@@ -291,34 +238,46 @@ export const PdfInvoicedSection = ({
               textAlign: 'right',
               alignItems: 'flex-end',
             }}>
-            {currentInvoiceAmountPercentageVats.map((v, idx) => {
-              const vatAmountFormatted = formatCurrency(v.vat, {
-                currency: currentCurrency?.code,
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-                roundingMode: 'floor',
-                excludeCurrencySymbol: true,
-                currencySymbol: currentCurrency?.symbol,
-                companyLang: selectedLng,
-              });
+            {currentPercentageVats?.map((v, idx) => {
+              const vatAmountFormatted = formatCurrency(
+                centsToMoney(currentCurrency?.code!, v.vat),
+                {
+                  currency: currentCurrency?.code,
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  excludeCurrencySymbol: true,
+                  currencySymbol: currentCurrency?.symbol,
+                  companyLang: selectedLng,
+                },
+              );
               return (
-                <Text key={idx} style={{marginBottom: 3, ...boldFontStyle}}>
+                <Text
+                  key={idx}
+                  style={{
+                    ...fontStyles.bold,
+                    color: primaryColor,
+                  }}>
                   {vatAmountFormatted}
                 </Text>
               );
             })}
           </View>
-          <Text style={{width: '20%', textAlign: 'right', ...boldFontStyle}}>
+          <Text
+            style={{
+              width: '20%',
+              textAlign: 'right',
+              ...fontStyles.bold,
+              color: primaryColor,
+            }}>
             {formatCurrency(
               amount +
-                currentInvoiceAmountPercentageVats
-                  .map((v) => v.vat)
+                currentPercentageVats
+                  .map((v) => centsToMoney(currentCurrency?.code!, v.vat))
                   .reduce((a, b) => a + b, 0),
               {
                 currency: currentCurrency?.code,
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-                roundingMode: 'floor',
                 excludeCurrencySymbol: true,
                 currencySymbol: currentCurrency?.symbol,
                 companyLang: selectedLng,

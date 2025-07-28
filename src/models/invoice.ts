@@ -19,9 +19,18 @@ import {
 } from './misc';
 import {PropertyOwnerSimpleView} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
-import {ServiceOrderType, ServiceOrderView} from './service-order';
+import {
+  ServiceOrderType,
+  ServiceOrderView,
+  ServiceOrderViewArticleInfoRecord,
+} from './service-order';
 import {Order} from './pagination';
 import {CANCEL_ACTION} from 'models/status';
+import {
+  ArticleInfoRecord,
+  EditableQuotationSubItemRecord,
+  SubItemsConfig,
+} from './quotation';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT',
@@ -31,6 +40,9 @@ export enum InvoiceStatus {
   EXPIRED = 'EXPIRED',
   CREDITED = 'CREDITED',
   CANCELLED = 'CANCELLED',
+  OVERDUE_NOTICE_1 = 'OVERDUE_NOTICE_1',
+  OVERDUE_NOTICE_2 = 'OVERDUE_NOTICE_2',
+  OVERDUE_NOTICE_3 = 'OVERDUE_NOTICE_3',
 }
 
 export enum InvoiceStatusFilter {
@@ -42,6 +54,9 @@ export enum InvoiceStatusFilter {
   EXPIRED = 'EXPIRED',
   CREDITED = 'CREDITED',
   CANCELLED = 'CANCELLED',
+  OVERDUE_NOTICE_1 = 'OVERDUE_NOTICE_1',
+  OVERDUE_NOTICE_2 = 'OVERDUE_NOTICE_2',
+  OVERDUE_NOTICE_3 = 'OVERDUE_NOTICE_3',
 }
 
 export enum InvoiceStatusView {
@@ -52,6 +67,9 @@ export enum InvoiceStatusView {
   PARTIALLY_PAID = 'Partially Paid',
   CANCELLED = 'Cancelled',
   CREDITED = 'Credited',
+  OVERDUE_NOTICE_1 = 'Dunning 1',
+  OVERDUE_NOTICE_2 = 'Dunning 2',
+  OVERDUE_NOTICE_3 = 'Dunning 3',
 }
 
 export interface InvoiceItem {
@@ -69,19 +87,38 @@ export interface InvoiceItem {
   };
 }
 
+export enum InvoiceUnitAmountSource {
+  DEFAULT = 'DEFAULT',
+  MIX_ARTICLE = 'MIX_ARTICLE',
+  MIX_SUB_ITEMS = 'MIX_SUB_ITEMS',
+}
+
+export interface InvoiceItemAdditionalInfo {
+  discount?: Discount;
+  unitAmountSource?: InvoiceUnitAmountSource;
+  subItemsConfig?: {
+    subItemsVisible?: boolean;
+    priceVisible?: boolean;
+  };
+  userSeqNumber?: string;
+  payment?: {
+    type: InvoiceItemPaymentType;
+    amount: AggregatedAmount;
+    percentage?: number;
+  };
+}
+
 export interface InvoiceItemView {
   id: string;
   invoiceId?: string;
   articleId?: string;
-  article?: ArticleView;
+  article?: ServiceOrderViewArticleInfoRecord;
   name: string;
+  unitPurchaseAmount?: MultiVatsAmount;
   unitAmount: MultiVatsAmount;
   quantity: number;
   description: string;
-  additionalInfo?: {
-    discount?: Discount;
-    payment?: InvoiceItemPaymentRecord;
-  };
+  additionalInfo?: InvoiceItemAdditionalInfo;
 }
 
 export interface AggregatedInvoiceItem extends InvoiceItem {
@@ -235,15 +272,15 @@ export interface InvoicePaymentView {
 }
 
 export interface QueryInvoiceParams {
-  pageIndex: number;
-  pageSize: number;
+  pageIndex?: number;
+  pageSize?: number;
   order?: Order;
   orderByField?: InvoiceOrderField;
   query?: string;
   contractId?: string[];
   sentDateFrom?: string;
   sentDateTo?: string;
-  status: InvoiceStatus[];
+  status?: InvoiceStatus[];
   propertyOwnerId?: string[];
   totalAmountFrom?: number;
   totalAmountTo?: number;
@@ -337,20 +374,18 @@ export interface ArticleRecord {
 }
 
 export interface InvoiceItemRecord {
-  id?: string;
-  article?: ArticleRecord;
+  id?: string; // only for frontend key - we don't send it to backend
+  article?: ArticleInfoRecord;
   name: string;
   description?: string;
+  unitPurchaseAmount?: AmountRecord;
   unitAmount: AmountRecord;
   quantity: number;
   discount?: Discount;
   payment?: InvoiceItemPaymentRecord;
-  additionalInfo?:
-    | {
-        discount?: Discount;
-        payment?: InvoiceItemPaymentRecord;
-      }
-    | undefined;
+  subItemsConfig?: SubItemsConfig;
+  subItems?: EditableQuotationSubItemRecord[];
+  userSeqNumber?: string;
 }
 
 export enum InvoiceType {
@@ -377,7 +412,7 @@ export interface InvoiceFormData {
   description: string;
   dueDate?: Date;
   sentDate?: Date;
-  items: InvoiceItemRecord[];
+  items: EditableInvoiceItem[];
   paymentInfo: PaymentInfo;
   paymentTerm?: InvoicePaymentTermRecord;
   propertyOwnerId: string;
@@ -423,7 +458,7 @@ export interface CreateInvoice {
   sentDate?: string;
   type?: InvoiceType;
   items: InvoiceItemRecord[];
-  paymentTerm?: InvoicePaymentTermRecord;
+  paymentTerm?: InvoicePaymentTermRecord | null;
   paymentInfo?: PaymentInfo;
   shouldSendOut?: boolean;
   includeWorkReport?: boolean;
@@ -450,6 +485,8 @@ export interface CreateInvoice {
   showArticleSection?: boolean;
   refInvoiceId?: string;
   notes?: CreateInvoiceComment[];
+  showInvoicedSection?: boolean;
+  showPaymentSection?: boolean;
 }
 
 export interface UpdateInvoice {
@@ -461,7 +498,7 @@ export interface UpdateInvoice {
   dueDate?: string;
   sentDate?: string;
   items?: InvoiceItemRecord[];
-  paymentTerm?: InvoicePaymentTermRecord;
+  paymentTerm?: InvoicePaymentTermRecord | null;
   paymentInfo?: PaymentInfo;
   includeWorkReport?: boolean;
   includeCheckList?: boolean;
@@ -485,6 +522,8 @@ export interface UpdateInvoice {
   deliveryStartDate?: string;
   deliveryEndDate?: string;
   showArticleSection?: boolean;
+  showInvoicedSection?: boolean;
+  showPaymentSection?: boolean;
   elevatorExternalId?: string;
 }
 
@@ -541,6 +580,8 @@ export interface InvoiceActivityView {
   text: string;
   additionalInfo: string;
   meta: Meta;
+  overdueNoticePdfPath?: string;
+  count?: number;
 }
 
 export interface MyInvoiceActivityView {
@@ -558,6 +599,7 @@ export interface MyInvoiceActivityView {
 export interface InvoiceActivityOverdueNoticeSentData {
   email: string;
   overdueNoticeId: string;
+  pdfPath: string;
 }
 
 export const ALL_MANUAL_INVOICE_TYPES = [
@@ -591,10 +633,26 @@ export interface InvoiceGeneration {
 export interface InvoiceItemAmount {
   discount: Discount;
   percentageVat?: number;
-  amountBeforeGlobalDiscount: Amount;
+  amountBeforeItemDiscount?: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount?: Amount;
+  payment: InvoiceItemPaymentRecord;
+  subItems: InvoiceSubItemAmount[];
+}
+
+export interface InvoiceSubItemPayment {
+  type: InvoiceItemPaymentType;
+  amount?: AggregatedAmount;
+  percentage?: number;
+}
+
+export interface InvoiceSubItemAmount {
+  payment: InvoiceSubItemPayment;
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeItemDiscount: Amount;
   amountAfterItemDiscount: Amount;
   amountAfterGlobalDiscount: Amount;
-  payment: InvoiceItemPaymentRecord;
 }
 
 export interface InvoiceAmountDetail {
@@ -657,6 +715,14 @@ export type SearchParameters = {
 
 export type InvoiceStatistics = {
   numOfInvoicesPerStatus: Record<string, number>;
+  amountsPerStatus: Record<
+    string,
+    {
+      value: number;
+      currency: string;
+      fractionDigits: number;
+    }[]
+  >;
 };
 
 export type QueryCancelInvoiceParams = {
@@ -671,3 +737,62 @@ export interface CalculateInvoiceAmountRecord {
   globalDiscount?: Discount;
   paymentRecord?: Payment;
 }
+
+export type EditableInvoiceItem = InvoiceItemRecord & {
+  id?: string;
+  margin?: number;
+};
+
+export type EditableInvoiceSubItemRecord = InvoiceSubItemRecord & {
+  margin?: number;
+  id?: string;
+  parentId?: string;
+};
+
+export interface InvoiceSubItemsConfig {
+  subItemsVisible?: boolean;
+  priceVisible?: boolean;
+}
+
+export interface InvoiceSubItemRecord {
+  article?: ArticleInfoRecord;
+  id?: string;
+  name: string;
+  unitPurchaseAmount?: Amount;
+  unitAmount: Amount;
+  quantity: number;
+  description?: string;
+  userSeqNumber?: string;
+}
+
+export interface PositionRowInvoice {
+  data: ArticleView;
+  id: string;
+  externalId: string;
+  name: string;
+  description: string;
+  type: ArticleType;
+  unit: string;
+  unitPurchaseAmount?: AmountRecord;
+  unitSellingAmount?: AmountRecord;
+  quantity?: number;
+  discount: number;
+}
+
+export type InvoicedColumn = {
+  name: string;
+  align: 'left' | 'right' | 'center' | 'justify' | undefined;
+  width: string;
+};
+
+export type GetInvoiceTimeUnit = {
+  selectedFrequency: string;
+  isYearlyFrequency: boolean;
+  isAfterJobCompletion: boolean;
+};
+
+export type InvoiceFrequencyValues = {
+  selectedCaseFrequency: string;
+  yearlyFrequency: boolean;
+  afterJobCompletion: boolean;
+};

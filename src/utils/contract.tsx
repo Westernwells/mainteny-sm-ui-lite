@@ -24,10 +24,11 @@ import {
   UpdateContractComponents,
 } from 'models/contract';
 import {toDate, toRestDate} from 'utils/datetime';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
 import {OptionsObject, SnackbarKey, SnackbarMessage} from 'notistack';
 import {formatCurrency} from 'utils/currency';
 import {Currency} from 'models/misc';
+import {Service} from 'pages/UnitDetails/Tabs/OverviewTab/ContractServices';
 
 export const costRangeConvertor = (
   selectedItems: string[],
@@ -169,6 +170,7 @@ export const componentsToMutate = (
     costType: c.additionalInfo?.costType,
     elevators: c.additionalInfo?.elevators,
     orderType: c.additionalInfo.orderType,
+    serviceDeliveryType: c.additionalInfo.serviceDeliveryType,
   })) as UpdateContractComponents[];
 
 export const calculateContractInvoiceRowPrice = (
@@ -262,7 +264,10 @@ export const convertExtendedRecordsToContractComponentRecords = (
   });
 
 export const parsElevatorRecourses = (
-  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
 ) =>
   elevatorResource?.map((elevator) => ({
     elevatorId: elevator.id,
@@ -282,26 +287,59 @@ export const parsElevatorRecourses = (
   }));
 
 export const mergeElevators = (
-  elevatorResource: ContractElevatorView[] | ElevatorView[],
-  elevatorsFromRow: ContractComponentView,
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
+  elevatorsFromRow: Service,
 ) => {
-  const infoMap = (elevatorsFromRow.additionalInfo?.elevators || []).reduce(
-    (map, elevator) => {
-      map[elevator.elevatorId] = elevator;
-      return map;
-    },
-    {} as Record<string, ContractServiceFormElevator>,
-  );
+  const existingElevators = elevatorsFromRow.additionalInfo?.elevators || [];
+
+  const infoMap = existingElevators.reduce((map, elevator) => {
+    map[elevator.elevatorId] = elevator;
+    return map;
+  }, {} as Record<string, ContractServiceFormElevator>);
+
+  const hasExisting = existingElevators.length > 0;
 
   return parsElevatorRecourses(elevatorResource || []).map((elevator) => ({
     ...elevator,
     ...(infoMap[elevator.elevatorId] || {}),
-    isChecked: Boolean(infoMap[elevator.elevatorId]),
+    isChecked: hasExisting ? Boolean(infoMap[elevator.elevatorId]) : true,
   }));
 };
 
+export const mergeElevatorsByExisting = (
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
+  elevatorsFromRow: Service,
+) => {
+  const existingElevators = elevatorsFromRow.additionalInfo?.elevators || [];
+
+  const parsedElevators = parsElevatorRecourses(elevatorResource || []);
+
+  const resourceMap = parsedElevators.reduce((map, elevator) => {
+    map[elevator.elevatorId] = elevator;
+    return map;
+  }, {} as Record<string, (typeof parsedElevators)[0]>);
+
+  return existingElevators.map((existingElevator) => {
+    const merged = {
+      ...resourceMap[existingElevator.elevatorId],
+      ...existingElevator,
+      isChecked: true,
+    };
+    return merged;
+  });
+};
+
 export const getElevatorDataByElevator = (
-  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
   elevatorsFromRow: ContractComponentView,
 ) => {
   const infoMap = (elevatorsFromRow.additionalInfo?.elevators || []).reduce(
@@ -468,4 +506,17 @@ export const transformContractViewComponentToContractRecord = (
     costType: component.additionalInfo.costType,
     costPackage: component.additionalInfo.costPackage,
     orderType: component.additionalInfo.orderType ?? undefined,
+    serviceDeliveryType: component.additionalInfo.serviceDeliveryType,
   }));
+
+export const getAutoJobStatus = (
+  firstInvoiceDate: Date | null,
+): {
+  label: string;
+  color: 'default' | 'darkSuccess';
+} => {
+  if (firstInvoiceDate) {
+    return {label: 'Yes', color: 'darkSuccess'};
+  }
+  return {label: 'No', color: 'default'};
+};

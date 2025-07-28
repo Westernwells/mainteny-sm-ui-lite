@@ -65,11 +65,13 @@ export const UnitDetailsForm = ({
       )
       .required('Category is required'),
     unitType: Yup.string().nullable(),
-    externalId: Yup.string().test(
-      'checkExternalId',
-      'This ID is already taken. Please enter a different one.',
-      async (value) => isExternalIdUnique(customerResource, value),
-    ),
+    externalId: Yup.string()
+      .test(
+        'checkExternalId',
+        'This ID is already taken. Please enter a different one.',
+        async (value) => isExternalIdUnique(customerResource, value),
+      )
+      .required('Unit number is required'),
   });
 
   const formik = useFormik<UnitDetailsFormModel>({
@@ -279,7 +281,7 @@ export const UnitDetailsForm = ({
                     : '',
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
-                required: false,
+                required: true,
               }}
             />
           </Grid>

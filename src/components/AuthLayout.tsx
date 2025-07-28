@@ -22,6 +22,8 @@ export const AuthLayout = ({children}: Props) => {
   const {t} = useTranslation();
   const queryClient = useQueryClient();
   const [selectedLng, setSelectedLng] = useState('');
+  const currentYear = new Date().getFullYear();
+
   useEffect(() => {
     const {language} = i18n;
     setSelectedLng(language.split('-')[0].toUpperCase());
@@ -208,8 +210,8 @@ export const AuthLayout = ({children}: Props) => {
               fontSize: '0.8rem',
               letterSpacing: '0.035em',
             }}>
-            ©2023 Mainteny. All rights reserved. <br /> Mainteny® is a
-            registered trademark.
+            ©{currentYear} {t('Mainteny. All rights reserved.')} <br />{' '}
+            {t('Mainteny® is a registered trademark.')}
           </Typography>
         </Box>
       </Box>

@@ -14,7 +14,7 @@ import {ReactComponent as ServicePackageIcon} from 'assets/icons/ServicePackageI
 import {ReactComponent as CalendarTodayIcon} from 'assets/icons/CalendarToday.svg';
 import {ReactComponent as UnionIcon} from 'assets/icons/UnionIcon.svg';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
-import {formatDate} from 'utils/datetime';
+import {formatDate, getMonthYearFromDate} from 'utils/datetime';
 import {theme} from 'theme';
 import {
   calculateContractInvoicePriceTotal,
@@ -31,21 +31,19 @@ import {getArticleTypeText} from 'utils/article-utils';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {getViewFrequency} from 'utils/elevator-utils';
 import {ArticleType} from 'models/article';
-import {ElevatorView} from 'models/elevator';
-import {
-  getJobTypeGivenName,
-  serviceOrderTypeToString,
-} from 'utils/service-order-utils';
+import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
 import {
   useCompanyJobTypes,
   useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useMemo} from 'react';
+import {getDisplayJobType} from 'utils/service-order-utils';
 import {Service} from '.';
 
 type Props = {
   service?: Service;
-  elevators: ContractElevatorView[] | ElevatorView[];
+  elevators: ContractElevatorView[] | ElevatorView[] | ElevatorSimpleView[];
 };
 
 const ServiceInformationReview = ({service, elevators}: Props) => {
@@ -61,15 +59,6 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
     user?.userAccount.serviceCompany.id!,
   );
 
-  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
-  const filteredOldJobTypes = oldJobTypes?.filter(
-    (oldJobType) =>
-      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
-  );
-
-  // Combine jobTypes and the filtered oldJobTypes
-  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
-
   const elevatorsData = getElevatorDataByElevator(
     elevators,
     service as ContractComponentView,
@@ -80,13 +69,23 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
     align?: TableCellProps['align'];
     width?: TableCellProps['width'];
   }[] = [
-    {name: 'Serial Number', align: 'left', width: '15%'},
+    {name: 'Unit ID', align: 'left', width: '15%'},
     {name: 'Building', width: '12%'},
     {name: 'Unit Address', width: '25%'},
     {name: 'Job Frequency', align: 'left', width: '15%'},
     {name: 'Invoice frequency', align: 'left', width: '15%'},
     {name: 'Invoice Price (Excl. VAT)', align: 'right', width: '18%'},
   ];
+
+  const displayJobType = useMemo(
+    () =>
+      getDisplayJobType({
+        value: service?.additionalInfo.orderType,
+        dynamicJobTypes: jobTypes,
+        oldJobTypes,
+      }),
+    [jobTypes, oldJobTypes, service?.additionalInfo.orderType],
+  );
 
   return (
     <>
@@ -114,7 +113,7 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
               {service?.additionalInfo?.firstOrderDate
-                ? formatDate(service?.additionalInfo?.firstOrderDate)
+                ? getMonthYearFromDate(service?.additionalInfo?.firstOrderDate)
                 : '-'}
             </Typography>
           </Box>
@@ -131,25 +130,7 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
               {t('Job type')}
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
-              {service?.additionalInfo.orderType &&
-              serviceOrderTypeToString(
-                getJobTypeGivenName(
-                  service?.additionalInfo.orderType,
-                  allJobTypes,
-                ),
-              ) === '-'
-                ? getJobTypeGivenName(
-                    service?.additionalInfo.orderType,
-                    allJobTypes,
-                  )
-                : t(
-                    serviceOrderTypeToString(
-                      getJobTypeGivenName(
-                        service?.additionalInfo.orderType,
-                        allJobTypes,
-                      ),
-                    ),
-                  )}
+              {displayJobType}
             </Typography>
           </Box>
         </Grid>
@@ -172,11 +153,13 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
           <ServicePackageIcon fontSize="1.6rem" />
           <Box sx={{paddingLeft: '1em'}}>
             <Typography variant="body1" color={theme.palette.text.secondary}>
-              Type
+              {t('Type')}
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
-              {getArticleTypeText(
-                service?.additionalInfo?.costType as ArticleType,
+              {t(
+                getArticleTypeText(
+                  service?.additionalInfo?.costType as ArticleType,
+                ),
               ) || '-'}
             </Typography>
           </Box>

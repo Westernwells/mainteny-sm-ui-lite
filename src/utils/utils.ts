@@ -2,22 +2,36 @@ import {formatISO} from 'date-fns';
 import * as XLSX from 'xlsx';
 import BigNumber from 'bignumber.js';
 import * as Yup from 'yup';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {get} from 'lodash';
 import {TFunction} from 'i18next';
 import {
+  EditableInvoiceItem,
   FILE_DESCRIPTION_PREFIXES,
+  InvoiceStatistics,
   InvoiceStatus,
   InvoiceView,
 } from 'models/invoice';
 
 import {ElevatorDataSchemaItem} from 'models/elevator';
-import {Address, AddressRecord, Coord, GeocodeAddress} from '../models/misc';
+import {Theme} from '@mui/system';
+import {VatView} from 'models/vat';
+import {EditableQuotationItem} from 'models/quotation';
+import {ContractServiceFormElevator, ContractTimeUnit} from 'models/contract';
+import {FileWithPreview} from 'models/files';
+import {MONTH_NUMBER_TO_NAME} from './month-constants';
+import {
+  Address,
+  AddressRecord,
+  Coord,
+  Currency,
+  GeocodeAddress,
+} from '../models/misc';
 import useHighlightText from '../hooks/useHighlightText';
 import {getCountryCode} from './countries';
 import {
   DEFAULT_ELEVATOR_TECHNICAL_FIELD_CATEGORIES,
   DEFAULT_ELEVATOR_TECHNICAL_FIELD_NAMES,
+  ESCAPE_DOT_STRING,
 } from './constants';
 
 export const capitalize = (role: any[]) => {
@@ -338,27 +352,32 @@ export const getUserFullName = (userAccount?: {
 
 export const addTimeToDate = (dateObject: string | Date, timeObject: Date) => {
   if (!timeObject) return '';
-  const newTime = new Date(dateObject || timeObject);
-  newTime.setHours(
+  const date = new Date(dateObject);
+  const newTime = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
     timeObject.getHours(),
     timeObject.getMinutes(),
     timeObject.getSeconds(),
+    0,
   );
   return newTime.toISOString() ?? '';
 };
 
 export const addDateToTime = (timeObject: Date | string, dateObject: Date) => {
   if (!dateObject) return '';
-
-  const newDate = new Date(timeObject || dateObject);
-
-  newDate.setUTCFullYear(
-    dateObject.getUTCFullYear(),
-    dateObject.getUTCMonth(),
-    dateObject.getUTCDate(),
+  const time = new Date(timeObject);
+  const newDate = new Date(
+    dateObject.getFullYear(),
+    dateObject.getMonth(),
+    dateObject.getDate(),
+    time.getHours(),
+    time.getMinutes(),
+    time.getSeconds(),
+    0,
   );
-
-  return newDate?.toISOString() ?? '';
+  return newDate.toISOString() ?? '';
 };
 
 export const hasProtocol = (url: string) => {
@@ -531,7 +550,7 @@ export const removeUndefinedAndEmptyValues = (
     return acc;
   }, {} as Record<string, any>);
 
-const isEmptyHTML = (htmlString: string) => {
+export const isEmptyHTML = (htmlString: string) => {
   // Create a temporary div element
   const tempDiv = document.createElement('div');
 
@@ -550,7 +569,8 @@ export const yupValidations = {
     Yup.mixed().test(
       'checkRichTextField',
       message,
-      (value: string) => !!value && !isEmptyHTML(value),
+      (value: unknown): boolean =>
+        typeof value === 'string' && !!value && !isEmptyHTML(value),
     ),
 };
 
@@ -749,3 +769,264 @@ export const getTechnicalFieldCategory = (
 
   return name;
 };
+
+export const generateMonthDropdownFromElevatorJobFrequency = (
+  elevators: ContractServiceFormElevator[],
+  t: TFunction<'translation'>,
+  extraData?: {firstOrderDate?: string | Date},
+) => {
+  const {firstOrderDate} = extraData ?? {};
+
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getFullYear();
+
+  const monthYearMap = new Map<number, number>(); // Map<month, year>
+
+  elevators.forEach((elevator) => {
+    if (elevator.orderGenerationJob?.timeUnit !== ContractTimeUnit.MONTHLY) {
+      for (let m = 1; m <= 12; m += 1) {
+        const y = m <= currentMonth ? currentYear + 1 : currentYear;
+        monthYearMap.set(m, y);
+      }
+      return;
+    }
+
+    elevator.orderGenerationJob?.timeNumbers.forEach((month) => {
+      const year = month <= currentMonth ? currentYear + 1 : currentYear;
+      monthYearMap.set(month, year);
+    });
+  });
+
+  if (firstOrderDate) {
+    const date = new Date(firstOrderDate);
+    const orderMonth = date.getMonth() + 1;
+    const orderYear = date.getFullYear();
+
+    // Overwrite existing year with firstOrderDate's year
+    monthYearMap.set(orderMonth, orderYear);
+  }
+
+  const monthYearArray = Array.from(monthYearMap.entries())
+    .map(([month, year]) => ({month, year}))
+    .sort((a, b) => {
+      const aDate = new Date(a.year, a.month - 1);
+      const bDate = new Date(b.year, b.month - 1);
+      return aDate.getTime() - bDate.getTime();
+    });
+
+  return monthYearArray.map(({month, year}) => ({
+    label: `${t(MONTH_NUMBER_TO_NAME[month])} ${year}`,
+    value: month,
+  }));
+};
+
+export const escapeDotInString = (str: string): string =>
+  str.replace(/\./g, ESCAPE_DOT_STRING); // Escape all dots
+
+export const restoreDotInString = (str: string): string =>
+  str.replace(new RegExp(ESCAPE_DOT_STRING, 'g'), '.'); // Restore dots
+
+export const formatAutocompleteAddress = (
+  currentValues: Address | null,
+  componentAddress?: AddressRecord,
+) => {
+  if (!componentAddress) {
+    const newValues = {
+      ...(currentValues ?? {}),
+      component: {
+        ...(currentValues?.component ?? {}),
+        street: '',
+      },
+      id: currentValues?.id!,
+      fullName: '',
+    };
+
+    return newValues;
+  }
+
+  const newValues = {
+    ...componentAddress,
+    component: {
+      ...(currentValues?.component ?? {}),
+      ...(componentAddress?.component ?? {}),
+      name: currentValues?.component?.name,
+      name2: currentValues?.component?.name2,
+      name3: currentValues?.component?.name3,
+    },
+    id: currentValues?.id!,
+    fullName: componentAddress?.fullName || '',
+  };
+
+  return newValues;
+};
+
+export const aggregateInvoiceStatistics = (
+  currency: Currency,
+  invoiceStatistics?: InvoiceStatistics,
+) => {
+  const CURRENCY = currency.code;
+  const numOfInvoicesPerStatus =
+    invoiceStatistics?.numOfInvoicesPerStatus ?? {};
+  const noOfPaidStatus = numOfInvoicesPerStatus[InvoiceStatus.PAID] ?? 0;
+  const noOfUnPaidStatus = numOfInvoicesPerStatus[InvoiceStatus.NOT_PAID] ?? 0;
+  const noOfOverdueStatus = numOfInvoicesPerStatus[InvoiceStatus.EXPIRED] ?? 0;
+  const noOfOverdueNotice1Status =
+    numOfInvoicesPerStatus[InvoiceStatus.OVERDUE_NOTICE_1] ?? 0;
+  const noOfOverdueNotice2Status =
+    numOfInvoicesPerStatus[InvoiceStatus.OVERDUE_NOTICE_2] ?? 0;
+  const noOfOverdueNotice3Status =
+    numOfInvoicesPerStatus[InvoiceStatus.OVERDUE_NOTICE_3] ?? 0;
+  const noOfPartiallyPaidStatus =
+    numOfInvoicesPerStatus[InvoiceStatus.PARTIALLY_PAID] ?? 0;
+  const amountsPerStatus = invoiceStatistics?.amountsPerStatus ?? {};
+
+  const sentInvoiceAmount =
+    amountsPerStatus[InvoiceStatus.NOT_PAID]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const paidInvoiceAmount =
+    amountsPerStatus[InvoiceStatus.PAID]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const partiallyPaidInvoiceAmount =
+    amountsPerStatus[InvoiceStatus.PARTIALLY_PAID]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const overdueInvoiceAmount =
+    amountsPerStatus[InvoiceStatus.EXPIRED]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const overdue1InvoiceAmount =
+    amountsPerStatus[InvoiceStatus.OVERDUE_NOTICE_1]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const overdue2InvoiceAmount =
+    amountsPerStatus[InvoiceStatus.OVERDUE_NOTICE_2]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const overdue3InvoiceAmount =
+    amountsPerStatus[InvoiceStatus.OVERDUE_NOTICE_3]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+
+  const statusesCount = {
+    total:
+      noOfUnPaidStatus +
+      noOfOverdueStatus +
+      noOfOverdueNotice1Status +
+      noOfOverdueNotice2Status +
+      noOfOverdueNotice3Status +
+      noOfPaidStatus +
+      noOfPartiallyPaidStatus,
+    overdue:
+      noOfOverdueStatus +
+      noOfOverdueNotice1Status +
+      noOfOverdueNotice2Status +
+      noOfOverdueNotice3Status,
+  };
+  const statusesAmount = {
+    total:
+      sentInvoiceAmount +
+      paidInvoiceAmount +
+      partiallyPaidInvoiceAmount +
+      overdueInvoiceAmount +
+      overdue1InvoiceAmount +
+      overdue2InvoiceAmount +
+      overdue3InvoiceAmount,
+    paid: paidInvoiceAmount + partiallyPaidInvoiceAmount,
+    pending:
+      sentInvoiceAmount +
+      overdueInvoiceAmount +
+      overdue1InvoiceAmount +
+      overdue2InvoiceAmount +
+      overdue3InvoiceAmount,
+  };
+
+  return {statusesCount, statusesAmount};
+};
+
+export const calculatePercentChange = (
+  oldValue?: number,
+  newValue?: number,
+) => {
+  if (!oldValue || !newValue) return 0;
+  const change = ((newValue - oldValue) / oldValue) * 100;
+  return parseFloat(change.toFixed(2));
+};
+
+export const resolveStatusInputChipColor = (
+  theme: Theme,
+  color: string,
+): string => {
+  if (color.startsWith('#')) return color;
+  if (color.includes('.')) {
+    const [key, subkey] = color.split('.');
+    return theme.palette[key]?.[subkey] ?? theme.palette.grey[500];
+  }
+  return theme.palette[color]?.main ?? theme.palette.grey[500];
+};
+
+export const resolveVatFromBackend = (
+  vatId: string | undefined,
+  backendPercentage: number | undefined,
+  backendName: string | undefined,
+  taxRates?: VatView[],
+): {percentageVat?: number; vatName: string} => {
+  const taxRate = taxRates?.find((v) => v.id === vatId);
+
+  if (!taxRate) {
+    return {
+      percentageVat: backendPercentage ?? 0,
+      vatName: backendName || '',
+    };
+  }
+
+  if (taxRate.percentage !== backendPercentage) {
+    return {
+      percentageVat: taxRate.percentage,
+      vatName: taxRate.name,
+    };
+  }
+
+  return {
+    percentageVat: backendPercentage ?? 0,
+    vatName: backendName || '',
+  };
+};
+
+export const applyVatToItems = (
+  items: (EditableInvoiceItem | EditableQuotationItem)[],
+  vat: VatView,
+  currency: string,
+) =>
+  items.map((item) => {
+    const basePatch = {
+      vatId: vat.id,
+      vatName: vat.name,
+      percentageVat: vat.percentage,
+      currency,
+    };
+
+    const patchedSubItems = item.subItems?.map((sub) => ({
+      ...sub,
+      unitAmount: {...sub.unitAmount, ...basePatch},
+      unitPurchaseAmount: {...sub.unitPurchaseAmount, ...basePatch},
+    }));
+
+    return {
+      ...item,
+      unitAmount: {...item.unitAmount, ...basePatch},
+      unitPurchaseAmount: {...item.unitPurchaseAmount, ...basePatch},
+      article: {
+        ...item.article,
+        unitSellingAmount: item.article?.unitSellingAmount
+          ? {...item.article.unitSellingAmount, ...basePatch}
+          : undefined,
+        unitPurchaseAmount: item.article?.unitPurchaseAmount
+          ? {...item.article.unitPurchaseAmount, ...basePatch}
+          : undefined,
+      },
+      subItems: patchedSubItems,
+    };
+  });

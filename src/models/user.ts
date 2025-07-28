@@ -1,6 +1,5 @@
 import {ServiceCompany, ServiceCompanyView} from './service-company';
-import {AddressRecord, Contact, Meta, TimeWindowRecord} from './misc';
-import {ServiceOrderType} from './service-order';
+import {AddressRecord, Meta, PersonalContact, TimeWindowRecord} from './misc';
 import {WorkHoursType} from './workHours';
 
 export enum UserAccountStatus {
@@ -36,7 +35,7 @@ export interface UserAccount {
   photoUrl: string;
   roles: Role[];
   serviceCompany: ServiceCompany;
-  contact: Contact;
+  contact: PersonalContact;
   status: UserAccountStatus;
   meta: Meta;
 }
@@ -50,9 +49,10 @@ export interface UserAccountView {
   roles: Role[];
   serviceCompany: ServiceCompanyView;
   status: UserAccountStatus;
-  contact: Contact;
+  contact: PersonalContact;
   meta: Meta;
   title: string;
+  category: string;
 }
 
 export interface UserAccountSimpleView {
@@ -61,12 +61,12 @@ export interface UserAccountSimpleView {
   firstName: string;
   lastName: string;
   photoUrl: string;
+  contact: PersonalContact;
+  category: string;
+  title: string;
+  serviceCompanyId?: string;
   roles: Role[];
   status: UserAccountStatus;
-  contact: Contact;
-  title: string;
-  serviceCompanyId: string;
-  category: string;
 }
 
 export interface CreateUserAccountData {
@@ -75,7 +75,7 @@ export interface CreateUserAccountData {
   firstName: string;
   lastName: string;
   photoUrl: string;
-  contact: Contact;
+  contact: PersonalContact;
   serviceCompanyId: string;
 }
 
@@ -84,7 +84,7 @@ export interface UpdateUserAccountData {
   firstName: string;
   lastName: string;
   photoUrl: string;
-  contact: Contact;
+  contact: PersonalContact;
 }
 
 export interface TechnicianData {
@@ -120,7 +120,7 @@ export interface UserView {
 
 export interface UserAdditionalInfo {
   leftVacationDays: number;
-  assignedServiceOrderTypes?: ServiceOrderType[];
+  assignedServiceOrderTypes?: string[];
   totalYearlyVacationDaysAllowed?: number;
 }
 

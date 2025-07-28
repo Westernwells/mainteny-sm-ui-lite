@@ -6,11 +6,11 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import {
   Box,
-  Switch,
-  Typography,
   Divider,
   IconButton,
   SelectChangeEvent,
+  Switch,
+  Typography,
 } from '@mui/material';
 import {ContractServiceForm, ContractTimeUnit} from 'models/contract';
 import {theme} from 'theme';
@@ -18,6 +18,10 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {FormikProps} from 'formik';
 import {useTranslation} from 'react-i18next';
 import {getListViewFrequency} from 'utils/elevator-utils';
+import {
+  getInvoiceFrequencyTimeUnit,
+  getInvoiceFrequencyValuesFromTimeUnit,
+} from 'utils/invoice';
 import {FormSelect} from './form/FormSelect';
 import {Button} from './Button';
 
@@ -31,6 +35,7 @@ type Props = {
   componentId: string;
   formik: FormikProps<ContractServiceForm>;
   mode?: 'edit' | 'new';
+  filteredUnitIds?: string[];
 };
 
 const monthsData: MonthData[] = [
@@ -48,11 +53,20 @@ const monthsData: MonthData[] = [
   {month: 'December', isSelected: false, number: 12},
 ];
 
-const InvoiceFrequencyPicker: React.FC<Props> = ({
+const FREQUENCY_OPTIONS = [
+  {label: 'Every year', value: 'everyYear'},
+  {label: 'Every 2 years', value: 'every2Years'},
+  {label: 'Every 3 years', value: 'every3Years'},
+  {label: 'Every 4 years', value: 'every4Years'},
+  {label: 'Every 5 years', value: 'every5Years'},
+];
+
+const InvoiceFrequencyPicker = ({
   componentId,
   formik,
   mode = 'new',
-}) => {
+  filteredUnitIds = [],
+}: Props) => {
   const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selectedMonths, setSelectedMonths] = useState<MonthData[]>(monthsData);
@@ -82,9 +96,13 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({
       case 'every4Years':
         timeUnit = ContractTimeUnit.QUADRENNIALLY;
         break;
+      case 'every5Years':
+        timeUnit = ContractTimeUnit.EVERY_5_YEARS;
+        break;
       default:
         break;
     }
+
     formik.setFieldValue('invoiceJob.timeUnit', timeUnit);
     formik.setFieldValue('invoiceJob.timeNumbers', []);
   };
@@ -113,35 +131,13 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({
     let selectedCaseFrequency = '';
 
     if (elevator) {
-      switch (elevator.invoiceJob?.timeUnit) {
-        case ContractTimeUnit.NONE:
-          afterJobCompletion = true;
-          yearlyFrequency = false;
-          break;
-        case ContractTimeUnit.ANNUALLY:
-          yearlyFrequency = true;
-          afterJobCompletion = false;
-          selectedCaseFrequency = 'everyYear';
-          break;
-        case ContractTimeUnit.BIENNIALLY:
-          yearlyFrequency = true;
-          afterJobCompletion = false;
-          selectedCaseFrequency = 'every2Years';
-          break;
-        case ContractTimeUnit.TRIENNIALLY:
-          yearlyFrequency = true;
-          afterJobCompletion = false;
-          selectedCaseFrequency = 'every3Years';
-          break;
-        case ContractTimeUnit.QUADRENNIALLY:
-          yearlyFrequency = true;
-          afterJobCompletion = false;
-          selectedCaseFrequency = 'every4Years';
-          break;
-        default:
-          afterJobCompletion = false;
-          yearlyFrequency = false;
-      }
+      const newValue = getInvoiceFrequencyValuesFromTimeUnit(
+        elevator.invoiceJob?.timeUnit,
+      );
+
+      afterJobCompletion = newValue.afterJobCompletion;
+      yearlyFrequency = newValue.yearlyFrequency;
+      selectedCaseFrequency = newValue.selectedCaseFrequency;
     }
 
     setAfterJobCompletion(afterJobCompletion);
@@ -161,52 +157,43 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({
       .filter((item) => item.isSelected)
       .map((item) => item.number);
 
-    const timeUnit =
-      isYearlyFrequency && selectedFrequency === 'everyYear'
-        ? ContractTimeUnit.ANNUALLY
-        : isYearlyFrequency && selectedFrequency === 'every2Years'
-        ? ContractTimeUnit.BIENNIALLY
-        : isYearlyFrequency && selectedFrequency === 'every3Years'
-        ? ContractTimeUnit.TRIENNIALLY
-        : isYearlyFrequency && selectedFrequency === 'every4Years'
-        ? ContractTimeUnit.QUADRENNIALLY
-        : isAfterJobCompletion
-        ? ContractTimeUnit.NONE
-        : ContractTimeUnit.MONTHLY;
+    const timeUnit = getInvoiceFrequencyTimeUnit({
+      selectedFrequency,
+      isYearlyFrequency,
+      isAfterJobCompletion,
+    });
 
     if (
-      formik.values.elevators.findIndex(
-        (elevator) => elevator.elevatorId === componentId,
-      ) === 0 &&
+      filteredUnitIds.length > 0 &&
+      filteredUnitIds[0] === componentId &&
       mode === 'new'
     ) {
-      const updatedElevators = formik.values.elevators.map((elevator) => ({
-        ...elevator,
-        invoiceJob: {
-          ...elevator.invoiceJob,
-          timeNumbers: formattedNumbers,
-          timeUnit,
-        },
-      }));
-
-      updatedElevators.slice(1).forEach((_, index) => {
-        updatedElevators[index + 1].invoiceJob.timeNumbers = formattedNumbers;
-      });
+      const updatedElevators = formik.values.elevators.map((elevator) =>
+        filteredUnitIds.includes(elevator.elevatorId)
+          ? {
+              ...elevator,
+              invoiceJob: {
+                ...elevator.invoiceJob,
+                timeNumbers: formattedNumbers,
+                timeUnit,
+              },
+            }
+          : elevator,
+      );
       formik.setFieldValue('elevators', updatedElevators);
     } else {
-      const updatedElevators = formik.values.elevators.map((elevator) => {
-        if (componentId === elevator.elevatorId) {
-          return {
-            ...elevator,
-            invoiceJob: {
-              ...elevator.invoiceJob,
-              timeNumbers: formattedNumbers,
-              timeUnit,
-            },
-          };
-        }
-        return elevator;
-      });
+      const updatedElevators = formik.values.elevators.map((elevator) =>
+        elevator.elevatorId === componentId
+          ? {
+              ...elevator,
+              invoiceJob: {
+                ...elevator.invoiceJob,
+                timeNumbers: formattedNumbers,
+                timeUnit,
+              },
+            }
+          : elevator,
+      );
       formik.setFieldValue('elevators', updatedElevators);
     }
 
@@ -417,12 +404,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({
               <FormSelect
                 labelId="frequency-label"
                 label=""
-                options={[
-                  {label: 'Every year', value: 'everyYear'},
-                  {label: 'Every 2 years', value: 'every2Years'},
-                  {label: 'Every 3 years', value: 'every3Years'},
-                  {label: 'Every 4 years', value: 'every4Years'},
-                ]}
+                options={FREQUENCY_OPTIONS}
                 selectProps={{
                   id: 'frequency-label',
                   value: selectedFrequency,

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {QueryClient, QueryClientProvider} from 'react-query';
 import {ReactQueryDevtools} from 'react-query/devtools';
 import {createRoot} from 'react-dom/client';
@@ -7,8 +6,8 @@ import {ThemeProvider} from '@mui/material/styles';
 import {MutationErrorHandler, queryErrorHandler} from 'reactQuery/handlers';
 import {SnackbarProvider} from 'notistack';
 import {LanguageProvider} from 'context/LanguageProvider';
+import {PdfStylesProvider} from 'context/PdfStylesProvider';
 import * as Sentry from '@sentry/react';
-import {UserCompanyProvider} from 'context/UserCompanyProvider';
 import {App} from './App';
 import {theme} from './theme';
 import './assets/fonts/Aventa/Aventa-Regular.ttf';
@@ -16,13 +15,23 @@ import './assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import {LicenseInfo} from '@mui/x-license-pro';
 import BigNumber from 'bignumber.js';
 import './utils/withResolversPolyfill';
+import {AxiosError} from 'axios';
+import {UserCompanyProvider} from 'context/UserCompanyProvider';
+import {DropzoneProvider} from 'context/DropzoneProvider';
 
 BigNumber.config({DECIMAL_PLACES: 2});
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      useErrorBoundary: false,
+      useErrorBoundary: (error) => {
+        const axiosError = error as AxiosError;
+        const method = axiosError?.config?.method?.toLowerCase();
+        if (method !== 'get') {
+          return false;
+        }
+        return (axiosError?.response?.status || 0) >= 500;
+      },
       onError: queryErrorHandler,
       // refetchOnWindowFocus: false,
     },
@@ -34,8 +43,8 @@ const queryClient = new QueryClient({
 
 const isProduction = import.meta.env.MODE === 'prod';
 
-// disable Sentry in Cypress e2e tests
-if (!window.Cypress) {
+// disable Sentry in playwright e2e tests
+if (!navigator.webdriver) {
   Sentry.init({
     dsn: import.meta.env.REACT_APP_SENTRY_DSN,
     environment: isProduction ? 'production' : import.meta.env.MODE,
@@ -51,7 +60,7 @@ if (!window.Cypress) {
   });
 }
 
-// Add the script tag dynamically
+// Add Kalasar script dynamically
 const script = document.createElement('script');
 script.src = 'https://design.kalasar.com/static/mainteny@prod/kalasar.js';
 script.async = true;
@@ -65,7 +74,6 @@ LicenseInfo.setLicenseKey(import.meta.env.REACT_APP_MUI_PRO_LICENSE);
 
 root.render(
   <ThemeProvider theme={theme}>
-    <CssBaseline />
     <LanguageProvider>
       <QueryClientProvider client={queryClient}>
         <SnackbarProvider
@@ -77,12 +85,16 @@ root.render(
           hideIconVariant
           maxSnack={3}>
           <UserCompanyProvider>
-            <App />
+            <PdfStylesProvider>
+              <DropzoneProvider>
+                <App />
+              </DropzoneProvider>
+            </PdfStylesProvider>
           </UserCompanyProvider>
         </SnackbarProvider>
-
-        {window.Cypress ? null : <ReactQueryDevtools />}
+        {navigator.webdriver ? null : <ReactQueryDevtools />}
       </QueryClientProvider>
+      <CssBaseline />
     </LanguageProvider>
   </ThemeProvider>,
 );

@@ -2,6 +2,9 @@ import {useEffect, useState} from 'react';
 import {convertBase64ToPNG, getBase64FromUrl} from 'utils/utils';
 
 export const fetchAndConvertImageToBase64 = async (url: string) => {
+  if (!url) {
+    return '';
+  }
   try {
     const fetchedImageUrl = await getBase64FromUrl(url);
     if (fetchedImageUrl) {

@@ -1,6 +1,7 @@
 import {Box, Typography} from '@mui/material';
 import {Confirm} from 'components/Confirm';
 import {Dialog} from 'components/Dialog';
+import {dialogPaperStyles} from 'components/MixedPositions/MixedPositions.styles';
 import {UserCompanyContext} from 'context/UserCompanyProvider';
 import {useFormik} from 'formik';
 import {
@@ -20,11 +21,14 @@ import {useTranslation} from 'react-i18next';
 import {theme} from 'theme';
 import {
   cleanHtmlContent,
+  collapseNBSPParagraphs,
   convertCategoryToMacro,
   convertCategoryToText,
   isFileSizeValid,
 } from 'utils/text-block';
 import * as Yup from 'yup';
+import DOMPurify from 'dompurify';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 
 type Props = {
   textBlockCategory: TextBlockCategory;
@@ -61,6 +65,7 @@ const TextBlockActions = ({
 }: Props) => {
   const {t} = useTranslation();
   const {company} = useContext(UserCompanyContext);
+  const {fontStyles} = useContext(PdfStylesContext);
 
   const formik = useFormik<TextBlockFormModel>({
     initialValues: {
@@ -148,8 +153,13 @@ const TextBlockActions = ({
         onCancel={() => onCloseSubDialogs()}
         onSave={handleEditOnSave}
         dialogProps={{
-          maxWidth: 'sm',
+          maxWidth: 'lg',
           open: openDialog || false,
+        }}
+        sx={{
+          '& .MuiDialog-paper': {
+            ...dialogPaperStyles,
+          },
         }}>
         <TextBlockForm formik={formik} />
       </Dialog>
@@ -168,8 +178,13 @@ const TextBlockActions = ({
           setActiveSubDialog('edit');
         }}
         dialogProps={{
-          maxWidth: 'sm',
+          maxWidth: 'lg',
           open: openPreviewDialog || false,
+        }}
+        sx={{
+          '& .MuiDialog-paper': {
+            ...dialogPaperStyles,
+          },
         }}>
         <Box>
           {infoItems.map((item, index) => (
@@ -182,14 +197,23 @@ const TextBlockActions = ({
               {item.label === t('Text') ? (
                 <Box
                   dangerouslySetInnerHTML={{
-                    __html: cleanHtmlContent(item.value),
+                    __html: collapseNBSPParagraphs(
+                      DOMPurify.sanitize(cleanHtmlContent(item.value)),
+                    ),
                   }}
                   sx={{
                     margin: '0em',
                     padding: '0em',
+                    '& *': {
+                      fontFamily:
+                        item.label === t('Text')
+                          ? `${fontStyles.name} !important`
+                          : 'Aventa',
+                    },
                     '& ul, ol': {
                       marginLeft: '20px',
-                      listStylePosition: 'inside',
+                      listStylePosition: 'outside',
+                      lineHeight: 0,
                     },
                     '& ul': {
                       listStyleType: 'disc',
@@ -199,8 +223,7 @@ const TextBlockActions = ({
                     },
                     '& p': {
                       marginBottom: '0em',
-                      lineHeight: '1em',
-                      padding: '8px 0px',
+                      lineHeight: '1.1em',
                     },
                   }}
                 />

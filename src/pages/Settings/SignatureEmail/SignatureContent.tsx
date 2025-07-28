@@ -72,8 +72,7 @@ const SignatureContent = ({
               <img
                 src={logoUrl[employeeSignature?.content.images[0]!] || logoSrc}
                 width={88}
-                style={{borderRadius: '50%', objectFit: 'cover'}}
-                height={88}
+                style={{objectFit: 'contain', maxHeight: '88px'}}
                 alt={employeeSignature?.content.images[0] || logoSrc}
                 loading="lazy"
               />

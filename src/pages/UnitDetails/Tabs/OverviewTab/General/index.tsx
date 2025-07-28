@@ -53,6 +53,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
     yearBuilt: elevatorData.additionalInfo.builtYear,
     status: elevatorData.status,
     spendingLimit: elevatorData.additionalInfo.spendingLimit,
+    numberOfStops: elevatorData.additionalInfo.numberOfStops,
   });
 
   const {
@@ -61,6 +62,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
     reset,
     watch,
     setValue,
+    control,
     formState: {errors},
   } = useForm<GeneralFormModel>({
     defaultValues: getDefaultValues(elevator),
@@ -85,6 +87,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
         builtYear: data.yearBuilt,
         status: data.status,
         spendingLimit: Number(data.spendingLimit),
+        numberOfStops: Number(data.numberOfStops),
       },
       elevatorId: elevator.id,
     });
@@ -99,6 +102,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
     'spendingLimit',
     'builtYear',
     'type',
+    'numberOfStops',
   ]).current;
 
   return (
@@ -161,6 +165,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
           register={register}
           watch={watch}
           setValue={setValue}
+          control={control}
         />
       </Dialog>
     </InfoCard>

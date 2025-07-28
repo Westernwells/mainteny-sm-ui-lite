@@ -10,8 +10,10 @@ type Props = {
 const getStyles = () =>
   StyleSheet.create({
     header: {
-      height: '86px',
-      width: '595px',
+      height: 86,
+      width: 595,
+      top: 0,
+      left: 0,
       position: 'absolute',
       display: 'flex',
       justifyContent: 'flex-start',
@@ -31,8 +33,8 @@ const PdfTemplateHeader = ({headerInfo, headerPath}: Props) => {
             height: headerInfo.height,
             objectFit: 'contain',
             position: 'absolute',
-            top: `${headerInfo.posY}px`,
-            left: `${headerInfo.posX}px`,
+            top: headerInfo.posY,
+            left: headerInfo.posX,
           }}
         />
       )}

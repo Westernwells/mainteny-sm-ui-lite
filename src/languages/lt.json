@@ -1072,8 +1072,6 @@
   "Create Job": "Kurti darbą",
   "Search job type, customer, address etc.": "Paieškos darbo tipas, klientas, adresas ir kt.",
   "New Job": "Naujas darbas",
-  "Regular": "Įprastas",
-  "REGULAR": "Įprastas",
   "Ongoing": "Vyksta",
   "All": "Viskas",
   "Init": "Int",
@@ -1478,7 +1476,7 @@
   "Initial amount": "Pradinė suma",
   "Handling fee": "Tvarkymo mokestis",
   "The invoice is overdue [XX] days. We remind you to please pay the outstanding amount.": "Sąskaitos faktūra yra pradinė [xx] dienos. Mes primename, kad prašome sumokėti neapmokėtą sumą.",
-  "©2023 Mainteny. All rights reserved.": "© 2023 Priežiūra. Visos teisės saugomos.",
+  "Mainteny. All rights reserved.": "© 2025 Priežiūra. Visos teisės saugomos.",
   "Mainteny® is a registered trademark.": "„Priteny®“ yra registruotas prekės ženklas.",
   "This ID is already taken. Please enter a different one.": "Šis ID jau paimtas. Įveskite kitą.",
   "CONTRACT NAME": "Sutarties vardas",
@@ -2007,5 +2005,7 @@
   "Amount Due: {{amountDue}}": "Suma Tinka: {{SoumDue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Jei sumokėjote, praneškite mums. Jei ne, padarykite tai greitai, kad išvengtumėte papildomų mokesčių.",
   "Questions? Contact us at {{contactEmail}}": "Klausimai? Susisiekite su mumis {{Contactemail}}",
-  "Thanks, {{companyName}}": "Ačiū, {{CompanyName}}"
+  "Thanks, {{companyName}}": "Ačiū, {{CompanyName}}",
+  "Serial number": "Serijos numeris",
+  "Multiple days": "Kelios dienos"
 }

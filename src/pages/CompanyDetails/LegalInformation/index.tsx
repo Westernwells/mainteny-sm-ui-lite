@@ -92,22 +92,22 @@ export const LegalInformation = ({company}: Props) => {
         }}>
         <CardDataListItem
           label="Managing Director"
-          value={company.settings.managingDirector}
+          value={company.settings?.managingDirector}
           Icon={PersonOutline}
         />
         <CardDataListItem
           label="Owner"
-          value={company.settings.owner}
+          value={company.settings?.owner}
           Icon={PersonOutline}
         />
         <CardDataListItem
           label="Arbitration court"
-          value={company.settings.arbitrationCourt}
+          value={company.settings?.arbitrationCourt}
           Icon={GavelOutlined}
         />
         <CardDataListItem
           label="Trade registration number"
-          value={company.settings.tradeRegisterNumber}
+          value={company.settings?.tradeRegisterNumber}
           Icon={TagOutlined}
         />
       </Card>

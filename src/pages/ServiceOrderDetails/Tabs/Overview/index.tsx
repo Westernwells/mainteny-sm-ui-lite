@@ -1,9 +1,6 @@
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import {
-  useServiceOrderActivities,
-  useServiceOrderArticles,
-} from 'hooks/reactQuery/useServiceOrder';
+import {useServiceOrderActivities} from 'hooks/reactQuery/useServiceOrder';
 import useTheme from '@mui/material/styles/useTheme';
 import {Timeline} from 'components/Timeline';
 import Typography from '@mui/material/Typography';
@@ -12,19 +9,21 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceOrderView} from 'models/service-order';
 import {InfoCard} from 'components/InfoCard';
 import {useTranslation} from 'react-i18next';
-import React, {useEffect, useState} from 'react';
+import {useState} from 'react';
 import ContactsWidget from 'pages/Contacts/ContactsWidget';
 import {ContactPersonAssociationType} from 'models/contacts';
 import {JobOverviewBottomDrawer} from 'components/JobOverviewBottomDrawer';
 import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
 import {getDefaultTechnician, getDialogTitle} from 'utils/service-order-utils';
+import {AttachmentEntityType} from 'models/attachment';
 import {OrderInfoCard} from './OrderInfoCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
-import {Articles} from './Articles';
 import {Description} from './Description';
 import {Attachment} from './Attachment';
 import {AppointmentPreferences} from './AppointmentPreferences';
+import {JobNotes} from './JobNotes';
+import ServiceOrderPositions from './ServiceOrderPositions';
 
 interface Props {
   serviceOrder: ServiceOrderView;
@@ -36,16 +35,9 @@ export const Overview = ({serviceOrder}: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const formatDate = useFormatDate();
-  const {data: serviceOrderActivities = [], refetch} =
-    useServiceOrderActivities(serviceOrder.id);
-
-  const {data: serviceOrderArticles} = useServiceOrderArticles(serviceOrder.id);
-
-  useEffect(() => {
-    if (serviceOrder.id) {
-      refetch();
-    }
-  }, [serviceOrder]);
+  const {data: serviceOrderActivities = []} = useServiceOrderActivities(
+    serviceOrder?.id,
+  );
 
   return (
     <Grid
@@ -83,16 +75,12 @@ export const Overview = ({serviceOrder}: Props) => {
           </Box>
 
           <Box mt="1em" flexGrow={1}>
-            <Articles
-              serviceOrderArticles={serviceOrderArticles}
-              serviceOrder={serviceOrder}
-              customerId={serviceOrder?.elevator?.propertyOwner?.id}
-            />
+            <ServiceOrderPositions serviceOrder={serviceOrder} />
           </Box>
 
           <Box mt="1em" flexGrow={1}>
             <Invoices
-              serviceOrderId={serviceOrder.id}
+              serviceOrderId={serviceOrder?.id}
               paymentStatus={serviceOrder.additionalInfo?.paymentStatus!}
             />
           </Box>
@@ -108,7 +96,13 @@ export const Overview = ({serviceOrder}: Props) => {
             />
           </Box>
           <Box mt="1em" flexGrow={1}>
-            <Attachment order={serviceOrder} />
+            <JobNotes order={serviceOrder} />
+          </Box>
+          <Box mt="1em" flexGrow={1}>
+            <Attachment
+              entityId={serviceOrder.id}
+              entityType={AttachmentEntityType.SERVICE_ORDER}
+            />
           </Box>
           <Box mt="1em" flexGrow={1}>
             <ContactsWidget
@@ -174,13 +168,14 @@ export const Overview = ({serviceOrder}: Props) => {
           onClose={() => setOpenDialog(false)}
           defaultTechnicians={getDefaultTechnician(serviceOrder)}
           defaultStartDate={
-            serviceOrder.schedules.length
-              ? new Date(serviceOrder.schedules[0].startTime)
+            serviceOrder.schedules.length &&
+            serviceOrder.schedules[0]?.startTime
+              ? new Date(serviceOrder.schedules[0]?.startTime)
               : null
           }
           defaultEndDate={
-            serviceOrder.schedules.length
-              ? new Date(serviceOrder.schedules[0].endTime)
+            serviceOrder.schedules.length && serviceOrder.schedules[0]?.endTime
+              ? new Date(serviceOrder.schedules[0]?.endTime)
               : null
           }
           defaultDueDate={

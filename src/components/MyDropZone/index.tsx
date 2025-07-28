@@ -1,0 +1,469 @@
+import React, {
+  forwardRef,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import {FileErrors, FileWithPreview} from 'models/files';
+import {FileRejection, useDropzone} from 'react-dropzone';
+import {ONE_KB_IN_BYTES, ONE_MB_IN_BYTES} from 'utils/constants';
+import {WrapperProps} from 'components/MyDropZone/types';
+import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
+import Typography from '@mui/material/Typography';
+import {CheckCircleRounded} from '@mui/icons-material';
+import useTheme from '@mui/material/styles/useTheme';
+import {Cropper} from 'react-cropper';
+import 'styles/cropper.css';
+import {ReactComponent as CloudUploadIcon} from 'assets/icons/CloudUploadIcon.svg';
+
+import {Dialog} from 'components/Dialog';
+import {useDropzoneContext} from 'context/DropzoneProvider';
+import {Button} from '../Button';
+import {Thumb} from './Thumb';
+
+function formatAcceptedFileType(items: string[]) {
+  const result: {[key: string]: any} = {};
+  items.forEach((item) => {
+    if (item === 'application/vnd.ms-outlook') {
+      result[item] = ['.msg'];
+    } else if (item === 'image/tiff') {
+      result[item] = ['.tiff', '.tif'];
+    } else {
+      result[item] = [];
+    }
+  });
+
+  return result;
+}
+
+const MyDropZone = forwardRef(
+  (
+    {
+      existingFiles = [],
+      getAcceptedFiles,
+      getRejectedFileWithErrors,
+      hint = '',
+      acceptedFileTypes,
+      maxFiles,
+      isCropped = false,
+      clearFilesAfterSubmit = false,
+      cropperTitle,
+      children,
+      isWrapper = false,
+      bgColor,
+    }: PropsWithChildren<WrapperProps>,
+    ref,
+  ) => {
+    const {t} = useTranslation();
+    const theme = useTheme();
+    const {setOpen, setGetInputProps, setGetRootProps} = useDropzoneContext();
+
+    const [openDialog, setOpenDialog] = useState(false);
+    const [errors, setErrors] = useState<FileErrors>({type: false, size: true});
+    const [isEditingFileName, setIsEditingFileName] = useState(false);
+    const [currentEditingFileName, setCurrentEditingFileName] = useState('');
+    const [newFileName, setNewFileName] = useState('');
+    const [isDragActive, setIsDragActive] = useState(false);
+    const isDropzoneWrapperShown = isWrapper && children && !isDragActive;
+    const [files, setFiles] = useState<FileWithPreview[]>([]);
+
+    const [cropper, setCropper] = useState<any>();
+    const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
+      maxSize: ONE_MB_IN_BYTES * 20,
+      maxFiles,
+      accept: acceptedFileTypes
+        ? formatAcceptedFileType(acceptedFileTypes)
+        : {'*': []},
+      noClick: true,
+      onDrop: () => {
+        setErrors({type: false, size: false});
+        setIsDragActive(false);
+        fileRejections.forEach((file) => {
+          file.errors.forEach((err) => {
+            if (err.code === 'file-too-large') {
+              setErrors({...errors, size: true});
+            }
+            if (err.code === 'file-invalid-type') {
+              setErrors({...errors, type: true});
+            }
+          });
+        });
+      },
+      onDragEnter: () => setIsDragActive(true),
+      onDragLeave: () => setIsDragActive(false),
+      onDropAccepted: (acceptedFiles) => {
+        setIsDragActive(false);
+        if (maxFiles === 1) {
+          setFiles([
+            ...acceptedFiles.map((file) =>
+              Object.assign(file, {
+                preview: URL.createObjectURL(file),
+              }),
+            ),
+          ]);
+        } else {
+          setFiles([
+            ...files,
+            ...acceptedFiles.map((file) =>
+              Object.assign(file, {
+                preview: URL.createObjectURL(file),
+              }),
+            ),
+          ]);
+        }
+      },
+    });
+
+    const hasProcessedCurrentFiles = useRef(false);
+
+    const handleCropped = useCallback(
+      (croppedFile?: null | File) => {
+        if (getAcceptedFiles) {
+          if (croppedFile && croppedFile !== null) {
+            const result = [
+              Object.assign(croppedFile, {
+                preview: URL.createObjectURL(croppedFile!),
+              }),
+            ];
+            getAcceptedFiles(result);
+          } else {
+            getAcceptedFiles(files);
+          }
+
+          if (clearFilesAfterSubmit) {
+            setFiles([]);
+            hasProcessedCurrentFiles.current = false;
+          }
+        }
+        if (getRejectedFileWithErrors) {
+          getRejectedFileWithErrors(fileRejections as FileRejection[]);
+        }
+      },
+      [
+        getAcceptedFiles,
+        getRejectedFileWithErrors,
+        files,
+        clearFilesAfterSubmit,
+        fileRejections,
+      ],
+    );
+
+    const removeFile = (fileKey: string) => {
+      const newFiles = files.filter(
+        (item, index) => `${item.name}_${index}` !== fileKey,
+      );
+
+      setFiles(newFiles);
+    };
+
+    const onSaveFileName = (fileKey: string) => {
+      const result = files.map((item, index) => {
+        if (`${item.name}_${index}` === fileKey) {
+          const newFile = new File([item], newFileName, {
+            type: item.type,
+          });
+          return Object.assign(newFile, {
+            preview: URL.createObjectURL(newFile),
+          });
+        }
+        return item;
+      });
+
+      setFiles(result);
+    };
+
+    const OnCancelEdit = () => {
+      setIsEditingFileName(false);
+      setNewFileName('');
+    };
+
+    useImperativeHandle(ref, () => ({
+      open,
+      removeFile: (fileKey: string) => removeFile(fileKey),
+      files,
+    }));
+
+    const thumbs = files.map((file: FileWithPreview, index) => (
+      <Thumb
+        key={`${file.name}-${index}`}
+        oneMbInBytes={ONE_MB_IN_BYTES}
+        onKbinBytes={ONE_KB_IN_BYTES}
+        file={file}
+        onNameChange={(e) => {
+          setNewFileName(e.target.value);
+        }}
+        isEditingFileName={isEditingFileName}
+        currentEditingFileName={currentEditingFileName}
+        newFileName={newFileName}
+        onDeleteFile={() => removeFile(`${file.name}_${index}`)}
+        onCancelEdit={OnCancelEdit}
+        onSaveFileName={() => {
+          onSaveFileName(`${file.name}_${index}`);
+          setIsEditingFileName(false);
+        }}
+        onEditClick={() => {
+          setNewFileName(file.name);
+          setIsEditingFileName(true);
+          setCurrentEditingFileName(file.name);
+        }}
+      />
+    ));
+
+    const renderErrors = () =>
+      fileRejections.map((item, index) => (
+        <Box mb="0.5em" key={index}>
+          <Typography component="div" variant="body1" color="error">
+            {`${index + 1}. ${item.file.name}`}:{' '}
+          </Typography>
+          <Box sx={{ml: '1em'}}>
+            {item.errors.map((error) => (
+              <Typography
+                component="div"
+                variant="body2"
+                color="error"
+                key={index}>
+                {error.code === 'file-too-large'
+                  ? t('File is larger than 20mb')
+                  : t(error.message)}
+              </Typography>
+            ))}
+          </Box>
+        </Box>
+      ));
+
+    function urlToFile(url: string, filename: string, mimeType: string) {
+      return fetch(url)
+        .then((res) => res.arrayBuffer())
+        .then((buf) => new File([buf], filename, {type: mimeType}));
+    }
+
+    const getCropData = async () => {
+      let resultFile = null;
+      if (typeof cropper !== 'undefined') {
+        await urlToFile(
+          cropper.getCroppedCanvas().toDataURL(),
+          files[0].name,
+          files[0].type,
+        ).then((file) => {
+          resultFile = file;
+        });
+      }
+      return resultFile;
+    };
+
+    const saveCroppedFile = async () => {
+      const croppedFile = await getCropData();
+      handleCropped(croppedFile);
+      setOpenDialog(false);
+    };
+
+    useEffect(() => {
+      if (existingFiles.length) {
+        setFiles(existingFiles);
+      }
+    }, [existingFiles]);
+
+    useEffect(() => {
+      if (isCropped && files.length > 0) {
+        setOpenDialog(true);
+      }
+
+      if (files.length > 0 && !isCropped) {
+        handleCropped();
+      }
+    }, [files, fileRejections, isCropped, handleCropped]);
+
+    useEffect(
+      () =>
+        // revoke the data uris to avoid memory leaks
+        () =>
+          files.forEach((file) => URL.revokeObjectURL(file.preview)),
+      [],
+    );
+
+    useEffect(() => {
+      setOpen(open);
+      setGetInputProps(getInputProps);
+      setGetRootProps(getRootProps);
+    }, []);
+
+    return (
+      <Box
+        component="section"
+        width="100%"
+        {...(isDropzoneWrapperShown
+          ? getRootProps({className: 'dropzone'})
+          : {})}
+        onClick={(e) => e.stopPropagation()}>
+        {isDropzoneWrapperShown ? (
+          <>
+            {/* Needs input tag to be present to open file explorer */}
+            <input type="file" {...getInputProps()} style={{display: 'none'}} />
+            {children}
+          </>
+        ) : (
+          <Box
+            component="div"
+            {...getRootProps({className: 'dropzone'})}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '1rem',
+              backgroundColor: bgColor || theme.palette.inputBackground.main,
+              border: `${
+                isWrapper ? 'none' : '2px dashed rgba(143, 155, 179, 0.5)'
+              }`,
+              p: '2rem',
+              cursor: 'pointer',
+              height: '10rem',
+              borderRadius: '4px',
+            }}>
+            <input {...getInputProps()} />
+            <CloudUploadIcon style={{width: '2rem', height: '2rem'}} />
+            <Box sx={{display: 'flex', flexDirection: 'column'}}>
+              <Box sx={{display: 'flex', alignItems: 'center'}}>
+                <Button
+                  label={t('Select File To Upload')}
+                  style={{
+                    textTransform: 'inherit',
+                    color: theme.palette.primary.light,
+                    marginLeft: '-0.5rem',
+                  }}
+                  buttonProps={{
+                    variant: 'text',
+                    size: 'medium',
+                    onClick: open,
+                  }}
+                />
+                <Typography variant="body2" component="div" fontWeight={600}>
+                  {t('or drag and drop')}
+                </Typography>
+              </Box>
+              <Typography variant="caption">
+                {t(hint)} {t('(max. 20MB)')}
+              </Typography>
+            </Box>
+          </Box>
+        )}
+
+        {!isWrapper && (
+          <>
+            {!isCropped && (
+              <Box sx={{mt: '1.5em'}}>
+                {thumbs}
+                <Box sx={{my: '0.625rem'}}>{renderErrors()}</Box>
+              </Box>
+            )}
+            <Dialog
+              title={cropperTitle || 'Upload image'}
+              onCancel={() => setOpenDialog(false)}
+              onSave={saveCroppedFile}
+              dialogProps={{
+                maxWidth: 'md',
+                open: openDialog || false,
+              }}>
+              <Box>
+                {files.length > 0 && (
+                  <>
+                    <Box
+                      sx={{
+                        height: '2.5em',
+                        width: '100%',
+                        background: '#404040',
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0 0.625em',
+                        color: 'white',
+                        borderRadius: '4px 4px 0 0',
+                      }}>
+                      {t('Drag to reposition picture')}
+                    </Box>
+                    <Cropper
+                      style={{
+                        height: 400,
+                        width: '100%',
+                      }}
+                      zoomTo={1}
+                      initialAspectRatio={1}
+                      preview=".img-preview"
+                      src={files[0].preview}
+                      viewMode={1}
+                      minCropBoxHeight={10}
+                      minCropBoxWidth={10}
+                      background={false}
+                      responsive
+                      autoCropArea={1}
+                      checkOrientation={false}
+                      onInitialized={(instance) => {
+                        setCropper(instance);
+                      }}
+                      guides
+                    />
+                  </>
+                )}
+                <Box
+                  sx={{mt: '1.5em'}}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="self-start">
+                  <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                    <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                      <Box
+                        sx={{
+                          mr: '1em',
+                          display: 'flex',
+                          mt: '0.5em',
+                          flexDirection: 'row',
+                        }}>
+                        <CheckCircleRounded
+                          sx={{
+                            mr: '0.5em',
+                            color: errors.type ? 'error.main' : 'success.main',
+                          }}
+                        />
+                        <Typography component="div" variant="body1">
+                          {t('JPG, PNG or BMP only')}
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          mr: '1em',
+                          display: 'flex',
+                          mt: '0.5em',
+                          flexDirection: 'row',
+                        }}>
+                        <CheckCircleRounded
+                          sx={{
+                            mr: '0.5em',
+                            color: errors.size ? 'error.main' : 'success.main',
+                          }}
+                        />
+                        <Typography component="div" variant="body1">
+                          {t('File size less than 5MB only')}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                  <Button
+                    label={t('Replace Image')}
+                    buttonProps={{
+                      variant: 'text',
+                      onClick: open,
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Dialog>
+          </>
+        )}
+      </Box>
+    );
+  },
+);
+
+export default MyDropZone;

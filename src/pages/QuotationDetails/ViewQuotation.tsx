@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
 import printJS from 'print-js';
@@ -20,6 +20,7 @@ import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps
 import {
   useDeleteQuotation,
   usePrintQuotation,
+  useQuotationAmountDetailQuery,
   useReplyQuotation,
   useSendQuotation,
 } from 'hooks/reactQuery/useQuotation';
@@ -27,9 +28,10 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   QuotationActivityView,
   QuotationStatus,
+  QuotationSubItemRecord,
   QuotationView,
 } from 'models/quotation';
-import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
@@ -50,7 +52,6 @@ import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate'
 import {pdf} from '@react-pdf/renderer';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {EmptySection} from 'components/EmptySection';
 import {PDFContainer} from 'components/PDFContainer';
 import {
@@ -66,6 +67,11 @@ import {companyLanguageContextMap} from 'utils/language';
 import {HeaderFooterInfoData} from 'models/misc';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {quotationItemToQuotationItemRecord} from 'utils/quotation';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {FileWithPreview} from 'models/files';
+import {useVats} from 'hooks/reactQuery/useVats';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -92,6 +98,7 @@ interface Props {
   footerInfo: HeaderFooterInfoData;
   headerUrl: string;
   footerUrl: string;
+  quotationSubItems?: Record<string, QuotationSubItemRecord[]>;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -109,13 +116,18 @@ export const ViewQuotation = ({
   footerInfo,
   headerUrl,
   footerUrl,
+  quotationSubItems,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
+  const {data: taxRates} = useVats();
   const navigate = useNavigate();
   const {search} = useLocation();
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -129,7 +141,27 @@ export const ViewQuotation = ({
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    quotation.description,
+  );
+
   const {mutate: deleteQuotation} = useDeleteQuotation();
+
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(quotationSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, QuotationSubItemRecord[]>,
+      ),
+    [quotationSubItems],
+  );
 
   const {data: elevator} =
     typeof elevatorId === 'string'
@@ -177,7 +209,7 @@ export const ViewQuotation = ({
 
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutateAsync: printQuotation} = usePrintQuotation();
-  const {mutateAsync: sendQuotation, isLoading: sendingQuotation} =
+  const {mutateAsync: sendQuotation, isLoading: isSendingQuotation} =
     useSendQuotation({
       shouldNavigate: false,
     });
@@ -256,9 +288,23 @@ export const ViewQuotation = ({
     }
   }, [quotation]);
 
+  const transformedQuotationItems = useMemo(
+    () =>
+      quotation?.items.map((item) =>
+        quotationItemToQuotationItemRecord(item, taxRates, subItemsMap),
+      ) || [],
+    [quotation?.items, subItemsMap],
+  );
+
+  const {
+    data: quotationAmountDetail,
+    isLoading: isLoadingQuotationAmountDetail,
+  } = useQuotationAmountDetailQuery(quotation.id);
+
   const generateBlobUrl = async () => {
     const blob = await pdf(
       <QuotationPdfTemplate
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
@@ -269,6 +315,11 @@ export const ViewQuotation = ({
         headerInfo={headerInfo}
         footerPath={footerUrl}
         footerInfo={footerInfo}
+        quotationItems={transformedQuotationItems}
+        quotationAmountDetail={quotationAmountDetail}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     setBlobFile(blob);
@@ -279,7 +330,18 @@ export const ViewQuotation = ({
 
   useEffect(() => {
     generateBlobUrl();
-  }, [quotation, headerUrl, footerUrl]);
+  }, [
+    quotation,
+    headerUrl,
+    footerUrl,
+    quotationSubItems,
+    quotationAmountDetail,
+    fontStyles,
+    primaryColor,
+    secondaryColor,
+    company,
+    isLoadingQuotationAmountDetail,
+  ]);
 
   const getExistingFiles = async (
     fileDownloadUrl:
@@ -379,18 +441,20 @@ export const ViewQuotation = ({
       return {
         bottomDrawerPrimaryLabel: 'Download',
         bottomDrawerPrimaryAction: handleDownload,
-        disabled: !filePathToDownload,
+        disabled: !filePathToDownload || isLoadingQuotationAmountDetail,
       };
     if (quotation.status === QuotationStatus.DRAFT)
       return {
         bottomDrawerPrimaryLabel: 'Send',
         bottomDrawerPrimaryAction: handleOpenSendEmail,
+        disabled: isLoadingQuotationAmountDetail,
       };
     return {
       bottomDrawerPrimaryLabel: 'Mark Accepted',
       bottomDrawerPrimaryAction: () => setIsDialogOpen(true),
+      disabled: isLoadingQuotationAmountDetail,
     };
-  }, [quotation, filePathToDownload]);
+  }, [quotation, filePathToDownload, isLoadingQuotationAmountDetail]);
 
   return (
     <Box>
@@ -427,7 +491,8 @@ export const ViewQuotation = ({
                       background: 'transparent',
                     },
                     onClick: handleDownload,
-                    disabled: !filePathToDownload,
+                    disabled:
+                      !filePathToDownload || isLoadingQuotationAmountDetail,
                     startIcon: <FileDownloadIcon />,
                   }}
                 />
@@ -456,8 +521,10 @@ export const ViewQuotation = ({
               />
               <Typography variant="subtitle1" fontWeight="600">
                 {formatCurrency(
-                  (quotation.totalAmount.netAmount ?? 0) /
-                    10 ** quotation.totalAmount.fractionDigits!,
+                  centsToMoney(
+                    currentCurrency.code,
+                    quotation.totalAmount.netAmount,
+                  ),
                   {currency: quotation.totalAmount.currency},
                 )}
               </Typography>
@@ -765,13 +832,13 @@ export const ViewQuotation = ({
           setActiveSignature(undefined);
         }}
         id={quotation.id}
-        confirmBtnDisabled={sendingQuotation}
+        confirmBtnDisabled={isSendingQuotation}
         email={
           quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
           quotation?.elevator?.propertyOwner?.contact.email
         }
         subject={stripHtmlTags(quotation.subject)}
-        content={quotation.description}
+        content={emailBody}
         existingFiles={existingFiles}
         isLoadingFiles={isLoadingFiles}
         callback={async (emailRecord) => {

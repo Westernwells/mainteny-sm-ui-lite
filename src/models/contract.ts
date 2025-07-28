@@ -1,12 +1,4 @@
-import {Client} from './client';
-import {
-  Address,
-  Amount,
-  AmountRecord,
-  Meta,
-  TimeWindowRecord,
-  TimeWindowType,
-} from './misc';
+import {Address, Amount, AmountRecord, Meta} from './misc';
 import {
   ElevatorAdditionalInfo,
   ElevatorAssignmentSimpleView,
@@ -17,7 +9,6 @@ import {
   ElevatorSortableFields,
   ElevatorStatus,
   ElevatorTimeRuleView,
-  ElevatorView,
 } from './elevator';
 import {
   PropertyContactPersonSimpleView,
@@ -31,7 +22,8 @@ import {ServiceCompanySimpleView, ServiceCompanyType} from './service-company';
 import {ServiceOrderType} from './service-order';
 import {InvoiceGeneration} from './invoice';
 import {Order} from './pagination';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+
+import {FileWithPreview} from 'models/files';
 
 export interface QueryContractCommentsParams {
   pageIndex: number;
@@ -68,6 +60,7 @@ export enum TimeUnitYearView {
   BIENNIALLY = 'Every 2 year',
   TRIENNIALLY = 'Every 3 year',
   QUADRENNIALLY = 'Every 4 year',
+  EVERY_5_YEARS = 'Every 5 years',
   WEEKLY = 'Weekly',
   BIWEEKLY = 'Every 2 weeks',
   TRIWEEKLY = 'Every 3 weeks',
@@ -102,6 +95,7 @@ export enum ContractTimeUnit {
   BIENNIALLY = 'BIENNIALLY',
   TRIENNIALLY = 'TRIENNIALLY',
   QUADRENNIALLY = 'QUADRENNIALLY',
+  EVERY_5_YEARS = 'EVERY_5_YEARS',
 }
 
 export enum YearlyContractTimeUnit {
@@ -109,6 +103,13 @@ export enum YearlyContractTimeUnit {
   BIENNIALLY = 'Every 2 years',
   TRIENNIALLY = 'Every 3 years',
   QUADRIENNIALLY = 'Every 4 years',
+  EVERY_5_YEARS = 'Every 5 years',
+}
+
+export enum ContractServiceDeliveryType {
+  PAST = 'PAST',
+  CURRENT = 'CURRENT',
+  FUTURE = 'FUTURE',
 }
 
 export interface ContractNameTypes {
@@ -276,6 +277,7 @@ export interface UpdateContractComponents {
   name: string;
   elevators: ContractComponentElevator[];
   costPackage?: CostPackage;
+  serviceDeliveryType?: ContractServiceDeliveryType;
 }
 
 export interface ContractElevatorView {
@@ -519,14 +521,16 @@ export interface ContractServiceForm {
   id?: string;
   name: string;
   group?: string;
-  firstInvoiceDate?: Date | null;
-  firstOrderDate?: Date | null;
+  firstInvoiceDate?: Date | string | null;
+  firstOrderDate?: Date | string | null;
   costType: ArticleType;
   costPackage: CostPackage;
   elevators: ContractServiceFormElevator[];
   isAutomaticJobCycle?: boolean;
   yearlyPrice?: number;
   orderType?: string;
+  serviceDeliveryType?: ContractServiceDeliveryType;
+  isChecked?: boolean;
 }
 
 export interface ContractServiceFormElevator {
@@ -555,6 +559,7 @@ export interface ExtendedContractComponentRecord {
   costPackage: CostPackage;
   isAutomaticJobCycle: boolean;
   orderType?: ServiceOrderType;
+  serviceDeliveryType?: ContractServiceDeliveryType;
 }
 
 export interface ContractComponentRecord {
@@ -568,6 +573,7 @@ export interface ContractComponentRecord {
   costType: ArticleType;
   costPackage?: CostPackage;
   orderType?: string | null;
+  serviceDeliveryType?: ContractServiceDeliveryType;
 }
 
 export interface ContractComponentView {
@@ -580,25 +586,13 @@ export interface ContractComponentView {
 
 export interface ContractComponentAdditionalInfo {
   costType: ArticleType;
-  firstInvoiceDate?: Date | null;
-  firstOrderDate?: Date | null;
+  firstInvoiceDate?: string | null;
+  firstOrderDate?: string | null;
   costPackage?: CostPackage;
   elevators: ContractComponentElevator[];
   orderType?: string;
   yearlyPrice?: number;
-}
-
-export interface ContractServiceForm {
-  id?: string;
-  name: string;
-  group?: string;
-  firstInvoiceDate?: Date | null;
-  firstOrderDate?: Date | null;
-  costType: ArticleType;
-  costPackage: CostPackage;
-  elevators: ContractServiceFormElevator[];
-  isAutomaticJobCycle?: boolean;
-  isChecked?: boolean;
+  serviceDeliveryType?: ContractServiceDeliveryType;
 }
 
 export interface ContractServiceFormElevator {
@@ -656,6 +650,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
       costPackage,
       groupNumber,
       orderType,
+      serviceDeliveryType,
     } = extendedContractRecord;
 
     const convertedElevators: ContractComponentElevator[] = elevators
@@ -674,6 +669,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
       costType,
       costPackage,
       orderType,
+      serviceDeliveryType,
     };
 
     return contractComponentRecord;
@@ -731,6 +727,7 @@ const YEARLY_TIME_UNIT_TO_NUMBER = new Map<ContractTimeUnit, number>([
   [ContractTimeUnit.BIENNIALLY, 2],
   [ContractTimeUnit.TRIENNIALLY, 3],
   [ContractTimeUnit.QUADRENNIALLY, 4],
+  [ContractTimeUnit.EVERY_5_YEARS, 5],
 ]);
 
 const weeklyDivider = (
@@ -782,7 +779,8 @@ export const calculateContractInvoicePriceTotal = (
           | ContractTimeUnit.ANNUALLY
           | ContractTimeUnit.BIENNIALLY
           | ContractTimeUnit.TRIENNIALLY
-          | ContractTimeUnit.QUADRENNIALLY,
+          | ContractTimeUnit.QUADRENNIALLY
+          | ContractTimeUnit.EVERY_5_YEARS,
       );
       timeLength = 1 / (divider || 1);
     }
@@ -829,11 +827,27 @@ export const monthNames = [
   'Dec',
 ];
 
+export const SERVICE_DELIVERY_TYPES = [
+  {
+    label: 'Before invoice generation',
+    value: 'PAST',
+  },
+  {
+    label: 'During invoice generation',
+    value: 'CURRENT',
+  },
+  {
+    label: 'After invoice generation',
+    value: 'FUTURE',
+  },
+];
+
 export enum ContractTimeUnitYearView {
   ANNUALLY = 'Every year',
   BIENNIALLY = 'Every 2 years',
   TRIENNIALLY = 'Every 3 years',
   QUADRENNIALLY = 'Every 4 years',
+  EVERY_5_YEARS = 'Every 5 years',
   WEEKLY = 'Weekly',
   BIWEEKLY = 'Every 2 weeks',
   NONE = 'After job',
@@ -857,6 +871,7 @@ export const getSingleItemViewFrequency = (
     case ContractTimeUnit.BIENNIALLY:
     case ContractTimeUnit.TRIENNIALLY:
     case ContractTimeUnit.QUADRENNIALLY:
+    case ContractTimeUnit.EVERY_5_YEARS:
       frequencySet.add(ContractTimeUnitYearView[timeUnit]);
       break;
     default:

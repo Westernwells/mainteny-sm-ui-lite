@@ -20,7 +20,7 @@ const PageContainer = ({gap, children}: PropsWithChildren<Props>) => (
         left: 0,
         right: 0,
       }}
-      date-testid="page-content-root-container"
+      data-testid="page-content-root-container"
       gap={gap}>
       {children}
     </Box>

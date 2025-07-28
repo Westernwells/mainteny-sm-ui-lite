@@ -1,5 +1,4 @@
 import {FlexContainer} from 'components/FlexContainer';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {PageCard} from 'components/PageCard';
 import {Stepper} from 'components/Stepper';
 import {useFormik} from 'formik';
@@ -7,7 +6,6 @@ import {
   useCreateContract,
   useQueryContract,
 } from 'hooks/reactQuery/useContract';
-import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {
@@ -27,11 +25,7 @@ import {useCurrentCurrency} from 'utils/currency';
 import {toRestDate} from 'utils/datetime';
 import * as Yup from 'yup';
 import {createEmptyResource} from 'utils/paging';
-import {Box, Typography} from '@mui/material';
-import {theme} from 'theme';
-import {useTranslation} from 'react-i18next';
 import NewContractBasicInfo from './NewContractBasicInfo';
-import NewContractDocuments from './NewContractDocuments';
 import NewContractSelectUnits from './NewContractSelectUnits';
 import {NewContractCustomer} from './NewContractCustomer';
 import {NewContractServices} from './NewContractServices';
@@ -44,7 +38,6 @@ const steps = [
   'Include units',
   'Add Services',
   'Customize Contract',
-  'Attach documents',
 ];
 
 const isExternalIdUnique = async (
@@ -67,7 +60,6 @@ const isExternalIdUnique = async (
 };
 
 const NewContract = () => {
-  const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
@@ -123,10 +115,6 @@ const NewContract = () => {
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
-  const {mutateAsync: uploadFiles, isLoading: isUploading} = useUploadFiles(
-    'Documents uploaded successfully',
-  );
-
   const {mutateAsync: createContract, isLoading} = useCreateContract(
     'Contract is created',
   );
@@ -172,13 +160,6 @@ const NewContract = () => {
     },
   );
 
-  const formikDocuments = useFormik<{documents: FileWithPreview[]}>({
-    initialValues: {
-      documents: [],
-    },
-    onSubmit: () => {},
-  });
-
   const formikContractComponents = useFormik<{
     components: ExtendedContractComponentRecord[];
   }>({
@@ -196,20 +177,12 @@ const NewContract = () => {
       (activeStep === 2 && Object.keys(formikUnits.errors).length) ||
       (activeStep === 3 &&
         formikContractComponents.values.components.length === 0) ||
-      (activeStep === 4 &&
-        Object.keys(formikCustomizeContract.errors).length) ||
-      (activeStep === 5 && Object.keys(formikDocuments.errors).length)
+      (activeStep === 4 && Object.keys(formikCustomizeContract.errors).length)
     ) {
       return setDisableNextBtn(true);
     }
     return setDisableNextBtn(false);
-  }, [
-    activeStep,
-    formikDocuments,
-    formikUnits,
-    formikBasicInfo,
-    formikContractComponents,
-  ]);
+  }, [activeStep, formikUnits, formikBasicInfo, formikContractComponents]);
 
   const handleCancel = () => {
     setActiveStep(0);
@@ -218,7 +191,6 @@ const NewContract = () => {
   const handleSubmit = async () => {
     const contractId = uuid;
 
-    const uploadPath = `${serviceCompanyId}/contracts/${contractId}/documents`;
     const newContract: ContractRequestBody = {
       type: ContractTypes.SERVICE,
       id: contractId,
@@ -238,18 +210,6 @@ const NewContract = () => {
         formikCustomizeContract.values.annualPriceAdjustmentPercentage,
       noticePeriodInMonth: formikCustomizeContract.values.noticePeriodInMonth,
       autoRenewalCancelled: formikCustomizeContract.values.autoRenewalCancelled,
-      documents: formikDocuments.values.documents.reduce<FileWithPreview[]>(
-        (newArr: FileWithPreview[], obj) => [
-          ...newArr,
-          {
-            ...obj,
-            type: obj.type,
-            uri: `${uploadPath}/${obj.name}`,
-            description: obj.name.split('.')[0],
-          },
-        ],
-        [],
-      ),
       description: formikBasicInfo.values.description,
       components: convertExtendedRecordsToContractComponentRecords(
         formikContractComponents.values.components,
@@ -258,9 +218,6 @@ const NewContract = () => {
     };
 
     await createContract(newContract);
-    if (formikDocuments.values.documents.length) {
-      await uploadFiles({files: formikDocuments.values.documents, uploadPath});
-    }
     navigate(`/contracts/details/${contractId}`, {replace: true});
   };
 
@@ -269,10 +226,10 @@ const NewContract = () => {
       handleCancel={handleCancel}
       handleSubmit={handleSubmit}
       getActiveStep={(val) => setActiveStep(val)}
-      disableNextBtn={disableNextBtn || isLoading || isUploading}
+      disableNextBtn={disableNextBtn || isLoading}
       steps={steps}
       stepperStyles={{width: '100%'}}
-      submitting={isLoading || isUploading}
+      submitting={isLoading}
       containerStyles={{
         flexGrow: 1,
         ml: '0',
@@ -352,26 +309,6 @@ const NewContract = () => {
                 formik={formikCustomizeContract}
                 formikContractComponents={formikContractComponents}
               />
-            </PageCard>
-          </FlexContainer>
-        )}
-
-        {activeStep === 5 && (
-          <FlexContainer containerStyle={{mt: '1em'}}>
-            <PageCard
-              headerLabel="Documents"
-              contentContainerStyles={{height: '100%'}}>
-              <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-                <Typography
-                  variant="body1"
-                  color={theme.palette.text.secondary}
-                  pb={5}>
-                  {t(
-                    'Upload documents associated with the contract to ensure comprehensive and well-documented record.',
-                  )}
-                </Typography>
-              </Box>
-              <NewContractDocuments formik={formikDocuments} />
             </PageCard>
           </FlexContainer>
         )}

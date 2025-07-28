@@ -47,7 +47,7 @@ export const ResetPassword = () => {
       .matches(/[!@#$%^&*(),.?":{}|<>_]/g, t('Must contain 1 symbol')),
     confirmPassword: Yup.string()
       .required(t('This field is required'))
-      .oneOf([Yup.ref('password'), null], t('Passwords must match')),
+      .oneOf([Yup.ref('password')], t('Passwords must match')),
   });
 
   const resetForm = useFormik({

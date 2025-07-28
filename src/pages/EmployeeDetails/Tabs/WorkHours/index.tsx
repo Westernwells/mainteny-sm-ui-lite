@@ -158,7 +158,13 @@ const WorkHoursTab = ({employeeId}: Props) => {
     <Box sx={{display: 'flex', justifyContent: 'flex-end', mb: '0.5em'}}>
       <Widget
         searchPlaceholder="Search by order type, order number etc."
-        getSearchValue={(val) => setSearch(val)}
+        getSearchValue={(val) => {
+          setPage({
+            ...page,
+            pageIndex: 0,
+          });
+          setSearch(val);
+        }}
         filterItems={renderFilterItems()}
         refInput={textInput}
       />

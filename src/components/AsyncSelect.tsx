@@ -6,6 +6,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {Control, Controller} from 'react-hook-form';
 import * as _ from 'lodash';
 import {t} from 'i18next';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {FormInput} from './form/FormInput';
 
 export interface QueryProps {
@@ -29,6 +30,9 @@ interface Props<T>
   textFieldProps?: TextFieldProps;
   name: string;
   control?: Control<any>;
+  prefetchFn?: (id: string) => Promise<T>;
+  allowPrefill?: boolean;
+  testId?: string;
 }
 
 const AsyncSelect = <T,>({
@@ -37,6 +41,9 @@ const AsyncSelect = <T,>({
   textFieldProps,
   name,
   control,
+  prefetchFn,
+  testId,
+  allowPrefill = false,
   ...props
 }: Props<T>) => {
   const [open, setOpen] = useState(false);
@@ -44,6 +51,7 @@ const AsyncSelect = <T,>({
   const [query, setQuery] = useState<string>('');
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(open && options.length === 0);
+  const {showError} = useSnackbar();
 
   const getOptions = useCallback(
     async (searchText: string) => {
@@ -53,6 +61,7 @@ const AsyncSelect = <T,>({
         pageSize: 20,
         query: searchText,
       });
+
       setOptions(response?.data || []);
       setLoading(false);
     },
@@ -80,6 +89,30 @@ const AsyncSelect = <T,>({
     debouncedChangeHandler(searchText);
   };
 
+  const prefillValue = async (id: string) => {
+    if (!prefetchFn) return;
+
+    try {
+      setLoading(true);
+
+      const data = await prefetchFn(id);
+
+      setOptions([data]);
+
+      setInputValue(_.get(data, labelKey) as string);
+    } catch (e) {
+      showError(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (props.value && typeof props.value === 'string' && allowPrefill) {
+      prefillValue(props.value);
+    }
+  }, [props.value, allowPrefill]);
+
   return (
     <Controller
       name={name}
@@ -97,6 +130,7 @@ const AsyncSelect = <T,>({
             size="small"
             id={`asynchronous-demo-${name}`}
             sx={{width: '100%'}}
+            data-testId={testId}
             open={open}
             onOpen={() => {
               setOpen(true);
@@ -134,11 +168,7 @@ const AsyncSelect = <T,>({
               props?.onChange?.(event, details?.option as unknown as T, reason);
             }}
             onInputChange={(event, newInputValue, reason) => {
-              if (
-                reason === 'input' ||
-                reason === 'clear' ||
-                (reason === 'reset' && newInputValue === '')
-              ) {
+              if (reason === 'input' || reason === 'clear') {
                 onInputChange(newInputValue);
               }
             }}

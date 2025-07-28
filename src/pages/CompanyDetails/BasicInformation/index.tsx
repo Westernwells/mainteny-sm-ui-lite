@@ -11,7 +11,6 @@ import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {Dialog} from 'components/Dialog';
 import {Card} from 'components/Card';
 import {CardDataListItem} from 'components/CardDataListItem';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {ServiceCompanyItem} from 'models/service-company';
 import {phoneValidationRE} from 'pages/NewEmployee/BasicEmployeeForm';
 import {useUpdateCompany} from 'hooks/reactQuery/useCompanies';
@@ -20,6 +19,7 @@ import {useUuid} from 'hooks/reactQuery/useUuid';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {formatAddressFullname} from 'utils/utils';
 import {companyLanguageContextMap} from 'utils/language';
+import {FileWithPreview} from 'models/files';
 import {BasicInformationCompanyFormModel} from './model';
 import {EditBasicInformation} from './EditBasicInformation';
 

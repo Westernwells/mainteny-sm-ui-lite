@@ -2,6 +2,8 @@ import {SvgIconComponent} from '@mui/icons-material';
 
 export const ACTION_CELL_WIDTH = '48px';
 export const NOTES_CELL_WIDTH = '64px';
+export const DESCRIPTION_CELL_WIDTH = '100px';
+export const MAX_PAGE_SIZE = 50;
 
 export type CellCallbackProps = {
   onClick?: () => void;
@@ -11,6 +13,8 @@ export type HeaderCellProps = {
   headerName: string;
   fieldName?: string;
   onSort?: () => void;
+  headerIconTooltip?: string;
+  headerIcon?: React.ReactNode;
 };
 
 export type CellProps = {
@@ -64,3 +68,10 @@ export type CustomizableColumn = {
 export enum CustomizableTable {
   UNIT = 'UNIT',
 }
+
+export type DragData = {
+  id: string;
+  index: number;
+  type: 'main' | 'sub';
+  parentIndex?: number;
+};

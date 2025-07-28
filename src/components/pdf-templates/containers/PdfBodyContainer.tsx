@@ -8,10 +8,9 @@ type Props = {
 const getStyles = () =>
   StyleSheet.create({
     body: {
-      flex: 1,
-      marginBottom: 86,
       paddingLeft: 57,
       paddingRight: 35,
+      flex: 1,
     },
   });
 

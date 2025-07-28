@@ -33,6 +33,8 @@ export enum FIXED_CYCLE_TYPE {
   OneYear = '1_year',
   TwoYears = '2_years',
   ThreeYears = '3_years',
+  FourYears = '4_years',
+  FiveYears = '5_years',
 }
 
 export type CycleOption = {
@@ -47,6 +49,8 @@ export const CYCLE_OPTIONS: CycleOption[] = [
   {label: 'Every 1 year', value: FIXED_CYCLE_TYPE.OneYear},
   {label: 'Every 2 years', value: FIXED_CYCLE_TYPE.TwoYears},
   {label: 'Every 3 years', value: FIXED_CYCLE_TYPE.ThreeYears},
+  {label: 'Every 4 years', value: FIXED_CYCLE_TYPE.FourYears},
+  {label: 'Every 5 years', value: FIXED_CYCLE_TYPE.FiveYears},
 ];
 
 const CYCLE_TO_UNIT_ARRAY: (FIXED_CYCLE_TYPE | ContractTimeUnit)[][] = [
@@ -56,6 +60,8 @@ const CYCLE_TO_UNIT_ARRAY: (FIXED_CYCLE_TYPE | ContractTimeUnit)[][] = [
   [FIXED_CYCLE_TYPE.OneYear, ContractTimeUnit.ANNUALLY],
   [FIXED_CYCLE_TYPE.TwoYears, ContractTimeUnit.BIENNIALLY],
   [FIXED_CYCLE_TYPE.ThreeYears, ContractTimeUnit.TRIENNIALLY],
+  [FIXED_CYCLE_TYPE.FourYears, ContractTimeUnit.QUADRENNIALLY],
+  [FIXED_CYCLE_TYPE.FiveYears, ContractTimeUnit.EVERY_5_YEARS],
 ];
 
 export const CYCLE_TYPE_TO_LABEL_MAP = new Map<FIXED_CYCLE_TYPE, string>(

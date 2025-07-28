@@ -79,7 +79,7 @@ export const SuppliersDataGrid = ({setRowItem}: Props) => {
 
   useEffect(() => {
     setRows(makeRows(articleSupplierResource.data));
-  }, [articleSupplierResource.total]);
+  }, [articleSupplierResource.data]);
 
   if (isIdle || isLoading) {
     return (

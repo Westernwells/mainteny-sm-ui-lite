@@ -23,11 +23,11 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {FormHelperText, IconButton, InputAdornment} from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import RichTextEditor from 'components/RichTextEditor';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useFetchCompanyEmailConfig} from 'hooks/reactQuery/useEmail';
 import {useCurrentEditor} from '@tiptap/react';
 import {EmailSignature} from 'models/employee';
 import {EMAIL_ATTACHMENT_SIZE_UPPER_LIMIT} from 'models/email';
+import {FileWithPreview} from 'models/files';
 import {Order} from '../../models/pagination';
 
 interface Props {
@@ -109,8 +109,8 @@ export const SendEmailDialog = ({
       bccEmails:
         bccMails?.bccEmails && bccMails.bccEmails.length > 0
           ? bccMails.bccEmails
-          : user?.userAccount.contact.email
-          ? [user?.userAccount.contact.email]
+          : user?.userAccount?.contact?.email
+          ? [user?.userAccount?.contact?.email]
           : [],
       attachments: [],
     },
@@ -203,7 +203,7 @@ export const SendEmailDialog = ({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       fullWidth
-      maxWidth="md"
+      maxWidth="lg"
       PaperProps={{
         sx: {
           padding: '1.5rem',
@@ -227,6 +227,13 @@ export const SendEmailDialog = ({
             freeSolo
             onKeyDown={handleKeyDown}
             disableClearable
+            filterOptions={(options, {inputValue}) =>
+              options.filter((o) => {
+                const text =
+                  `${o.userAccount?.firstName} ${o.userAccount?.lastName} ${o.userAccount?.contact?.email}`.toLowerCase();
+                return text.includes(inputValue?.toLowerCase());
+              })
+            }
             queryFn={(params) =>
               fetchServiceCompanyContactPersons(serviceCompanyId, {
                 ...params,
@@ -507,6 +514,8 @@ export const SendEmailDialog = ({
               onSignatureSelect={(signature?: EmailSignature) => {
                 onSignatureSelect?.(signature);
               }}
+              updateHtml={(h) => setValue('content', h)}
+              html={content}
             />
             {!isFileSizeFormValid && (
               <FormHelperText error>

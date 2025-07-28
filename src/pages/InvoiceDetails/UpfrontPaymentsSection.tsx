@@ -1,4 +1,4 @@
-import {Fragment, useEffect} from 'react';
+import {Fragment, useContext, useEffect} from 'react';
 import {t} from 'i18next';
 import {uniq} from 'lodash';
 import {theme} from 'theme';
@@ -17,12 +17,14 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  TextField,
 } from '@mui/material';
-import {FormikProps, getIn} from 'formik';
-import {NumberFormatValues} from 'react-number-format';
+import BigNumber from 'bignumber.js';
+import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
 import {
-  DiscountType,
+  AggregatedAmount,
+  InvoiceAmountDetail,
   InvoiceFormData,
   InvoiceType,
   InvoiceView,
@@ -30,24 +32,22 @@ import {
 } from 'models/invoice';
 import {
   aggregatedAmountToMoney,
+  centsToMoney,
   formatCurrency,
+  getCurrencySymbol,
+  getDecimalSeparator,
+  getThousandsSeparator,
   useCurrentCurrency,
 } from 'utils/currency';
-import {
-  calculateTotalAmountInclVats,
-  calculateTotalWithPerItemDiscount,
-} from 'utils/calculate-total';
-import {fixRounding} from 'utils/utils';
 import {ReactComponent as UpfrontInvoiceIcon} from 'assets/icons/UpfrontInvoiceIcon.svg';
-import {
-  applyDiscount,
-  correctCreditNoteInvoicesPercentages,
-  getAggregatedPartialPaymentsVats,
-} from './utils';
+import {correctCreditNoteInvoicesPercentages} from './utils';
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {State} from 'models/misc';
+import {UseFormReturn} from 'react-hook-form';
+import {LanguageContext} from 'context/LanguageProvider';
+import {collectVatsFromInvoices, aggregateVats} from 'utils/invoice';
 
 interface TableProps extends React.ComponentProps<typeof MuiTable> {
   children: React.ReactNode;
@@ -92,20 +92,31 @@ const Table = ({children, headStyles, bodyStyles, ...props}: TableProps) => (
 );
 
 interface Props {
-  formik: FormikProps<InvoiceFormData>;
+  formMethods: UseFormReturn<InvoiceFormData>;
   previousInvoices: InvoiceView[];
+  onRecalcInvoice: () => void;
   invoice?: InvoiceView;
+  invoiceAmountDetail?: InvoiceAmountDetail;
 }
 
 export const UpfrontPaymentsSection = ({
-  formik,
+  formMethods,
   previousInvoices: allPreviousInvoices,
+  onRecalcInvoice,
   invoice,
+  invoiceAmountDetail,
 }: Props) => {
   const currentCurrency = useCurrentCurrency();
   const isEditing = !!invoice;
   // if editing, we need to show only past invoices till this one (editing invoice included)
   // if creating, we need to show all invoices
+
+  const {language: selectedLng} = useContext(LanguageContext);
+  const {setValue, watch, getValues, formState} = formMethods;
+
+  const watchedPayment = watch('payment');
+  const watchedInvoiceType = watch('type');
+
   const previousInvoices = correctCreditNoteInvoicesPercentages(
     isEditing
       ? allPreviousInvoices.slice(
@@ -115,45 +126,44 @@ export const UpfrontPaymentsSection = ({
       : allPreviousInvoices,
   );
 
-  const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
-    formik.values.items,
+  const subtotalExclVat = centsToMoney(
+    currentCurrency?.code!,
+    invoiceAmountDetail?.amountAfterGlobalDiscount?.netAmount ?? 0,
   );
-  const subtotalExclVat = applyDiscount({
-    actualValue: subtotalExclVatAfterPerItemDiscount,
-    ...(formik.values.discount?.type === DiscountType.AMOUNT
-      ? {amount: formik.values.discount?.amount?.value ?? 0}
-      : {percentage: formik.values.discount?.percentage ?? 0}),
-  });
 
-  const handleUpfrontPaymentChange = (values: {
-    name?: string;
-    value?: number;
-  }) => {
-    const {value} = values;
-    if (formik.values.payment?.type === PaymentType.LUMP_SUM) {
-      formik.setFieldValue('payment', {
-        ...formik.values.payment,
+  const handleUpfrontPaymentChange = (values: NumberFormatValues) => {
+    const {floatValue} = values;
+    if (watchedPayment?.type === PaymentType.LUMP_SUM) {
+      setValue('payment', {
+        ...getValues('payment'),
+        type: getValues('payment')?.type!,
         amount: {
-          value: value || 0,
+          value: floatValue || 0,
           currency: currentCurrency.code,
           fractionDigits: currentCurrency.fractionDigits,
         },
       });
-    } else if (formik.values.payment?.type === PaymentType.PERCENTAGE) {
-      formik.setFieldValue('payment', {
-        ...formik.values.payment,
-        percentage: value || 0,
+    } else if (watchedPayment?.type === PaymentType.PERCENTAGE) {
+      setValue('payment', {
+        ...getValues('payment'),
+        type: getValues('payment')?.type!,
+        percentage: floatValue || 0,
       });
     }
+    onRecalcInvoice();
   };
 
-  const previousInvoicesTotalExclVat = previousInvoices
-    ?.map(
-      (i) =>
-        (i.totalAmount?.netAmount ?? 0) /
-        10 ** (i.totalAmount?.fractionDigits ?? 2),
-    )
-    ?.reduce((a, b) => a + b, 0);
+  const prevInvoicesExcludingCurrent = previousInvoices.filter(
+    (i) => i.id !== invoice?.id,
+  );
+
+  const previousInvoicesTotalExclCurrentVat = centsToMoney(
+    currentCurrency.code,
+    prevInvoicesExcludingCurrent.reduce(
+      (sum, i) => sum + (i.totalAmount?.netAmount || 0),
+      0,
+    ),
+  );
 
   const isAllowedAmountField = (values: NumberFormatValues) => {
     const {floatValue} = values;
@@ -161,16 +171,13 @@ export const UpfrontPaymentsSection = ({
       return true;
     }
 
-    if (
-      floatValue < 0 ||
-      formik.values.payment?.type === PaymentType.PERCENTAGE
-    ) {
+    if (floatValue < 0 || watchedPayment?.type === PaymentType.PERCENTAGE) {
       return false;
     }
 
     const maxAmount =
       subtotalExclVat -
-      previousInvoicesTotalExclVat +
+      previousInvoicesTotalExclCurrentVat +
       (isEditing
         ? (invoice.totalAmount?.netAmount ?? 0) /
           10 ** (invoice.totalAmount?.fractionDigits ?? 2)
@@ -202,84 +209,50 @@ export const UpfrontPaymentsSection = ({
     return floatValue <= maxPercentage;
   };
 
-  const amount =
-    formik.values.payment?.type === PaymentType.LUMP_SUM
-      ? formik.values.payment?.amount?.value ?? 0
-      : formik.values.payment?.type === PaymentType.PERCENTAGE
-      ? (subtotalExclVat * (formik.values.payment?.percentage ?? 0)) / 100
-      : 0;
+  const paymentValue = watch('payment.amount.value') ?? 0;
 
-  const amountFormatted = formatCurrency(fixRounding(amount, 2), {
+  const currentInvoiceNet = centsToMoney(
+    currentCurrency.code,
+    (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.netAmount ?? 0,
+  );
+
+  const amountFormatted = formatCurrency(currentInvoiceNet, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-    roundingMode: 'floor',
   });
 
-  const totalAmountExclVat = isEditing
-    ? amount +
-      previousInvoicesTotalExclVat -
-      (invoice.totalAmount?.netAmount ?? 0) /
-        10 ** (invoice.totalAmount?.fractionDigits ?? 2)
-    : amount + previousInvoicesTotalExclVat;
-  const totalAmountExclVatFormatted = formatCurrency(
-    fixRounding(totalAmountExclVat, 2),
-    {
-      currency: currentCurrency.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      roundingMode: 'floor',
-    },
-  );
+  const totalAmountExclVat =
+    currentInvoiceNet + previousInvoicesTotalExclCurrentVat;
 
-  const allItemsHasSameVAT = formik.values.items.every(
-    (item) =>
-      item.unitAmount.percentageVat ===
-      formik.values.items[0].unitAmount.percentageVat,
-  );
-
-  const percentageVats = formik.values.items.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: formik.values.items[0].unitAmount.percentageVat ?? 0,
-            vat:
-              totalAmountExclVat *
-              ((formik.values.items[0].unitAmount.percentageVat ?? 0) / 100),
-          },
-        ]
-      : getAggregatedPartialPaymentsVats(
-          formik.values.items,
-          totalAmountExclVat,
-        )
-    : [];
-  const currentInvoiceAmountPercentageVats = formik.values.items.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: formik.values.items[0].unitAmount.percentageVat,
-            vat:
-              amount *
-              ((formik.values.items[0].unitAmount.percentageVat ?? 0) / 100),
-          },
-        ]
-      : getAggregatedPartialPaymentsVats(formik.values.items, amount)
-    : [];
-
-  const totalAmountInclVats = calculateTotalAmountInclVats({
-    subtotalExclVatAfterDiscount: totalAmountExclVat,
-    percentageVats,
+  const totalAmountExclVatFormatted = formatCurrency(totalAmountExclVat, {
+    currency: currentCurrency.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   });
 
-  const totalAmountInclVatsFormatted = formatCurrency(
-    fixRounding(totalAmountInclVats, 2),
-    {
-      currency: currentCurrency.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      roundingMode: 'floor',
-    },
-  );
+  const currentPercentageVats =
+    (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
+
+  const previousVats = collectVatsFromInvoices(prevInvoicesExcludingCurrent);
+
+  const allVats = [...previousVats, ...currentPercentageVats];
+
+  const finalAggregatedVats = aggregateVats(allVats);
+
+  const totalAmountInclVats =
+    (finalAggregatedVats
+      ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
+      ?.reduce((a, b) => a + b, 0) ?? 0) + totalAmountExclVat;
+
+  const totalAmountInclVatsFormatted = formatCurrency(totalAmountInclVats, {
+    currency: currentCurrency?.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    excludeCurrencySymbol: true,
+    currencySymbol: currentCurrency?.symbol,
+    companyLang: selectedLng,
+  });
 
   const hasPreviousInvoices = previousInvoices.length > 0;
 
@@ -288,24 +261,18 @@ export const UpfrontPaymentsSection = ({
     const firstInvoicePayment = firstInvoice?.additionalInfo.payment;
     const firstInvoicePaymentType = firstInvoicePayment?.type;
     const isFinalAfterPreviousInvoices =
-      hasPreviousInvoices && formik.values.type === InvoiceType.FINAL;
+      hasPreviousInvoices && watchedInvoiceType === InvoiceType.FINAL;
     const invoiceIndex = previousInvoices?.length + 1;
-    const articlesAreSame =
-      ((firstInvoicePayment?.amount?.netAmount || 0) /
-        (subtotalExclVat * 100)) *
-        100 ===
-      firstInvoicePayment?.percentage;
 
     if (isEditing) {
       // do nothing if editing
     } else if (isFinalAfterPreviousInvoices) {
       const description = `${invoiceIndex}. ${t('Final invoice')}`;
       // prefill percentage/amount if it's a final invoice after previous invoices
-      if (formik.values.payment?.description !== description) {
-        formik.setFieldValue('payment', {
-          ...formik.values.payment,
-          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE &&
-          articlesAreSame
+      if (watchedPayment?.description !== description) {
+        setValue('payment', {
+          ...watchedPayment,
+          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
             ? {
                 type: PaymentType.PERCENTAGE,
                 description,
@@ -315,8 +282,10 @@ export const UpfrontPaymentsSection = ({
                 type: PaymentType.LUMP_SUM,
                 description,
                 amount: {
-                  ...formik.values.payment?.amount,
-                  value: subtotalExclVat - previousInvoicesTotalExclVat,
+                  ...watchedPayment?.amount,
+                  value: subtotalExclVat,
+                  currency:
+                    watchedPayment?.amount?.currency || currentCurrency.code,
                 },
               }),
         });
@@ -324,39 +293,54 @@ export const UpfrontPaymentsSection = ({
     } else {
       // change payment type according to first invoice
       const description = `${invoiceIndex}. ${t('Upfront invoice')}`;
-      if (formik.values.payment?.description !== description) {
-        formik.setFieldValue('payment', {
-          ...formik.values.payment,
+      if (watchedPayment?.description !== description) {
+        let newPayment = {
+          ...getValues('payment'),
           type:
-            firstInvoicePaymentType === PaymentType.PERCENTAGE &&
-            articlesAreSame
+            firstInvoicePaymentType === PaymentType.PERCENTAGE
               ? PaymentType.PERCENTAGE
               : PaymentType.LUMP_SUM,
           description,
-        });
+        };
+
+        if (newPayment.type === PaymentType.LUMP_SUM) {
+          newPayment.amount = {
+            value: 0,
+            currency: currentCurrency.code,
+            fractionDigits: currentCurrency.fractionDigits,
+          };
+        }
+
+        if (newPayment.type === PaymentType.PERCENTAGE) {
+          newPayment.percentage = 0;
+        }
+
+        setValue('payment', newPayment);
       }
     }
-  }, [previousInvoices]);
+  }, [previousInvoices, formMethods]);
 
   useEffect(() => {
     if (!invoice) return;
     // initialize payment object if it's not set
-    if (invoice?.additionalInfo?.payment && !formik.values.payment) {
+
+    if (invoice?.additionalInfo?.payment) {
       const amountMoney = aggregatedAmountToMoney(
         invoice.additionalInfo.payment.amount,
       );
       amountMoney.value =
         (amountMoney?.value ?? 0) / 10 ** (amountMoney?.fractionDigits ?? 2);
-      formik.setFieldValue('payment', {
+      setValue('payment', {
         ...invoice.additionalInfo.payment,
         amount: amountMoney,
       });
     }
   }, [invoice]);
 
-  const paymentDescriptionError =
-    getIn(formik.touched, 'payment.description') &&
-    getIn(formik.errors, 'payment.description');
+  const paymentDescriptionError: string | undefined = formState.touchedFields
+    ?.payment?.description
+    ? formState.errors?.payment?.description?.message
+    : undefined;
 
   const invoicedSectionColumns: {
     name: string;
@@ -394,22 +378,30 @@ export const UpfrontPaymentsSection = ({
                 return null;
               }
               const invoiceTotalAmount = i.totalAmount;
+              const sortedVats = (invoiceTotalAmount.vats || [])
+                .slice()
+                .sort((a, b) => a.percentageVat - b.percentageVat);
               const description =
                 i.type === InvoiceType.CREDIT_NOTE
                   ? t('Credit Note invoice')
                   : i.additionalInfo?.payment?.description || '';
               const fractionDigits = invoiceTotalAmount?.fractionDigits ?? 2;
               const amountExclVat = Math.abs(
-                (invoiceTotalAmount?.netAmount ?? 0) / 10 ** fractionDigits,
+                centsToMoney(
+                  currentCurrency.code,
+                  invoiceTotalAmount?.netAmount ?? 0,
+                ),
               );
               const amountExclVatFormatted = formatCurrency(amountExclVat, {
                 currency: currentCurrency.code,
                 minimumFractionDigits: fractionDigits,
                 maximumFractionDigits: fractionDigits,
-                roundingMode: 'floor',
               });
               const totalAmountInclVat = Math.abs(
-                (invoiceTotalAmount?.grossAmount ?? 0) / 10 ** fractionDigits,
+                centsToMoney(
+                  currentCurrency.code,
+                  invoiceTotalAmount?.grossAmount ?? 0,
+                ),
               );
               const totalAmountInclVatFormatted = formatCurrency(
                 totalAmountInclVat,
@@ -417,7 +409,6 @@ export const UpfrontPaymentsSection = ({
                   currency: currentCurrency.code,
                   minimumFractionDigits: fractionDigits,
                   maximumFractionDigits: fractionDigits,
-                  roundingMode: 'floor',
                 },
               );
               const signBeforeNumber =
@@ -435,20 +426,19 @@ export const UpfrontPaymentsSection = ({
                     {amountExclVatFormatted}
                   </TableCell>
                   <TableCell align="right">
-                    {invoiceTotalAmount?.vats?.map((v, idx) => (
+                    {sortedVats?.map((v, idx) => (
                       <p key={idx}>{v.percentageVat}%</p>
                     ))}
                   </TableCell>
                   <TableCell align="right">
-                    {invoiceTotalAmount?.vats?.map((v, idx) => {
+                    {sortedVats?.map((v, idx) => {
                       const vatAmount = Math.abs(
-                        (v?.vat ?? 0) / 10 ** fractionDigits,
+                        centsToMoney(currentCurrency.code, v?.vat ?? 0),
                       );
                       const vatAmountFormatted = formatCurrency(vatAmount, {
                         currency: currentCurrency.code,
                         minimumFractionDigits: fractionDigits,
                         maximumFractionDigits: fractionDigits,
-                        roundingMode: 'floor',
                       });
                       return <p key={idx}>{vatAmountFormatted}</p>;
                     })}
@@ -475,32 +465,35 @@ export const UpfrontPaymentsSection = ({
                 {amountFormatted}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {currentInvoiceAmountPercentageVats?.map((v, idx) => (
+                {currentPercentageVats?.map((v, idx) => (
                   <p key={idx}>{v.percentageVat}%</p>
                 ))}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {currentInvoiceAmountPercentageVats?.map((v, idx) => {
-                  const vatAmountFormatted = formatCurrency(v.vat, {
-                    currency: currentCurrency.code,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    roundingMode: 'floor',
-                  });
+                {currentPercentageVats?.map((v, idx) => {
+                  const vatAmountFormatted = formatCurrency(
+                    centsToMoney(currentCurrency?.code!, v.vat),
+                    {
+                      currency: currentCurrency?.code,
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                      companyLang: selectedLng,
+                      currencySymbol: currentCurrency?.symbol,
+                    },
+                  );
                   return <p key={idx}>{vatAmountFormatted}</p>;
                 })}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
                 {formatCurrency(
-                  amount +
-                    currentInvoiceAmountPercentageVats
-                      ?.map((v) => v.vat)
+                  currentInvoiceNet +
+                    currentPercentageVats
+                      ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
                       ?.reduce((a, b) => a + b, 0),
                   {
                     currency: currentCurrency.code,
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                    roundingMode: 'floor',
                   },
                 )}
               </TableCell>
@@ -530,18 +523,20 @@ export const UpfrontPaymentsSection = ({
         ?.filter((payment) => payment.meta.state === State.ACTIVE)
         .reduce(
           (acc, p) =>
-            acc +
-            (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
+            acc + centsToMoney(currentCurrency.code, p.amount?.value ?? 0),
           0,
         ),
     )
     ?.reduce((acc, a) => acc + a, 0);
-  const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
+
+  const outstandingPayments = BigNumber(totalAmountInclVats)
+    .minus(paidAmountInclVats)
+    .toNumber();
+
   const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-    roundingMode: 'floor',
   });
 
   const renderPaymentHistorySection = () => (
@@ -585,11 +580,11 @@ export const UpfrontPaymentsSection = ({
               const paidAmountExclVat = Math.abs(
                 i.payments
                   ?.filter((payment) => payment.meta.state === State.ACTIVE)
-                  ?.map(
-                    (p) =>
-                      (p.additionalInfo.paymentDetails?.netAmount ?? 0) /
-                      10 **
-                        (p.additionalInfo.paymentDetails?.fractionDigits ?? 2),
+                  ?.map((p) =>
+                    centsToMoney(
+                      currentCurrency?.code,
+                      p.additionalInfo.paymentDetails?.netAmount ?? 0,
+                    ),
                   )
                   ?.reduce((a, b) => a + b, 0),
               );
@@ -600,7 +595,6 @@ export const UpfrontPaymentsSection = ({
                   currency: currentCurrency.code,
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                  roundingMode: 'floor',
                 },
               );
 
@@ -614,10 +608,8 @@ export const UpfrontPaymentsSection = ({
               const totalPriceInclVat = Math.abs(
                 i.payments
                   ?.filter((payment) => payment.meta.state === State.ACTIVE)
-                  ?.map(
-                    (p) =>
-                      (p.amount?.value ?? 0) /
-                      10 ** (p.amount?.fractionDigits ?? 2),
+                  ?.map((p) =>
+                    centsToMoney(currentCurrency?.code, p.amount?.value ?? 0),
                   )
                   .reduce((a, b) => a + b, 0),
               );
@@ -628,7 +620,6 @@ export const UpfrontPaymentsSection = ({
                   currency: currentCurrency.code,
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                  roundingMode: 'floor',
                 },
               );
               const signBeforeNumber =
@@ -654,12 +645,16 @@ export const UpfrontPaymentsSection = ({
                     {percentageVats?.map((pV, idx) => (
                       <p key={`${pV?.percentageVat}-${idx}`}>
                         {signBeforeNumber}
-                        {formatCurrency(Math.abs((pV?.vat ?? 0) / 10 ** 2), {
-                          currency: currentCurrency.code,
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                          roundingMode: 'floor',
-                        })}
+                        {formatCurrency(
+                          Math.abs(
+                            centsToMoney(currentCurrency?.code, pV?.vat ?? 0),
+                          ),
+                          {
+                            currency: currentCurrency.code,
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          },
+                        )}
                       </p>
                     ))}
                   </TableCell>
@@ -720,9 +715,15 @@ export const UpfrontPaymentsSection = ({
                       ...(prevInvoice.id === invoice?.id
                         ? {
                             name: 'payment.description',
-                            value: formik.values.payment?.description,
-                            onChange: formik.handleChange,
-                            onBlur: formik.handleBlur,
+                            value: watchedPayment?.description,
+                            onChange: (
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) =>
+                              setValue('payment', {
+                                ...getValues('payment'),
+                                type: getValues('payment')?.type!,
+                                description: e.target.value,
+                              }),
                             required: true,
                             error: !!paymentDescriptionError,
                             helperText: paymentDescriptionError,
@@ -744,76 +745,82 @@ export const UpfrontPaymentsSection = ({
                   display="flex"
                   justifyContent="flex-end"
                   gap={2}>
-                  {formik.values.payment?.type === PaymentType.PERCENTAGE && (
-                    <FormInput
-                      inputType="currency"
-                      {...(prevInvoice.id === invoice?.id && {
-                        onValueChange: handleUpfrontPaymentChange,
-                      })}
-                      fieldProps={{
-                        value:
-                          prevInvoice.id === invoice?.id
-                            ? formik.values.payment?.percentage
-                            : prevInvoice.additionalInfo.payment?.percentage ??
+                  {watchedPayment?.type === PaymentType.PERCENTAGE && (
+                    <NumericFormat
+                      name="payment.percentage"
+                      {...(prevInvoice.id === invoice?.id
+                        ? {
+                            value: watchedPayment?.percentage,
+                            isAllowed: isAllowedPercentageField,
+                            onValueChange: handleUpfrontPaymentChange,
+                          }
+                        : {
+                            value:
+                              prevInvoice.additionalInfo.payment?.percentage ??
                               0,
-                        size: 'small',
-                        label: 'Percentage',
-                        InputProps: {
-                          endAdornment: (
-                            <InputAdornment position="end">%</InputAdornment>
-                          ),
-                          inputProps: {
-                            style: {textAlign: 'right'},
-                          },
-                        },
-                      }}
-                      numericFormatProps={{
-                        disabled: prevInvoice.id !== invoice?.id,
-                        allowLeadingZeros: false,
-                        decimalScale: 0,
-                        isAllowed: isAllowedPercentageField,
-                      }}
-                    />
-                  )}
-                  <FormInput
-                    inputType="currency"
-                    {...(formik.values.payment?.type === PaymentType.LUMP_SUM
-                      ? {
-                          onValueChange: handleUpfrontPaymentChange,
-                        }
-                      : {})}
-                    fieldProps={{
-                      value:
-                        prevInvoice.id === invoice?.id
-                          ? amount
-                          : (prevInvoice.totalAmount?.netAmount ?? 0) /
-                            10 **
-                              (prevInvoice.totalAmount?.fractionDigits ?? 2),
-                      label: 'Amount (excl. VAT)',
-                      InputProps: {
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            {currentCurrency.symbol}
-                          </InputAdornment>
+                            disabled: true,
+                          })}
+                      customInput={TextField}
+                      label={t('Percentage')}
+                      fullWidth
+                      decimalScale={0}
+                      allowLeadingZeros={false}
+                      decimalSeparator={getDecimalSeparator(selectedLng)}
+                      thousandSeparator={getThousandsSeparator(selectedLng)}
+                      size="small"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">%</InputAdornment>
                         ),
                         inputProps: {
                           style: {textAlign: 'right'},
                         },
+                      }}
+                    />
+                  )}
+                  <NumericFormat
+                    {...(prevInvoice.id === invoice?.id
+                      ? {
+                          value: currentInvoiceNet,
+                          isAllowed: isAllowedAmountField,
+                          ...(watchedPayment?.type === PaymentType.LUMP_SUM
+                            ? {
+                                onValueChange: handleUpfrontPaymentChange,
+                              }
+                            : {}),
+                          disabled:
+                            watchedPayment?.type === PaymentType.PERCENTAGE,
+                        }
+                      : {
+                          value: centsToMoney(
+                            currentCurrency?.code,
+                            prevInvoice.totalAmount?.netAmount ?? 0,
+                          ),
+                          disabled: true,
+                        })}
+                    customInput={TextField}
+                    label={t('Amount (excl. VAT)')}
+                    fullWidth
+                    allowLeadingZeros={false}
+                    decimalScale={2}
+                    decimalSeparator={getDecimalSeparator(selectedLng)}
+                    thousandSeparator={getThousandsSeparator(selectedLng)}
+                    size="small"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          {
+                            getCurrencySymbol[
+                              prevInvoice.totalAmount?.currency ?? 'EUR'
+                            ]
+                          }
+                        </InputAdornment>
+                      ),
+                      inputProps: {
+                        style: {textAlign: 'right'},
                       },
                     }}
-                    numericFormatProps={{
-                      ...(prevInvoice.id === invoice?.id
-                        ? {
-                            disabled:
-                              formik.values.payment?.type ===
-                              PaymentType.PERCENTAGE,
-                          }
-                        : {
-                            disabled: true,
-                          }),
-                      isAllowed: isAllowedAmountField,
-                      allowLeadingZeros: false,
-                    }}
+                    id="upfront-amount"
                   />
                 </Grid>
               </Fragment>
@@ -826,9 +833,13 @@ export const UpfrontPaymentsSection = ({
                     size: 'small',
                     label: 'Name',
                     name: 'payment.description',
-                    value: formik.values.payment?.description,
-                    onChange: formik.handleChange,
-                    onBlur: formik.handleBlur,
+                    value: watchedPayment?.description,
+                    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                      setValue('payment', {
+                        ...getValues('payment'),
+                        type: getValues('payment')?.type!,
+                        description: e.target.value,
+                      }),
                     required: true,
                     error: !!paymentDescriptionError,
                     helperText: paymentDescriptionError,
@@ -841,56 +852,64 @@ export const UpfrontPaymentsSection = ({
                 display="flex"
                 justifyContent="flex-end"
                 gap={2}>
-                {formik.values.payment?.type === PaymentType.PERCENTAGE && (
-                  <FormInput
-                    inputType="currency"
-                    onValueChange={handleUpfrontPaymentChange}
-                    fieldProps={{
-                      value: formik.values.payment?.percentage,
-                      label: 'Percentage',
-                      InputProps: {
-                        endAdornment: (
-                          <InputAdornment position="end">%</InputAdornment>
-                        ),
-                        inputProps: {
-                          style: {textAlign: 'right'},
-                        },
-                      },
-                    }}
-                    numericFormatProps={{
-                      allowLeadingZeros: false,
-                      decimalScale: 0,
-                      isAllowed: isAllowedPercentageField,
-                    }}
-                  />
-                )}
-                <FormInput
-                  inputType="currency"
-                  {...(formik.values.payment?.type === PaymentType.LUMP_SUM
-                    ? {
-                        onValueChange: handleUpfrontPaymentChange,
-                      }
-                    : {})}
-                  fieldProps={{
-                    value: amount,
-                    label: 'Amount (excl. VAT)',
-                    InputProps: {
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          {currentCurrency.symbol}
-                        </InputAdornment>
+                {watchedPayment?.type === PaymentType.PERCENTAGE && (
+                  <NumericFormat
+                    name="payment.percentage"
+                    value={watchedPayment?.percentage}
+                    isAllowed={isAllowedPercentageField}
+                    customInput={TextField}
+                    label={t('Percentage')}
+                    fullWidth
+                    decimalScale={0}
+                    allowLeadingZeros={false}
+                    decimalSeparator={getDecimalSeparator(selectedLng)}
+                    thousandSeparator={getThousandsSeparator(selectedLng)}
+                    size="small"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">%</InputAdornment>
                       ),
                       inputProps: {
                         style: {textAlign: 'right'},
                       },
+                    }}
+                    onValueChange={handleUpfrontPaymentChange}
+                  />
+                )}
+
+                <NumericFormat
+                  name="payment.amount.value"
+                  value={
+                    watchedPayment?.type === PaymentType.PERCENTAGE
+                      ? currentInvoiceNet
+                      : paymentValue
+                  }
+                  disabled={watchedPayment?.type === PaymentType.PERCENTAGE}
+                  isAllowed={isAllowedAmountField}
+                  customInput={TextField}
+                  label={t('Amount (excl. VAT)')}
+                  fullWidth
+                  allowLeadingZeros={false}
+                  decimalScale={2}
+                  decimalSeparator={getDecimalSeparator(selectedLng)}
+                  thousandSeparator={getThousandsSeparator(selectedLng)}
+                  size="small"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        {currentCurrency.symbol}
+                      </InputAdornment>
+                    ),
+                    inputProps: {
+                      style: {textAlign: 'right'},
                     },
                   }}
-                  numericFormatProps={{
-                    disabled:
-                      formik.values.payment?.type === PaymentType.PERCENTAGE,
-                    isAllowed: isAllowedAmountField,
-                    allowLeadingZeros: false,
-                  }}
+                  {...(watchedPayment?.type === PaymentType.LUMP_SUM
+                    ? {
+                        onValueChange: handleUpfrontPaymentChange,
+                      }
+                    : {})}
+                  id="upfront-amount"
                 />
               </Grid>
             </>
@@ -916,37 +935,23 @@ export const UpfrontPaymentsSection = ({
             {totalAmountExclVatFormatted}
           </Typography>
 
-          {allItemsHasSameVAT ? (
-            <>
+          {finalAggregatedVats?.map((v) => (
+            <Fragment key={v.percentageVat}>
               <Typography variant="body1" color="primary.dark">
-                {T('VAT')} {percentageVats?.[0]?.percentageVat ?? 0}%
+                {T('VAT')} {v.percentageVat}%
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                {formatCurrency(fixRounding(percentageVats?.[0]?.vat ?? 0, 2), {
-                  currency: currentCurrency.code,
+                {formatCurrency(centsToMoney(currentCurrency?.code!, v.vat), {
+                  currency: currentCurrency?.code,
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                  roundingMode: 'floor',
+                  excludeCurrencySymbol: true,
+                  companyLang: selectedLng,
+                  currencySymbol: currentCurrency?.symbol,
                 })}
               </Typography>
-            </>
-          ) : (
-            percentageVats?.map((v) => (
-              <Fragment key={v.percentageVat}>
-                <Typography variant="body1" color="primary.dark">
-                  {T('VAT')} {v.percentageVat}%
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  {formatCurrency(fixRounding(v.vat, 2), {
-                    currency: currentCurrency.code,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    roundingMode: 'floor',
-                  })}
-                </Typography>
-              </Fragment>
-            ))
-          )}
+            </Fragment>
+          ))}
           <Typography variant="subtitle1" color="primary.dark" fontWeight={600}>
             {T('Total amount (incl. VAT)')}
           </Typography>

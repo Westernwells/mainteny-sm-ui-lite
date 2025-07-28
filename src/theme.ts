@@ -1,18 +1,6 @@
 import {outlinedInputClasses} from '@mui/material';
 import {createTheme} from '@mui/material/styles';
 
-import {Color} from '@mui/material/styles/createPalette';
-
-declare module '@mui/material/styles' {
-  interface PaletteOption {
-    blue: Color;
-  }
-
-  interface Palette {
-    blue: Color;
-  }
-}
-
 export const theme = createTheme({
   palette: {
     primary: {
@@ -83,6 +71,11 @@ export const theme = createTheme({
       '500': '#8F9BB3',
       '300': '#E0E0E0',
       '200': '#E4E9F2',
+    },
+
+    // @ts-ignore
+    purple: {
+      main: '#5D3FD3',
     },
 
     background: {
@@ -484,6 +477,16 @@ export const theme = createTheme({
             fontWeight: 500,
             fontSize: '0.625rem',
             lineHeight: 0.875,
+          },
+        },
+        {
+          props: {variant: 'secondary'},
+          style: {
+            fontSize: '12px',
+            fontWeight: 400,
+            lineHeight: '160%' /* 19.2px */,
+            letterSpacing: '0.96px',
+            textTransform: 'uppercase',
           },
         },
       ],

@@ -4,7 +4,6 @@ import {FormikProps} from 'formik';
 import {Role} from 'models/user';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from '@mui/material/styles';
-
 import {DatePicker} from 'components/DatePicker';
 import {FormSelect} from 'components/form/FormSelect';
 import {capitalize} from 'utils/utils';
@@ -22,8 +21,15 @@ const FormAbsence = ({formik, roles, name, takenDates}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
 
-  const shouldDisableDate = (date: Date) =>
+  const shouldDisableStartDate = (date: Date) =>
     takenDates.some((takenDate) => formatDate(takenDate) === formatDate(date));
+
+  const shouldDisableEndDate = (date: Date) => {
+    if (formik.values.dateStart && date < formik.values.dateStart) return true;
+    return takenDates.some(
+      (takenDate) => formatDate(takenDate) === formatDate(date),
+    );
+  };
 
   const options = [
     {label: t('1 Day'), value: '1 day'},
@@ -183,8 +189,10 @@ const FormAbsence = ({formik, roles, name, takenDates}: Props) => {
               error: !!(formik.touched.date && formik.errors.date),
             }}
             containerStyles={{mb: '1.5em'}}
-            shouldDisableDate={shouldDisableDate}
             required
+            shouldDisableDate={shouldDisableStartDate}
+            inputTestId="date-input"
+            popupTestId="date-calendar-popup"
           />
         )}
         {formik.values.duration === 'Multiple days' && (
@@ -209,8 +217,10 @@ const FormAbsence = ({formik, roles, name, takenDates}: Props) => {
                   : undefined
               }
               containerStyles={{mb: '1.5em'}}
-              shouldDisableDate={shouldDisableDate}
+              shouldDisableDate={shouldDisableStartDate}
               required
+              inputTestId="start-date-input"
+              popupTestId="start-date-calendar-popup"
             />
             <DatePicker
               defaultDate={formik.values.dateEnd}
@@ -232,8 +242,10 @@ const FormAbsence = ({formik, roles, name, takenDates}: Props) => {
                   : undefined
               }
               containerStyles={{mb: '1.5em'}}
-              shouldDisableDate={shouldDisableDate}
+              shouldDisableDate={shouldDisableEndDate}
               required
+              inputTestId="end-date-input"
+              popupTestId="end-date-calendar-popup"
             />
           </>
         )}

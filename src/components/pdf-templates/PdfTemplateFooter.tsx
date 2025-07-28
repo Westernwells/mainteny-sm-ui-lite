@@ -1,34 +1,27 @@
-import {View, StyleSheet, Text, Font, Image} from '@react-pdf/renderer';
+import {Image, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import {HeaderFooterInfoData} from 'models/misc';
 import {getRepresentationText} from 'utils/settings';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 
 type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount;
-  selectedLng?: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
-  isQuotationJobConfirmation?: boolean;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  flexBasisValue?: string,
-  itemCount?: number,
-) =>
+const getStyles = ({
+  flexBasisValue,
+  itemCount,
+  boldFontStyle,
+  primaryColor,
+  secondaryColor,
+}: {
+  flexBasisValue?: string;
+  itemCount?: number;
+} & PdfConfigurationStyles) =>
   StyleSheet.create({
     footerEmail: {
       display: 'flex',
@@ -37,7 +30,7 @@ const getStyles = (
     footerSectionBody: {
       fontSize: 6,
       fontWeight: 'light',
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 0.5,
@@ -76,12 +69,12 @@ const getStyles = (
     },
     emailText: {
       fontSize: 5,
-      color: '#616161',
+      color: secondaryColor,
       fontWeight: 'light',
     },
     pageNumberText: {
       fontSize: 7,
-      color: '#000000',
+      color: primaryColor,
       marginLeft: 4,
       textAlign: 'right',
       ...boldFontStyle,
@@ -90,7 +83,7 @@ const getStyles = (
       backgroundColor: 'white',
     },
     numberText: {
-      color: '#212121',
+      color: primaryColor,
     },
     footerContainer: {
       flexDirection: 'column',
@@ -98,20 +91,22 @@ const getStyles = (
       height: 86,
       position: 'absolute',
       bottom: 0,
-      paddingTop: 5,
       paddingLeft: 57,
       paddingRight: 35,
+      paddingTop: 5,
     },
     footerContent: {
       marginRight: 10,
       maxWidth: '100%',
       flex: `0 0 ${flexBasisValue}`,
       paddingRight: 10,
+      color: secondaryColor,
     },
     footerHeading: {
       paddingVertical: 0.5,
       fontSize: 6,
       ...boldFontStyle,
+      color: primaryColor,
     },
     imageContainer: {
       position: 'absolute',
@@ -124,16 +119,13 @@ const getStyles = (
   });
 const PdfTemplateFooter = ({
   userInfo,
-  selectedLng,
   translate,
   footerInfo,
   footerPath,
-  isQuotationJobConfirmation,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
   const visibleBankSections = [
     userInfo?.serviceCompany?.settings?.paymentInfo?.bankName,
     userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName,
@@ -142,7 +134,13 @@ const PdfTemplateFooter = ({
   const itemCount = visibleBankSections.length < 2 ? 3 : 4;
   const flexBasisValue = `${100 / itemCount}%`;
 
-  const styles = getStyles(boldFontStyle, flexBasisValue, itemCount);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    primaryColor,
+    secondaryColor,
+    flexBasisValue,
+    itemCount,
+  });
 
   const representationText = getRepresentationText(
     translate,
@@ -153,74 +151,70 @@ const PdfTemplateFooter = ({
     <View fixed style={styles.footerContainer}>
       <View style={styles.footerWrapper}>
         <View style={styles.leftFooter}>
-          {!isQuotationJobConfirmation && (
+          <View style={styles.footerContent}>
+            {!!userInfo?.serviceCompany.name && (
+              <Text style={styles.footerHeading}>
+                {userInfo?.serviceCompany?.name}
+              </Text>
+            )}
+            {!!userInfo?.serviceCompany?.billingAddress?.fullName && (
+              <Text style={styles.footerSectionBody}>
+                {userInfo?.serviceCompany?.billingAddress?.fullName}
+              </Text>
+            )}
+            {!!userInfo?.serviceCompany?.contact?.phone && (
+              <Text style={styles.footerSectionBody}>
+                {translate('Tel.')}: {userInfo?.serviceCompany?.contact?.phone}
+              </Text>
+            )}
+          </View>
+
+          {!!userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
             <View style={styles.footerContent}>
-              {!!userInfo?.serviceCompany.name && (
+              {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
                 <Text style={styles.footerHeading}>
-                  {userInfo?.serviceCompany?.name}
+                  {translate('Bank')}:{' '}
+                  {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName}
                 </Text>
               )}
-              {!!userInfo?.serviceCompany?.billingAddress?.fullName && (
+
+              {!!userInfo?.serviceCompany?.settings?.paymentInfo
+                ?.accountNumber && (
                 <Text style={styles.footerSectionBody}>
-                  {userInfo?.serviceCompany?.billingAddress?.fullName}
+                  {translate('Acc. nr.')}:{' '}
+                  {
+                    userInfo?.serviceCompany?.settings?.paymentInfo
+                      ?.accountNumber
+                  }
                 </Text>
               )}
-              {!!userInfo?.serviceCompany?.contact?.phone && (
+              {!!userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap:
+                      userInfo?.serviceCompany?.settings?.paymentInfo?.iban
+                        .length < 23
+                        ? 'nowrap'
+                        : 'wrap',
+                  }}>
+                  <Text style={styles.footerSectionBody}>
+                    {translate('IBAN')}:{' '}
+                  </Text>
+                  <Text style={{...styles.footerSectionBody, flexShrink: 1}}>
+                    {userInfo?.serviceCompany?.settings?.paymentInfo?.iban}
+                  </Text>
+                </View>
+              )}
+              {!!userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
                 <Text style={styles.footerSectionBody}>
-                  {translate('Tel.')}:{' '}
-                  {userInfo?.serviceCompany?.contact?.phone}
+                  {translate('BIC')}:{' '}
+                  {userInfo?.serviceCompany?.settings?.paymentInfo?.bic}
                 </Text>
               )}
             </View>
           )}
-
-          {!isQuotationJobConfirmation &&
-            !!userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
-              <View style={styles.footerContent}>
-                {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
-                  <Text style={styles.footerHeading}>
-                    {translate('Bank')}:{' '}
-                    {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName}
-                  </Text>
-                )}
-
-                {!!userInfo?.serviceCompany?.settings?.paymentInfo
-                  ?.accountNumber && (
-                  <Text style={styles.footerSectionBody}>
-                    {translate('Acc. nr.')}:{' '}
-                    {
-                      userInfo?.serviceCompany?.settings?.paymentInfo
-                        ?.accountNumber
-                    }
-                  </Text>
-                )}
-                {!!userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      flexWrap:
-                        userInfo?.serviceCompany?.settings?.paymentInfo?.iban
-                          .length < 23
-                          ? 'nowrap'
-                          : 'wrap',
-                    }}>
-                    <Text style={styles.footerSectionBody}>
-                      {translate('IBAN')}:{' '}
-                    </Text>
-                    <Text style={{...styles.footerSectionBody, flexShrink: 1}}>
-                      {userInfo?.serviceCompany?.settings?.paymentInfo?.iban}
-                    </Text>
-                  </View>
-                )}
-                {!!userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
-                  <Text style={styles.footerSectionBody}>
-                    {translate('BIC')}:{' '}
-                    {userInfo?.serviceCompany?.settings?.paymentInfo?.bic}
-                  </Text>
-                )}
-              </View>
-            )}
 
           {!!userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName && (
             <View style={styles.footerContent}>
@@ -270,40 +264,38 @@ const PdfTemplateFooter = ({
               )}
             </View>
           )}
-          {!isQuotationJobConfirmation && (
-            <View style={styles.footerContent}>
-              {representationText && (
-                <Text style={styles.footerHeading}>{representationText}</Text>
-              )}
+          <View style={styles.footerContent}>
+            {representationText && (
+              <Text style={styles.footerHeading}>{representationText}</Text>
+            )}
 
-              {!!userInfo?.serviceCompany?.settings?.arbitrationCourt && (
-                <Text style={styles.footerSectionBody}>
-                  {translate('Registration court')}:{' '}
-                  {userInfo?.serviceCompany?.settings?.arbitrationCourt}
-                </Text>
-              )}
-              {!!userInfo?.serviceCompany?.settings?.vatId && (
-                <Text style={styles.footerSectionBody}>
-                  {translate('VAT ID')}:{' '}
-                  {userInfo?.serviceCompany?.settings?.vatId}{' '}
-                </Text>
-              )}
+            {!!userInfo?.serviceCompany?.settings?.arbitrationCourt && (
+              <Text style={styles.footerSectionBody}>
+                {translate('Registration court')}:{' '}
+                {userInfo?.serviceCompany?.settings?.arbitrationCourt}
+              </Text>
+            )}
+            {!!userInfo?.serviceCompany?.settings?.vatId && (
+              <Text style={styles.footerSectionBody}>
+                {translate('VAT ID')}:{' '}
+                {userInfo?.serviceCompany?.settings?.vatId}{' '}
+              </Text>
+            )}
 
-              {!!userInfo?.serviceCompany?.settings?.taxNumber && (
-                <Text style={styles.footerSectionBody}>
-                  {translate('Tax ID')}:{' '}
-                  {userInfo?.serviceCompany?.settings?.taxNumber}
-                </Text>
-              )}
+            {!!userInfo?.serviceCompany?.settings?.taxNumber && (
+              <Text style={styles.footerSectionBody}>
+                {translate('Tax ID')}:{' '}
+                {userInfo?.serviceCompany?.settings?.taxNumber}
+              </Text>
+            )}
 
-              {!!userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
-                <Text style={styles.footerSectionBody}>
-                  {translate('Certified')}:{' '}
-                  {userInfo?.serviceCompany?.settings?.tradeRegisterNumber}
-                </Text>
-              )}
-            </View>
-          )}
+            {!!userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
+              <Text style={styles.footerSectionBody}>
+                {translate('Certified')}:{' '}
+                {userInfo?.serviceCompany?.settings?.tradeRegisterNumber}
+              </Text>
+            )}
+          </View>
         </View>
       </View>
 
@@ -350,12 +342,12 @@ const PdfTemplateFooter = ({
           <Image
             source={footerPath}
             style={{
-              width: footerInfo.width,
-              height: footerInfo.height,
+              width: footerInfo?.width,
+              height: footerInfo?.height,
               objectFit: 'contain',
               position: 'absolute',
-              top: footerInfo.posY,
-              left: footerInfo.posX,
+              top: footerInfo?.posY,
+              left: footerInfo?.posX,
               zIndex: 0,
             }}
           />

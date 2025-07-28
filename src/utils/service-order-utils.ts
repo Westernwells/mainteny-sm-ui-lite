@@ -1,24 +1,43 @@
 import {addMinutes, differenceInMinutes} from 'date-fns';
 import _ from 'lodash';
-import {EmployeesSimpleView} from 'models/employee';
+import {
+  EmployeesSimpleView,
+  EmployeesView,
+  ServiceOrderEmployeeView,
+} from 'models/employee';
 import {StatusColor} from 'models/status';
 import {getAddressString} from 'utils/address';
+import {ArticleType} from 'models/article';
+import {Discount, DiscountType} from 'models/invoice';
+import {AmountRecord, Currency} from 'models/misc';
+import {t} from 'i18next';
+import {VatView} from 'models/vat';
 import {
   AUTO_GENERATED_TO_PAYMENT_STATUS,
+  DateCellParts,
+  EditableServiceOrderItem,
+  GetServiceTypeProps,
+  NewServiceOrderItemRecord,
   SearchParameters,
   SERVICE_ORDER_PAYMENT_STATUS_VIEW,
+  ServiceOrderArticleRecord,
   ServiceOrderArticleView,
   ServiceOrderPaymentStatus,
   ServiceOrderPaymentWithIndicationStatus,
   ServiceOrderReportTimeRecord,
   ServiceOrderReportView,
   ServiceOrderStatus,
+  ServiceOrderSubArticleRecord,
   ServiceOrderTableRow,
   ServiceOrderType,
   ServiceOrderTypeRecord,
   ServiceOrderView,
+  statusLabelMap,
 } from '../models/service-order';
-import {toDate, toRestDateTime} from './datetime';
+import {formatDate, toDate, toRestDateTime} from './datetime';
+import {moneyToCents} from './currency';
+import {convertUserAccountsToSimpleView} from './user';
+import {resolveVatFromBackend} from './utils';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
@@ -245,7 +264,7 @@ export const articleViewToArticleRecord = (
   articles: ServiceOrderArticleView[],
 ) =>
   articles.map((i) => ({
-    articleId: i.article.id,
+    articleId: i.article?.id,
     article: i.article,
     description: i.description,
     name: i.name,
@@ -375,7 +394,7 @@ export const aggregateServiceOrderRow = (
   orders.map((order) => ({
     serviceOrderData: order,
     id: order.id,
-    elevatorExternalId: order.elevator.externalId,
+    elevatorExternalId: order.elevator.externalId || '',
     number: order.number,
     type: order.type,
     address: getAddressString(order.elevator.address),
@@ -388,11 +407,19 @@ export const aggregateServiceOrderRow = (
       order.additionalInfo.paymentStatus ??
       ServiceOrderPaymentStatus.NO_INVOICE,
     hasNotes: Boolean(order.additionalInfo.commentCount),
+    lastActivityAt: order.additionalInfo.lastActivityAt ?? '',
+    hasSchedule: order.schedules.length > 0,
+    scheduleDate:
+      order.schedules.length > 0 ? order.schedules[0]?.startTime : '',
+    tags: order.additionalInfo.tags ?? [],
   }));
 
 export const createSearchQuery = ({search, orderNumber}: SearchParameters) => {
   const elements = [];
-  if (search) elements.push(search);
+  const [firstSearch, ...tags] = (search || '').split('#');
+
+  if (firstSearch) elements.push(firstSearch);
+  if (tags.length > 0) tags.forEach((tag) => elements.push(`[tag:*${tag}*]`));
   if (orderNumber) elements.push(`[externalid:*${orderNumber}*]`);
   return elements.length ? elements.join(' ') : '';
 };
@@ -477,12 +504,23 @@ export const getJobTypeGivenName = (
   orderType: string | undefined,
   jobTypes?: ServiceOrderTypeRecord[],
 ): string => {
-  if (!orderType || !jobTypes) return '-';
+  if (!orderType || !jobTypes || !jobTypes.length) return '-';
+
+  const orderTypeString = serviceOrderTypeToString(orderType);
+
+  if (orderTypeString !== '-') {
+    return orderTypeString;
+  }
 
   const matchingJobType = jobTypes.find(
     (jobType) => jobType.name === orderType,
   );
   return matchingJobType?.givenName || '-';
+};
+
+export const isCustomJobType = (jobType: string) => {
+  const orderTypeString = serviceOrderTypeToString(jobType);
+  return orderTypeString === '-';
 };
 
 type FilterServiceOrderTypeProps = {
@@ -518,4 +556,442 @@ export const roundTimeWithSurcharge = (
   );
 
   return roundedMinutes + surchargeMinutes;
+};
+
+export function getServiceOrderDateParts(
+  row: ServiceOrderTableRow,
+): DateCellParts {
+  const {jobStatus, hasSchedule, scheduleDate, lastActivityAt} = row;
+
+  let label = statusLabelMap[jobStatus] ?? '-';
+
+  if (jobStatus === ServiceOrderStatus.OVERDUE && hasSchedule) {
+    label = statusLabelMap[ServiceOrderStatus.SCHEDULED];
+  }
+
+  const isScheduled =
+    jobStatus === ServiceOrderStatus.PLANNED ||
+    jobStatus === ServiceOrderStatus.SCHEDULED ||
+    (jobStatus === ServiceOrderStatus.OVERDUE && hasSchedule);
+
+  const date = isScheduled
+    ? scheduleDate
+      ? formatDate(scheduleDate)
+      : null
+    : lastActivityAt
+    ? formatDate(lastActivityAt)
+    : null;
+
+  return {label, date};
+}
+
+export const serviceOrderItemToServiceOrderItemRecord = (
+  serviceOrderItem: ServiceOrderArticleView,
+  subItemsMap: Record<string, ServiceOrderSubArticleRecord[]> = {},
+): NewServiceOrderItemRecord => {
+  const record: EditableServiceOrderItem = {
+    id: serviceOrderItem.id,
+    article: {...serviceOrderItem.article, id: serviceOrderItem.article?.id!},
+    name: serviceOrderItem.name,
+    description: serviceOrderItem.description,
+    quantity: serviceOrderItem.quantity,
+    unitAmount: {
+      ...serviceOrderItem.unitAmount,
+      netAmount: serviceOrderItem.unitAmount?.netAmount ?? 0,
+      percentageVat: serviceOrderItem.unitAmount?.percentageVat ?? 0,
+      currency: serviceOrderItem.unitAmount?.currency,
+      vatId: serviceOrderItem.unitAmount?.vatId ?? '',
+      vatName: serviceOrderItem.unitAmount?.vatName ?? '',
+    },
+    unitPurchaseAmount: {
+      ...serviceOrderItem.unitPurchaseAmount,
+      netAmount: serviceOrderItem.unitPurchaseAmount?.netAmount ?? 0,
+      percentageVat: serviceOrderItem.unitPurchaseAmount?.percentageVat ?? 0,
+      currency: serviceOrderItem.unitPurchaseAmount?.currency!,
+      vatId: serviceOrderItem.unitPurchaseAmount?.vatId ?? '',
+      vatName: serviceOrderItem.unitPurchaseAmount?.vatName ?? '',
+    },
+    discount: serviceOrderItem?.additionalInfo?.discount
+      ? {
+          ...serviceOrderItem.additionalInfo.discount,
+          type:
+            serviceOrderItem.additionalInfo?.discount?.type ||
+            DiscountType.NONE,
+          amount:
+            serviceOrderItem.additionalInfo?.discount?.amount &&
+            serviceOrderItem.additionalInfo?.discount?.type ===
+              DiscountType.AMOUNT
+              ? {
+                  ...serviceOrderItem.additionalInfo.discount.amount,
+                  value:
+                    (serviceOrderItem.additionalInfo.discount.amount.value ??
+                      0) /
+                    10 **
+                      (serviceOrderItem.additionalInfo.discount.amount
+                        .fractionDigits ?? 2),
+                }
+              : undefined,
+        }
+      : undefined,
+    userSeqNumber: serviceOrderItem?.additionalInfo?.userSeqNumber || undefined,
+    ownerName: serviceOrderItem.additionalInfo?.owner?.name || '',
+    ownerType: serviceOrderItem.ownerType!,
+  };
+
+  // If the article's type is PACKAGE, add a default costPackage if it doesn't exist.
+  if (serviceOrderItem.article?.type === ArticleType.PACKAGE) {
+    if (!serviceOrderItem.article.costPackage) {
+      record.article = {
+        ...record.article,
+        costPackage: {
+          laborPercentage: 50,
+          materialPercentage: 50,
+        },
+      };
+    }
+  }
+
+  if (serviceOrderItem.article?.type === ArticleType.MIX) {
+    const subItems = subItemsMap[serviceOrderItem.id] || [];
+
+    return {
+      ...record,
+      subItems: subItems.map((subItem) => ({
+        parentId: serviceOrderItem.id,
+        id: subItem?.id || '',
+        article: subItem.article,
+        name: subItem.name,
+        description: subItem.description,
+        quantity: subItem.quantity,
+        unitAmount: subItem.unitAmount,
+        unitPurchaseAmount: subItem.unitPurchaseAmount,
+        userSeqNumber: subItem.userSeqNumber || undefined,
+        serviceOrderId: serviceOrderItem.id,
+      })),
+      subItemsConfig: {
+        subItemsVisible:
+          serviceOrderItem.additionalInfo?.subArticlesConfig?.subItemsVisible ||
+          false,
+        priceVisible:
+          serviceOrderItem.additionalInfo?.subArticlesConfig?.priceVisible ||
+          false,
+      },
+    };
+  }
+
+  return record;
+};
+
+export const buildServiceOrderPayload = (
+  items: NewServiceOrderItemRecord[],
+  currentCurrency: Currency,
+  discount?: Discount,
+  taxRates?: VatView[],
+) => ({
+  articles: items.map((item) => {
+    // resolve VAT on the line‑item amount
+    const {percentageVat, vatName} = resolveVatFromBackend(
+      item.unitAmount?.vatId,
+      item.unitAmount?.percentageVat,
+      item.unitAmount?.vatName,
+      taxRates,
+    );
+
+    const {percentageVat: purchaseVat, vatName: purchaseVatName} =
+      resolveVatFromBackend(
+        item.article?.unitPurchaseAmount?.vatId,
+        item.article?.unitPurchaseAmount?.percentageVat,
+        item.article?.unitPurchaseAmount?.vatName,
+        taxRates,
+      );
+
+    const {percentageVat: sellingVat, vatName: sellingVatName} =
+      resolveVatFromBackend(
+        item.article?.unitSellingAmount?.vatId,
+        item.article?.unitSellingAmount?.percentageVat,
+        item.article?.unitSellingAmount?.vatName,
+        taxRates,
+      );
+
+    return {
+      id: undefined,
+      article: {
+        id: undefined,
+        name: item.article?.name,
+        externalId: item.article?.externalId,
+        type: item.article?.type,
+        unit: item.article?.unit,
+        unitSellingAmount: {
+          ...item.article?.unitSellingAmount,
+          currency:
+            item.article?.unitSellingAmount?.currency || currentCurrency.code,
+          percentageVat: sellingVat,
+          vatName: sellingVatName,
+        },
+        unitPurchaseAmount: {
+          ...item.article?.unitPurchaseAmount,
+          currency:
+            item.article?.unitPurchaseAmount?.currency || currentCurrency.code,
+          percentageVat: purchaseVat,
+          vatName: purchaseVatName,
+        },
+        costPackage: item.article?.costPackage,
+      },
+      name: item.name,
+      description: item.description,
+      unitAmount: {
+        currency: item.unitAmount?.currency || currentCurrency.code,
+        netAmount:
+          item.unitAmount?.netAmount !== undefined
+            ? Number(item.unitAmount.netAmount)
+            : 0,
+        percentageVat,
+        vatId: item.unitAmount?.vatId || '',
+        vatName,
+      },
+      quantity: Number.isNaN(Number(item.quantity)) ? 0 : Number(item.quantity),
+      discount:
+        item.discount?.type === DiscountType.AMOUNT
+          ? {
+              type: DiscountType.AMOUNT,
+              amount: {
+                ...item.discount.amount!,
+                value: (item.discount.amount?.value ?? 0) * 100,
+                currency:
+                  item.discount.amount?.currency || currentCurrency.code,
+              },
+            }
+          : {
+              type: DiscountType.PERCENTAGE,
+              percentage: item.discount?.percentage || 0,
+            },
+      subItemsConfig: item.subItemsConfig,
+      subArticles: item.subItems?.map((sub) => {
+        const {percentageVat: subPercentageVat, vatName: subVatName} =
+          resolveVatFromBackend(
+            sub.unitAmount?.vatId,
+            sub.unitAmount?.percentageVat,
+            sub.unitAmount?.vatName,
+            taxRates,
+          );
+        const {percentageVat: subPurchaseVat, vatName: subPurchaseVatName} =
+          resolveVatFromBackend(
+            sub.article?.unitPurchaseAmount?.vatId,
+            sub.article?.unitPurchaseAmount?.percentageVat,
+            sub.article?.unitPurchaseAmount?.vatName,
+            taxRates,
+          );
+        const {percentageVat: subSellingVat, vatName: subSellingVatName} =
+          resolveVatFromBackend(
+            sub.article?.unitSellingAmount?.vatId,
+            sub.article?.unitSellingAmount?.percentageVat,
+            sub.article?.unitSellingAmount?.vatName,
+            taxRates,
+          );
+
+        return {
+          article: {
+            id: undefined,
+            name: sub.article?.name,
+            externalId: sub.article?.externalId,
+            type: sub.article?.type,
+            unit: sub.article?.unit,
+            unitSellingAmount: {
+              ...sub.article?.unitSellingAmount,
+              currency:
+                sub.article?.unitSellingAmount?.currency ||
+                currentCurrency.code,
+              percentageVat: subSellingVat,
+              vatName: subSellingVatName,
+            },
+            unitPurchaseAmount: {
+              ...sub.article?.unitPurchaseAmount,
+              currency:
+                sub.article?.unitPurchaseAmount?.currency ||
+                currentCurrency.code,
+              percentageVat: subPurchaseVat,
+              vatName: subPurchaseVatName,
+            },
+            costPackage: sub.article?.costPackage,
+          },
+          id: undefined,
+          name: sub.name,
+          unitPurchaseAmount: sub.unitPurchaseAmount,
+          unitAmount: {
+            ...sub.unitAmount,
+            currency: sub.unitAmount?.currency || currentCurrency.code,
+            percentageVat: subPercentageVat,
+            vatName: subVatName,
+          },
+          quantity: Number.isNaN(Number(sub.quantity))
+            ? 0
+            : Number(sub.quantity),
+          description: sub.description,
+          userSeqNumber: sub.userSeqNumber,
+        };
+      }),
+      userSeqNumber: item.userSeqNumber,
+    };
+  }),
+  globalDiscount:
+    discount?.type === DiscountType.AMOUNT
+      ? {
+          type: DiscountType.AMOUNT,
+          amount: {
+            value: moneyToCents(
+              currentCurrency.code,
+              discount.amount?.value ?? 0,
+            ),
+            currency: discount.amount?.currency || currentCurrency.code,
+            fractionDigits:
+              discount.amount?.fractionDigits || currentCurrency.fractionDigits,
+          },
+        }
+      : {
+          type: DiscountType.PERCENTAGE,
+          percentage: discount?.percentage || 0,
+        },
+});
+
+export function formatServiceOrderArticles(
+  items: EditableServiceOrderItem[],
+  currentCurrency: Currency,
+): ServiceOrderArticleRecord[] {
+  return items.map((item) => {
+    const makeAmount = (amt?: AmountRecord) => ({
+      netAmount: amt?.netAmount ?? 0,
+      percentageVat: amt?.percentageVat ?? 0,
+      currency: amt?.currency ?? currentCurrency.code,
+      vatId: amt?.vatId || '',
+      vatName: amt?.vatName || '',
+    });
+
+    // normalize any discount you might have
+    const formattedDiscount: Discount | undefined = item.discount
+      ? {
+          ...item.discount,
+          type:
+            item.discount.type === DiscountType.NONE
+              ? DiscountType.PERCENTAGE
+              : item.discount.type,
+          amount:
+            item.discount.type === DiscountType.AMOUNT && item.discount.amount
+              ? {
+                  ...item.discount.amount,
+                  // turn into cents
+                  value:
+                    (item.discount.amount.value ?? 0) *
+                    10 ** (item.discount.amount.fractionDigits ?? 2),
+                  currency: item.discount.amount.currency,
+                }
+              : undefined,
+          percentage:
+            item.discount.type === DiscountType.PERCENTAGE ||
+            item.discount.type === DiscountType.NONE
+              ? item.discount.percentage ?? 0
+              : undefined,
+        }
+      : undefined;
+
+    // build the core record
+    const base: ServiceOrderArticleRecord = {
+      article: item.article && {
+        id:
+          item.article.id && item.article.id.length > 8
+            ? item.article.id
+            : undefined,
+        name: item.article.name,
+        externalId: item.article.externalId,
+        type: item.article.type,
+        unit: item.article.unit,
+        costPackage: item.article.costPackage,
+        unitSellingAmount: makeAmount(item.article.unitSellingAmount),
+        unitPurchaseAmount:
+          item.article.unitPurchaseAmount &&
+          makeAmount(item.article.unitPurchaseAmount),
+      },
+      name: item.name,
+      description: item.description,
+      quantity: item.quantity,
+      unitPurchaseAmount:
+        item.unitPurchaseAmount && makeAmount(item.unitPurchaseAmount),
+      unitAmount: makeAmount(item.unitAmount),
+      discount: formattedDiscount,
+      subArticlesConfig: item.subItemsConfig,
+      userSeqNumber: item.userSeqNumber ?? undefined,
+    };
+
+    // if there are sub‑items, format those too
+    if (Array.isArray(item.subItems) && item.subItems.length) {
+      base.subArticles = item?.subItems?.map(
+        (sub) =>
+          ({
+            article: sub.article && {
+              id:
+                sub.article.id && sub.article.id.length > 8
+                  ? sub.article.id
+                  : undefined,
+              name: sub.article.name,
+              externalId: sub.article.externalId,
+              type: sub.article.type,
+              unit: sub.article.unit,
+              costPackage: sub.article.costPackage,
+              unitSellingAmount: makeAmount(sub.article.unitSellingAmount),
+              unitPurchaseAmount: makeAmount(sub.article.unitPurchaseAmount),
+            },
+            name: sub.name,
+            description: sub.description,
+            quantity: Number.isNaN(Number(sub.quantity))
+              ? 0
+              : Number(sub.quantity),
+            unitPurchaseAmount:
+              sub.unitPurchaseAmount && makeAmount(sub.unitPurchaseAmount),
+            unitAmount: makeAmount(sub.unitAmount),
+            userSeqNumber: undefined,
+          } as ServiceOrderSubArticleRecord),
+      );
+    }
+
+    return base;
+  });
+}
+
+export function convertEmployeesToServiceOrderEmployees(
+  employees: EmployeesView[],
+): ServiceOrderEmployeeView[] {
+  return employees.map((employee) => ({
+    id: employee.id,
+    number: employee.number,
+    externalId: employee.externalId,
+    team: employee.team,
+    address: employee.address,
+    userAccount: convertUserAccountsToSimpleView(employee.userAccount),
+    isOnline: employee.isOnline,
+    additionalInfo: employee.additionalInfo,
+    meta: employee.meta,
+    online: employee.online,
+  }));
+}
+
+export const getDisplayJobType = ({
+  value,
+  dynamicJobTypes = [],
+  oldJobTypes = [],
+}: GetServiceTypeProps) => {
+  if (!value) return '-';
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes.filter(
+    (oldJobType) =>
+      !dynamicJobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...dynamicJobTypes, ...filteredOldJobTypes];
+
+  const foundOldJob = getJobTypeGivenName(value, filteredOldJobTypes);
+
+  if (foundOldJob !== '-') return t(foundOldJob);
+
+  return getJobTypeGivenName(value, allJobTypes);
 };

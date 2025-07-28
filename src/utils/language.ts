@@ -8,7 +8,7 @@ export const mapExceptionLanguage = (language: string) => {
 export const languageMap: {[key: string]: string} = {
   'en-US': 'en-us',
   'de-DE': 'de-de',
-  'sr-SP': 'sr-sp',
+  'sr-RS': 'sr-rs',
   'it-IT': 'it-it',
   'it-LT': 'it-lt',
   'ru-RU': 'ru-ru',
@@ -22,7 +22,7 @@ export const languageMap: {[key: string]: string} = {
 export const mapLanguageToLocale: {[key: string]: string} = {
   'en-us': 'enUS',
   'de-de': 'de',
-  'sr-SP': 'sr',
+  'sr-RS': 'sr',
   'it-it': 'it',
   'it-lt': 'lt',
   'ru-ru': 'ru',

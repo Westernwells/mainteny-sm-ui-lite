@@ -1,49 +1,24 @@
 import {
   Document,
-  Text,
-  View,
-  StyleSheet,
-  Font,
   Image,
   Page,
+  StyleSheet,
+  Text,
+  View,
 } from '@react-pdf/renderer';
 import {Currency} from 'models/misc';
 import {ArticleSubAssociationView, MixedPositionRow} from 'models/article';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {getCurrencySymbol, currencyFormatting} from 'utils/currency';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
-import MontserratBoldItalic from '../../assets/fonts/Montserrat/Montserrat-BoldItalic.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {currencyFormatting} from 'utils/currency';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 import PreviewFrame from '../../assets/images/PreviewFrame.jpg';
 import PreviewFrameTwo from '../../assets/images/PreviewFrame2.jpg';
 import PreviewFrameThree from '../../assets/images/PreviewFrame3.jpg';
 import PreviewFrameFour from '../../assets/images/PreviewFrame4.jpg';
+import ArticleTableHeader from './ArticleSection/ArticleTableHeader';
 
-// Register fonts
-Font.register({
-  family: 'Montserrat-Regular',
-  fonts: [
-    {src: MontserratRegular},
-    {src: MontserratBold, fontWeight: 'bold'},
-    {src: MontserratItalic, fontStyle: 'italic'},
-    {src: MontserratBoldItalic, fontWeight: 'bold', fontStyle: 'italic'},
-  ],
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (regularFontStyle: {fontFamily: string}) =>
+const getStyles = ({regularFontStyle, primaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
     page: {
       ...regularFontStyle,
@@ -53,44 +28,36 @@ const getStyles = (regularFontStyle: {fontFamily: string}) =>
       flexDirection: 'column',
       position: 'relative',
       paddingBottom: 25,
-      color: '#212121',
+      color: primaryColor,
       paddingTop: 46,
     },
     table: {
       width: '100%',
       display: 'flex',
     },
-    tableHead: {
-      display: 'flex',
-      flexDirection: 'row',
-      paddingVertical: 4,
-    },
-    tableHeading: {
-      color: '#616161',
-      display: 'flex',
-      fontSize: 6,
-      textTransform: 'uppercase',
-    },
     tableRow: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
       fontSize: 10,
+      marginVertical: 4,
+      width: '100%',
+      display: 'flex',
+      flexWrap: 'wrap',
     },
     subPositionRow: {
-      display: 'flex',
       flexDirection: 'row',
-      alignItems: 'flex-start',
       fontSize: 10,
+      marginVertical: 4,
+      width: '100%',
+      display: 'flex',
+      flexWrap: 'wrap',
     },
     descriptionText: {
       width: '85%',
       fontSize: 8,
-      color: '#212121',
-      marginVertical: 5,
-      letterSpacing: -0.15,
-      lineHeight: 1.4,
-      textAlign: 'justify',
-      paddingLeft: 20,
+      color: primaryColor,
+      paddingLeft: 30,
+      paddingRight: 5,
+      marginVertical: 2,
     },
     previewImage: {
       width: 150,
@@ -106,38 +73,44 @@ const getStyles = (regularFontStyle: {fontFamily: string}) =>
       paddingTop: 60,
     },
     col2Left: {
-      width: '2%',
+      width: '6%',
+      wordBreak: 'break-all',
+      whiteSpace: 'pre-wrap',
       textAlign: 'left',
-      marginRight: 10,
-      color: '#212121',
+      color: primaryColor,
     },
     col40Left: {
-      width: '40%',
+      width: '37%',
       textAlign: 'left',
-      color: '#212121',
+      color: primaryColor,
     },
     col10Right: {
       width: '10%',
       textAlign: 'right',
-      color: '#212121',
+      color: primaryColor,
     },
     col8Center: {
       width: '8%',
       textAlign: 'center',
       marginLeft: 10,
-      color: '#212121',
+      color: primaryColor,
     },
     col15Right: {
-      width: '15%',
+      width: '13%',
       textAlign: 'right',
-      color: '#212121',
+      color: primaryColor,
     },
     footerRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
       fontSize: 10,
       marginVertical: 3,
-      color: '#616161',
+      color: primaryColor,
+    },
+    container: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-end',
     },
   });
 
@@ -147,7 +120,7 @@ type Props = {
   selectedLng?: string;
   mixedPosition: MixedPositionRow | null;
   subPositions: ArticleSubAssociationView[] | null;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const MixedPositionPdf = ({
   currentCurrency,
@@ -155,13 +128,15 @@ const MixedPositionPdf = ({
   selectedLng,
   mixedPosition,
   subPositions,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(regularFontStyle);
+  const styles = getStyles({
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   return (
     <Document>
@@ -188,59 +163,34 @@ const MixedPositionPdf = ({
             paddingLeft: 57,
             paddingRight: 35,
           }}>
-          <View>
-            <View style={styles.table}>
-              <View style={styles.tableHead}>
-                <View style={styles.tableRow}>
-                  <Text style={[styles.col2Left, styles.tableHeading]}>#</Text>
-                  <Text style={[styles.col40Left, styles.tableHeading]}>
-                    {translate('Article Name')}
-                  </Text>
-                  <Text style={[styles.col10Right, styles.tableHeading]}>
-                    {translate('Quantity')}
-                  </Text>
-                  <Text style={[styles.col8Center, styles.tableHeading]}>
-                    {translate('Unit')}
-                  </Text>
-                  <Text style={[styles.col15Right, styles.tableHeading]}>
-                    {`${translate('Price')} (${
-                      getCurrencySymbol[currentCurrency?.code!]
-                    })`}
-                  </Text>
-                  <Text style={[styles.col10Right, styles.tableHeading]}>
-                    {translate('Discount')}
-                  </Text>
-                  <Text style={[styles.col15Right, styles.tableHeading]}>
-                    {`${translate('Total')} (${
-                      getCurrencySymbol[currentCurrency?.code!]
-                    })`}
-                  </Text>
-                </View>
-              </View>
+          <View style={styles.table}>
+            <ArticleTableHeader
+              translate={translate}
+              currentCurrency={currentCurrency}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
+            />
 
-              <View style={styles.dataBody}>
-                <View>
-                  <View style={styles.tableRow}>
-                    <Text style={styles.col2Left}>{1}</Text>
-                    <HtmlPDF
-                      html={mixedPosition?.data.name || '-'}
-                      rootStyle={styles.col40Left}
-                    />
-                    <Text style={styles.col10Right}>
-                      {mixedPosition?.quantity || '0'}
-                    </Text>
-                    <Text style={styles.col8Center}>
-                      {translate(mixedPosition?.data.unit || '-')}
-                    </Text>
-                    <Text style={styles.col15Right}>
-                      {currencyFormatting(
-                        mixedPosition?.data.unitSellingAmount?.netAmount || 0,
-                        currentCurrency!,
-                        selectedLng,
-                      )}
-                    </Text>
-                    <Text style={styles.col10Right}>-</Text>
-                    <Text style={styles.col15Right}>
+            <View style={styles.dataBody}>
+              <View>
+                <View style={styles.tableRow}>
+                  <View style={styles.col2Left}>
+                    <Text>{1}</Text>
+                  </View>
+                  <View style={styles.col40Left}>
+                    <Text>{mixedPosition?.data.name || '-'}</Text>
+                  </View>
+
+                  <View style={styles.col10Right}>
+                    <Text>{mixedPosition?.quantity || '0'}</Text>
+                  </View>
+
+                  <View style={styles.col8Center}>
+                    <Text>{translate(mixedPosition?.data.unit || '-')}</Text>
+                  </View>
+
+                  <View style={styles.col15Right}>
+                    <Text>
                       {currencyFormatting(
                         mixedPosition?.data.unitSellingAmount?.netAmount || 0,
                         currentCurrency!,
@@ -248,41 +198,60 @@ const MixedPositionPdf = ({
                       )}
                     </Text>
                   </View>
+
+                  <View style={styles.col10Right}>
+                    <Text>-</Text>
+                  </View>
+
+                  <View style={styles.col15Right}>
+                    <Text>
+                      {currencyFormatting(
+                        mixedPosition?.data.unitSellingAmount?.netAmount || 0,
+                        currentCurrency!,
+                        selectedLng,
+                      )}
+                    </Text>
+                  </View>
+                </View>
+
+                <View>
                   {!!mixedPosition?.data.description?.trim() && (
                     <HtmlPDF
                       html={mixedPosition?.data.description || '-'}
                       rootStyle={{
                         ...styles.descriptionText,
                       }}
+                      fontStyles={fontStyles}
                     />
                   )}
                 </View>
+              </View>
 
-                {subPositions?.map((subPosition, index) => (
-                  <View key={index}>
-                    <View style={styles.subPositionRow}>
-                      <Text style={styles.col2Left}>
+              {subPositions?.map((subPosition, index) => (
+                <View key={index}>
+                  <View style={styles.subPositionRow}>
+                    <View style={styles.col2Left}>
+                      <Text>
                         {`1.${Number(subPosition?.seqNumber ?? 0) + 1}`}
                       </Text>
-                      <HtmlPDF
-                        html={subPosition.article.name || '-'}
-                        rootStyle={styles.col40Left}
-                      />
-                      <Text style={styles.col10Right}>
-                        {subPosition?.quantity || '0'}
-                      </Text>
-                      <Text style={styles.col8Center}>
+                    </View>
+                    <View style={styles.col40Left}>
+                      <Text>{subPosition.article.name || '-'}</Text>
+                    </View>
+
+                    <View style={styles.col10Right}>
+                      <Text> {subPosition?.quantity || '0'}</Text>
+                    </View>
+
+                    <View style={styles.col8Center}>
+                      <Text>
+                        {' '}
                         {translate(subPosition?.article.unit || '-')}
                       </Text>
-                      <Text style={styles.col15Right}>
-                        {currencyFormatting(
-                          subPosition.article.unitSellingAmount?.netAmount || 0,
-                          currentCurrency!,
-                          selectedLng,
-                        )}
-                      </Text>
-                      <Text style={styles.col10Right}>-</Text>
-                      <Text style={styles.col15Right}>
+                    </View>
+
+                    <View style={styles.col15Right}>
+                      <Text>
                         {currencyFormatting(
                           subPosition.article.unitSellingAmount?.netAmount || 0,
                           currentCurrency!,
@@ -290,105 +259,127 @@ const MixedPositionPdf = ({
                         )}
                       </Text>
                     </View>
-                    {!!subPosition?.article.description?.trim() && (
+
+                    <View style={styles.col10Right}>
+                      <Text>-</Text>
+                    </View>
+
+                    <View style={styles.col15Right}>
+                      <Text>
+                        {currencyFormatting(
+                          (subPosition.article.unitSellingAmount?.netAmount ??
+                            0) * (subPosition?.quantity ?? 0) || 0,
+                          currentCurrency!,
+                          selectedLng,
+                        )}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {!!subPosition?.article.description?.trim() && (
+                    <View>
                       <HtmlPDF
                         html={subPosition?.article.description || '-'}
                         rootStyle={{
                           ...styles.descriptionText,
                         }}
+                        fontStyles={fontStyles}
                       />
-                    )}
-                  </View>
-                ))}
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.container}>
+              <View style={styles.footerRow}>
+                <Text style={{width: '44%'}} />
+                <Text
+                  style={{
+                    width: '32%',
+                    color: primaryColor,
+                    fontSize: 10,
+                    textAlign: 'right',
+                  }}>
+                  {translate('Subtotal excl. VAT')}:
+                </Text>
+                <Text
+                  style={{
+                    width: '24%',
+                    textAlign: 'right',
+                    fontSize: 10,
+                    paddingRight: 5,
+                  }}>
+                  {currencyFormatting(
+                    mixedPosition?.data.unitSellingAmount?.netAmount || 0,
+                    currentCurrency!,
+                    selectedLng,
+                  )}
+                </Text>
               </View>
 
-              <View>
-                <View style={styles.footerRow}>
-                  <Text style={{width: '44%'}} />
-                  <Text
+              <View style={styles.footerRow}>
+                <Text style={{width: '44%'}} />
+                <View style={{width: '56%'}}>
+                  <View
                     style={{
-                      width: '32%',
-                      color: '#616161',
-                      fontSize: 10,
-                      textAlign: 'right',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingVertical: 4,
                     }}>
-                    {translate('Subtotal excl. VAT')}:
-                  </Text>
-                  <Text
-                    style={{
-                      width: '24%',
-                      textAlign: 'right',
-                      fontSize: 10,
-                    }}>
-                    {currencyFormatting(
-                      mixedPosition?.data.unitSellingAmount?.netAmount || 0,
-                      currentCurrency!,
-                      selectedLng,
-                    )}
-                  </Text>
-                </View>
-
-                <View style={styles.footerRow}>
-                  <Text style={{width: '44%'}} />
-                  <View style={{width: '56%'}}>
-                    <View
+                    <Text
                       style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        paddingVertical: 4,
+                        color: primaryColor,
+                        fontSize: 10,
+                        textAlign: 'right',
+                        width: '57%',
                       }}>
-                      <Text
-                        style={{
-                          color: '#616161',
-                          fontSize: 10,
-                          textAlign: 'right',
-                          width: '57%',
-                        }}>
-                        {translate('VAT')}{' '}
-                        {mixedPosition?.data.unitSellingAmount.percentageVat}%
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 10,
-                          textAlign: 'right',
-                          width: '43%',
-                        }}>
-                        {currencyFormatting(
-                          mixedPosition?.data.unitSellingAmount?.vat ?? 0,
-                          currentCurrency!,
-                          selectedLng,
-                        )}
-                      </Text>
-                    </View>
+                      {translate('VAT')}{' '}
+                      {mixedPosition?.data.unitSellingAmount.percentageVat}%
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        textAlign: 'right',
+                        width: '43%',
+                        paddingRight: 5,
+                      }}>
+                      {currencyFormatting(
+                        mixedPosition?.data.unitSellingAmount?.vat ?? 0,
+                        currentCurrency!,
+                        selectedLng,
+                      )}
+                    </Text>
                   </View>
                 </View>
+              </View>
 
-                <View style={styles.footerRow}>
-                  <Text style={{width: '44%'}} />
-                  <Text
-                    style={{
-                      width: '32%',
-                      color: '#212121',
-                      fontSize: 10,
-                      textAlign: 'right',
-                    }}>
-                    {translate('Total incl. VAT')}
-                  </Text>
-                  <Text
-                    style={{
-                      width: '24%',
-                      textAlign: 'right',
-                      fontSize: 10,
-                      color: '#212121',
-                    }}>
-                    {currencyFormatting(
-                      mixedPosition?.data.unitSellingAmount?.grossAmount || 0,
-                      currentCurrency!,
-                      selectedLng,
-                    )}
-                  </Text>
-                </View>
+              <View style={styles.footerRow}>
+                <Text style={{width: '44%'}} />
+                <Text
+                  style={{
+                    width: '32%',
+                    color: primaryColor,
+                    fontSize: 10,
+                    textAlign: 'right',
+                  }}>
+                  {translate('Total incl. VAT')}
+                </Text>
+                <Text
+                  style={{
+                    width: '24%',
+                    textAlign: 'right',
+                    fontSize: 10,
+                    color: primaryColor,
+                    paddingRight: 5,
+                  }}>
+                  {currencyFormatting(
+                    mixedPosition?.data.unitSellingAmount?.grossAmount || 0,
+                    currentCurrency!,
+                    selectedLng,
+                  )}
+                </Text>
               </View>
             </View>
           </View>

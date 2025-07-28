@@ -1,22 +1,29 @@
 import React, {
+  CSSProperties,
+  PropsWithChildren,
+  Ref,
+  useCallback,
+  useEffect,
   useMemo,
   useRef,
-  useEffect,
-  useCallback,
-  Ref,
-  CSSProperties,
   useState,
-  PropsWithChildren,
 } from 'react';
 import {useTranslation} from 'react-i18next';
 import {
-  Slate,
-  Editable,
-  withReact,
-  ReactEditor,
   DefaultElement,
+  Editable,
+  ReactEditor,
+  Slate,
+  withReact,
 } from 'slate-react';
-import {createEditor, BaseEditor, Descendant, Editor, Transforms} from 'slate';
+import {
+  BaseEditor,
+  createEditor,
+  Descendant,
+  Editor,
+  Transforms,
+  Node,
+} from 'slate';
 import {HistoryEditor, withHistory} from 'slate-history';
 import {theme} from 'theme';
 import {FormControl, FormHelperText} from '@mui/material';
@@ -27,6 +34,7 @@ import {
   RenderLeafProps,
 } from 'models/richTextField';
 import {deserialize, handleKeyDown, serialize} from 'utils/rich-text-field';
+import {RTFErrorBoundary} from 'components/ErrorBoundaries/RTFErrorBoundary';
 import {HoveringToolbar} from './HoveringToolbar';
 import {isPlainString} from '../../utils/rich-field-string';
 
@@ -35,13 +43,23 @@ const CustomElements = ({
   attributes,
   children,
 }: RenderElementProps) => {
-  const style = {fontSize: element.fontSize};
+  const baseStyle: CSSProperties = {
+    fontSize: element.fontSize,
+    color: element.color,
+    textIndent: element.textIndent,
+  };
+
+  const isSlateEmpty = () => {
+    const fullText = Node.string(element);
+    return fullText.trim() === '';
+  };
+  const empty = isSlateEmpty();
 
   switch (element.type) {
     case 'paragraph':
       return (
         <p
-          style={{...style, margin: 0}}
+          style={{...baseStyle, margin: 0}}
           {...attributes}
           ref={attributes.ref as Ref<HTMLParagraphElement>}>
           {children}
@@ -51,10 +69,10 @@ const CustomElements = ({
       return (
         <ul
           style={{
-            ...style,
+            ...baseStyle,
             marginLeft: '20px',
             listStyleType: 'disc',
-            listStylePosition: 'inside',
+            listStylePosition: 'outside',
           }}
           {...attributes}
           ref={attributes.ref as Ref<HTMLUListElement>}>
@@ -64,7 +82,7 @@ const CustomElements = ({
     case 'list-item':
       return (
         <li
-          style={style}
+          style={baseStyle}
           {...attributes}
           ref={attributes.ref as Ref<HTMLLIElement>}>
           {children}
@@ -74,62 +92,67 @@ const CustomElements = ({
       return (
         <ol
           style={{
-            ...style,
+            ...baseStyle,
             marginLeft: '20px',
             listStyleType: 'decimal',
-            listStylePosition: 'inside',
+            listStylePosition: 'outside',
           }}
           {...attributes}
           ref={attributes.ref as Ref<HTMLOListElement>}>
           {children}
         </ol>
       );
-    case 'left':
+    case 'left': {
+      const style: CSSProperties = {
+        textAlign: 'left',
+        ...(empty ? {lineHeight: 1.1} : {}),
+      };
       return (
         <div
-          style={{textAlign: 'left'}}
+          style={style}
           {...attributes}
           ref={attributes.ref as Ref<HTMLDivElement>}>
           {children}
         </div>
       );
-    case 'center':
+    }
+    case 'center': {
+      const style: CSSProperties = {
+        textAlign: 'center',
+        ...(empty ? {lineHeight: 1.1} : {}),
+      };
       return (
         <div
-          style={{textAlign: 'center'}}
+          style={style}
           {...attributes}
           ref={attributes.ref as Ref<HTMLDivElement>}>
           {children}
         </div>
       );
-    case 'right':
+    }
+    case 'right': {
+      const style: CSSProperties = {
+        textAlign: 'right',
+        ...(empty ? {lineHeight: 1.1} : {}),
+      };
       return (
         <div
-          style={{textAlign: 'right'}}
+          style={style}
           {...attributes}
           ref={attributes.ref as Ref<HTMLDivElement>}>
           {children}
         </div>
       );
+    }
     default:
-      // For the default case, we delegate to Slate's default rendering.
       return <DefaultElement {...{element, children, attributes}} />;
   }
 };
 
 const Leaf = ({attributes, children, leaf}: RenderLeafProps) => {
-  if (leaf.bold) {
-    children = <strong>{children}</strong>;
-  }
-
-  if (leaf.italic) {
-    children = <em>{children}</em>;
-  }
-
-  if (leaf.underlined) {
-    children = <u>{children}</u>;
-  }
-
+  if (leaf.bold) children = <strong>{children}</strong>;
+  if (leaf.italic) children = <em>{children}</em>;
+  if (leaf.underlined) children = <u>{children}</u>;
   if (leaf.fontSize) {
     const style = {
       fontSize: String(leaf.fontSize).endsWith('px')
@@ -142,21 +165,18 @@ const Leaf = ({attributes, children, leaf}: RenderLeafProps) => {
       </span>
     );
   }
-
   return <span {...attributes}>{children}</span>;
 };
 
 const styles: Record<string, CSSProperties> = {
   fieldset: {
-    border: '1px solid rgba(0, 0, 0, 0.23)',
+    border: '1px solid rgba(0,0,0,0.23)',
     borderRadius: '4px',
     margin: 0,
     padding: '8.5px 14px',
     width: '100%',
   },
-  errorFieldset: {
-    border: `1px solid ${theme.palette.error.main}`,
-  },
+  errorFieldset: {border: `1px solid ${theme.palette.error.main}`},
   legend: {
     color: theme.palette.text.secondary,
     fontWeight: 400,
@@ -164,19 +184,10 @@ const styles: Record<string, CSSProperties> = {
     lineHeight: 2,
     letterSpacing: '0.15px',
   },
-  redText: {
-    color: theme.palette.error.main,
-  },
-  editable: {
-    flex: 1,
-    outline: 'none',
-  },
-  endAdornment: {
-    marginTop: '-10px',
-  },
-  inputWrapper: {
-    display: 'flex',
-  },
+  redText: {color: theme.palette.error.main},
+  editable: {flex: 1, outline: 'none'},
+  endAdornment: {marginTop: '-10px'},
+  inputWrapper: {display: 'flex'},
 };
 
 interface Props {
@@ -192,7 +203,7 @@ interface Props {
   containerMinHeight?: number;
   endAdornment?: React.ReactNode;
   disabled?: boolean;
-  onClick?: (event: any) => void;
+  onClick?: (e: any) => void;
   name?: string;
   fieldsetStyles?: React.CSSProperties;
 }
@@ -216,6 +227,7 @@ const RichTextField = ({
   ...props
 }: PropsWithChildren<Props>) => {
   const {t} = useTranslation();
+  const containerRef = useRef<HTMLFieldSetElement>(null);
   const editorRef = useRef<(BaseEditor & ReactEditor & HistoryEditor) | null>(
     null,
   );
@@ -225,134 +237,123 @@ const RichTextField = ({
 
   const getValue = (htmlString: string) => {
     const initialValue: Descendant[] = [
-      {
-        type: 'paragraph',
-        children: [{text: ''}],
-      },
+      {type: 'paragraph', children: [{text: ''}]},
     ];
-
     if (!htmlString) return initialValue;
-    // check if htmlString is plain string
-    const parsed = new DOMParser().parseFromString(
+    const doc = new DOMParser().parseFromString(
       isPlainString(htmlString) ? `<p>${htmlString}</p>` : htmlString,
       'text/html',
     );
-    return deserialize(parsed.body);
+    const raw = deserialize(doc.body);
+    const all = Array.isArray(raw)
+      ? (raw as Descendant[])
+      : [raw as Descendant];
+    return all.length ? all : initialValue;
   };
-  const [value, setValue] = useState(() => getValue(html) as Descendant[]);
 
+  const [value, setValue] = useState<Descendant[]>(() => getValue(html));
   const renderElement = useCallback(
     (p: RenderElementProps) => <CustomElements {...p} />,
     [],
   );
-
   const renderLeaf = useCallback((p: RenderLeafProps) => <Leaf {...p} />, []);
 
   useEffect(() => {
-    const newValue = getValue(html) as Descendant[];
-    const {selection} = editor;
-
-    if (JSON.stringify(value) !== JSON.stringify(newValue)) {
-      setValue(newValue);
-      // Delete all entries leaving 1 empty node
-      Transforms.delete(editor, {
-        at: {
-          anchor: Editor.start(editor, []),
-          focus: Editor.end(editor, []),
-        },
+    if (!editor || html == null) return;
+    const newVal = getValue(html);
+    const sel = editor.selection;
+    if (JSON.stringify(value) !== JSON.stringify(newVal)) {
+      Editor.withoutNormalizing(editor, () => {
+        Transforms.delete(editor, {
+          at: {anchor: Editor.start(editor, []), focus: Editor.end(editor, [])},
+        });
+        Transforms.removeNodes(editor, {at: [0], voids: true});
+        Transforms.insertNodes(editor, newVal, {at: [0]});
+        if (sel && Editor.hasPath(editor, sel.anchor.path))
+          Transforms.select(editor, sel);
       });
-
-      // Removes empty node
-      Transforms.removeNodes(editor, {
-        at: [0],
-      });
-
-      // Insert array of children nodes
-      Transforms.insertNodes(editor, newValue, {
-        at: [editor.children.length],
-      });
-
-      if (selection) {
-        Transforms.select(editor, selection);
-      }
+      setValue(newVal);
     }
   }, [html]);
 
-  const debouncedUpdateHtml = useMemo(
-    () =>
-      debounce((e) => {
-        const newHTML = serialize(e);
-        updateHtml(newHTML);
-      }, 700),
+  const debounced = useMemo(
+    () => debounce((e) => updateHtml(serialize(e)), 700),
     [updateHtml],
   );
-
-  const handleChange = (v: Descendant[]) => {
+  const onChange = (v: Descendant[]) => {
     setValue(v);
-    debouncedUpdateHtml(editor);
+    debounced(editor);
   };
-
   const onKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) =>
-      handleKeyDown(event, editor),
+    (e: React.KeyboardEvent<HTMLDivElement>) => handleKeyDown(e, editor),
     [editor],
   );
 
   return (
-    <Slate editor={editor} initialValue={value} onChange={handleChange}>
-      {disabled ? null : <HoveringToolbar />}
-      <FormControl fullWidth disabled={disabled} {...props}>
-        <fieldset
-          style={{
-            ...styles.fieldset,
-            ...(error && styles.errorFieldset),
-            ...(containerMinHeight && {minHeight: `${containerMinHeight}px`}),
-            ...(fieldsetStyles ?? {}),
-          }}>
-          <legend
+    <RTFErrorBoundary>
+      <Slate editor={editor} initialValue={value} onChange={onChange}>
+        {!disabled && <HoveringToolbar container={containerRef.current} />}{' '}
+        {/* containerRef passed internally */}
+        <FormControl fullWidth disabled={disabled} {...props}>
+          <fieldset
+            ref={containerRef}
             style={{
-              ...styles.legend,
-              padding: label ? '2px' : '0',
-              ...(error && styles.redText),
+              ...styles.fieldset,
+              position: 'relative',
+              overflow: 'hidden',
+              ...(error && styles.errorFieldset),
+              ...(containerMinHeight && {minHeight: `${containerMinHeight}px`}),
+              ...(fieldsetStyles || {}),
             }}>
-            {t(label)} {required && <span style={styles.redText}>*</span>}
-          </legend>
-          <div style={styles.inputWrapper}>
-            <Editable
-              id={name}
-              name={name}
-              renderElement={renderElement}
-              renderLeaf={renderLeaf}
-              placeholder={t(placeholder)}
-              renderPlaceholder={({attributes, children}) => (
-                <span
-                  {...attributes}
-                  style={{...attributes.style, top: 'auto', fontSize: '16px'}}>
-                  {children}
-                </span>
-              )}
+            <legend
               style={{
-                ...styles.editable,
-                marginTop: label ? '-10px' : '0px',
-                minHeight: `${minRows * 24}px`,
-                fontSize: '16px',
-                lineHeight: '1.5',
-              }}
-              onKeyDown={onKeyDown}
-              onBlur={onBlur}
-              onClick={onClick}
-              readOnly={disabled}
-            />
-            {endAdornment && (
-              <div style={styles.endAdornment}>{endAdornment}</div>
-            )}
-          </div>
-        </fieldset>
-        {helperText && (
-          <FormHelperText error={error}>{t(helperText)}</FormHelperText>
-        )}
-      </FormControl>
-    </Slate>
+                ...styles.legend,
+                padding: label ? '2px' : '0',
+                ...(error && styles.redText),
+              }}>
+              {t(label)} {required && <span style={styles.redText}>*</span>}
+            </legend>
+            <div style={styles.inputWrapper}>
+              <Editable
+                id={name}
+                name={name}
+                renderElement={renderElement}
+                renderLeaf={renderLeaf}
+                placeholder={t(placeholder)}
+                renderPlaceholder={({attributes, children}) => (
+                  <span
+                    {...attributes}
+                    style={{
+                      ...attributes.style,
+                      top: 'auto',
+                      fontSize: '16px',
+                    }}>
+                    {children}
+                  </span>
+                )}
+                style={{
+                  ...styles.editable,
+                  marginTop: label ? '-10px' : '0',
+                  minHeight: `${minRows * 24}px`,
+                  fontSize: '16px',
+                  lineHeight: '1.5',
+                }}
+                onKeyDown={onKeyDown}
+                onBlur={onBlur}
+                onClick={onClick}
+                readOnly={disabled}
+              />
+              {endAdornment && (
+                <div style={styles.endAdornment}>{endAdornment}</div>
+              )}
+            </div>
+          </fieldset>
+          {helperText && (
+            <FormHelperText error={error}>{t(helperText)}</FormHelperText>
+          )}
+        </FormControl>
+      </Slate>
+    </RTFErrorBoundary>
   );
 };
 

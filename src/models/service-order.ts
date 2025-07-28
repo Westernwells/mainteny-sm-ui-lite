@@ -7,8 +7,10 @@ import {
 import {ContractSimpleView} from './contract';
 import {
   Amount,
+  AmountRecord,
   EmailRecord,
   Fee,
+  GenerationInfo,
   JobStatus,
   Meta,
   MultiVatsAmount,
@@ -17,13 +19,20 @@ import {
 } from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
-import {EmployeesSimpleView, EmployeesView} from './employee';
-import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
+import {
+  EmployeesSimpleView,
+  EmployeesView,
+  ServiceOrderEmployeeView,
+} from './employee';
+import {ArticleType, ArticleView, CostPackage} from './article';
 import {FileResource, FileResourceRecord} from './media';
-import {Discount} from './invoice';
+import {AggregatedAmount, Discount, InvoiceItemPaymentRecord} from './invoice';
 import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
-import {PropertyOwnerView} from 'models/propertyManager';
+import {PropertyOwnerSimpleView} from 'models/propertyManager';
+import {CommentRecord} from './comment';
+import {ArticleInfoRecord, SubItemsConfig} from './quotation';
+import {TagRecord} from 'models/tag';
 
 export enum Priority {
   A = 'A',
@@ -206,6 +215,7 @@ export enum ServiceOrderOrderField {
   JOB_TYPE = 'JOB_TYPE',
   PAYMENT_STATUS = 'PAYMENT_STATUS',
   JOB_STATUS = 'JOB_STATUS',
+  LAST_ACTIVITY_AT = 'LAST_ACTIVITY_AT',
 }
 
 export enum DispatchPlanStatus {
@@ -218,6 +228,15 @@ export enum DispatchPlanStatus {
 export enum JobScheduleType {
   AUTO = 'AUTO',
   FIXED = 'FIXED',
+}
+
+export enum JobScheduleSource {
+  NIGHTLY_SHUFFLE = 'NIGHTLY_SHUFFLE',
+  TECHNICIAN_REQUESTED = 'TECHNICIAN_REQUESTED',
+  ASSIGNMENT_PROCESS = 'ASSIGNMENT_PROCESS',
+  AUTO_RESCHEDULE = 'AUTO_RESCHEDULE',
+  MANUAL_ASSIGNMENT = 'MANUAL_ASSIGNMENT',
+  UNKNOWN = 'UNKNOWN',
 }
 
 export enum ChecklistStatus {
@@ -261,11 +280,11 @@ export interface ServiceOrderTimeSlot {
 }
 
 export interface ServiceOrderAdditionalInfo {
-  appointmentConfirmed: boolean;
+  appointmentConfirmed?: boolean;
   appointmentNotificationDueDate?: string;
-  appointmentNotificationRequired: boolean;
-  appointmentNotificationSent: boolean;
-  priority: Priority;
+  appointmentNotificationRequired?: boolean;
+  appointmentNotificationSent?: boolean;
+  priority?: Priority;
   checkListInfo?: {
     checkListId?: string;
     technicianSignature?: string;
@@ -274,9 +293,9 @@ export interface ServiceOrderAdditionalInfo {
     completedAt?: string;
     status?: ChecklistStatus;
   };
-  moreInformation: string;
-  quotationId: string;
-  workReportGenerated: boolean;
+  moreInformation?: string;
+  quotationId?: string;
+  workReportGenerated?: boolean;
   confirmationInfo?: ServiceOrderConfirmationInfo;
   purchaseOrderNumber?: string;
   callerInfo?: CallerInfo;
@@ -301,7 +320,13 @@ export interface ServiceOrderAdditionalInfo {
   pictures?: FileResource[];
   discount?: Discount;
   commentCount?: number;
-  totalAmount?: Amount;
+  totalAmount?: AggregatedAmount;
+  lastActivityAt?: string;
+  candidateTechnician?: ServiceOrderEmployeeView;
+  candidateTechnicians?: EmployeesSimpleView[];
+  generationInfo?: GenerationInfo;
+  notificationChannels?: ContactChannel[];
+  tags?: TagRecord[];
 }
 
 export interface ServiceOrderConfirmationInfo {
@@ -315,12 +340,11 @@ export interface ServiceOrderView {
   number: string;
   externalId: string;
   articles: ServiceOrderArticleView[];
-  elevator: ElevatorView;
+  elevator: ElevatorSimpleView;
   contract?: ContractSimpleView;
   description: string;
   type: ServiceOrderType | string;
   status: ServiceOrderStatus;
-  lastVisitDate: string;
   expectedVisitDate: string;
   actualStartTime?: string;
   actualEndTime?: string;
@@ -328,7 +352,7 @@ export interface ServiceOrderView {
   travelEndTime?: string;
   dueDate: string;
   serviceTime?: number;
-  schedules: ServiceOrderScheduleSimpleView[];
+  schedules: ServiceOrderScheduleView[];
   labels: string[];
   search: string;
   meta: Meta;
@@ -336,6 +360,9 @@ export interface ServiceOrderView {
   additionalInfo: ServiceOrderAdditionalInfo;
   checkLists?: ServiceOrderCheckListInfo[];
   serviceCompany: ServiceCompanySimpleView;
+  sortableFields?: {
+    technicianNames: string;
+  };
 }
 
 export interface ServiceOrderSimpleView {
@@ -352,7 +379,7 @@ export interface ServiceOrderSimpleView {
   lastVisitDate: string;
   meta: Meta;
   number: string;
-  schedules: ServiceOrderScheduleSimpleView[];
+  schedules: ServiceOrderScheduleView[];
   search: string;
   serviceCompanyId: string;
   serviceTime?: number;
@@ -417,6 +444,17 @@ export interface ServiceOrderScheduleSimpleView {
   createdAt: string;
 }
 
+export interface ServiceOrderScheduleView {
+  id: string;
+  serviceOrderId: string;
+  technician?: ServiceOrderEmployeeView;
+  startTime?: string;
+  endTime?: string;
+  type: JobScheduleType;
+  source: JobScheduleSource;
+  createdAt: string;
+}
+
 export interface UpdateServiceOrderBody {
   externalId: string;
   description: string;
@@ -425,6 +463,7 @@ export interface UpdateServiceOrderBody {
   checkListId: string;
   documents: FileResourceRecord[];
   pictures: FileResourceRecord[];
+  tags: string[];
 }
 
 export interface UpdateJobSchedule {
@@ -457,6 +496,7 @@ export interface CompleteServiceOrder {
   travelTimeRecord?: ServiceOrderReportTimeRecord;
   showTime?: boolean;
   showHours?: boolean;
+  customerName?: string;
 }
 
 export interface CheckListAnswerRecord {
@@ -502,6 +542,7 @@ export interface ServiceOrderReportAdditionalInfo {
     endTime: string;
   };
   status?: ReportStatus;
+  customerName?: string;
 }
 
 export interface ServiceOrderReportArticleView {
@@ -659,6 +700,29 @@ export interface CreateServiceOrderRecord {
   callerInfo?: CallerInfo;
   confirmationChannels?: ContactChannel[];
   notificationChannels?: ContactChannel[];
+  comments?: CommentRecord[];
+}
+
+export enum UnitAmountSource {
+  DEFAULT = 'DEFAULT',
+  MIX_ARTICLE = 'MIX_ARTICLE',
+  MIX_SUB_ITEMS = 'MIX_SUB_ITEMS',
+}
+
+export interface ServiceOrderSubArticlesConfig {
+  subItemsVisible?: boolean;
+  priceVisible?: boolean;
+}
+
+export interface ServiceOrderArticleAdditionalInfo {
+  discount?: Discount;
+  owner?: {
+    id: string;
+    name: string;
+  };
+  unitAmountSource?: UnitAmountSource;
+  subArticlesConfig?: ServiceOrderSubArticlesConfig;
+  userSeqNumber?: string;
 }
 
 export interface ServiceOrderArticleView {
@@ -666,35 +730,33 @@ export interface ServiceOrderArticleView {
   name: string;
   description: string;
   serviceOrderId: string;
-  article: ArticleRecord;
+  article?: ServiceOrderViewArticleInfoRecord;
+  unitPurchaseAmount?: MultiVatsAmount;
   unitAmount: MultiVatsAmount;
   quantity: number;
   ownerType?: ServiceOrderArticleOwnerType;
-  additionalInfo?:
-    | {
-        discount?: Discount;
-        owner?: {
-          id: string;
-          name: string;
-        };
-      }
-    | undefined;
+  additionalInfo?: ServiceOrderArticleAdditionalInfo;
+}
+
+export interface ServiceOrderViewArticleInfoRecord {
+  id?: string;
+  name: string;
+  externalId?: string;
+  type: ArticleType;
+  unit: string;
+  unitPurchaseAmount?: Amount;
+  unitSellingAmount: Amount;
+  costPackage?: CostPackage;
+  generationInfo?: GenerationInfo;
 }
 
 export interface ServiceOrderItemRecord {
   articleId: string;
   articleUnit: string;
-  description: string;
+  description?: string;
   name: string;
   quantity: number;
   unitAmount: Amount;
-}
-
-export interface ServiceOrderConfirmationPublishBody {
-  email: string;
-  emails: string[];
-  subject: string;
-  content: string;
 }
 
 export interface AppointmentConfirmationRequiredOrdersQueryParams {
@@ -731,12 +793,16 @@ export type ServiceOrderTableRow = {
   fullAddress: string;
   dueDate: string;
   technicians: EmployeesSimpleView[];
-  propertyOwner: PropertyOwnerView;
+  propertyOwner: PropertyOwnerSimpleView;
   jobStatus: ServiceOrderStatus;
   paymentStatus:
     | ServiceOrderPaymentStatus
     | ServiceOrderPaymentWithIndicationStatus;
   hasNotes: boolean;
+  lastActivityAt: string;
+  hasSchedule: boolean;
+  scheduleDate?: string;
+  tags: TagRecord[];
 };
 
 // used to indicate fields for the search parameter of service order endpoint
@@ -783,3 +849,144 @@ export interface ServiceOrderNameChangedRecord {
   fromName: string;
   toName: string;
 }
+
+export interface DateCellParts {
+  label: string;
+  date?: string | null;
+}
+
+export interface ServiceOrderSubItemRecord {
+  article?: ArticleInfoRecord;
+  id?: string;
+  name: string;
+  unitPurchaseAmount?: Amount;
+  unitAmount: Amount;
+  quantity: number;
+  description?: string;
+  userSeqNumber?: string;
+  ownerType?: ServiceOrderArticleOwnerType;
+  ownerName?: string;
+}
+
+export type EditableServiceOrderSubArticleRecord = ServiceOrderSubItemRecord & {
+  margin?: number;
+  id?: string;
+  parentId?: string;
+};
+
+export interface NewServiceOrderItemRecord {
+  id?: string; // only for frontend key - we don't send it to backend
+  article?: ArticleInfoRecord;
+  name: string;
+  description?: string;
+  unitPurchaseAmount?: AmountRecord;
+  unitAmount: AmountRecord;
+  quantity: number;
+  discount?: Discount;
+  subItemsConfig?: ServiceOrderSubArticlesConfig;
+  subArticles?: EditableServiceOrderSubArticleRecord[];
+  userSeqNumber?: string;
+  ownerType?: ServiceOrderArticleOwnerType;
+  ownerName?: string;
+  serviceOrderId?: string;
+  subItems?: EditableServiceOrderSubArticleRecord[];
+  payment?: InvoiceItemPaymentRecord;
+}
+
+export type EditableServiceOrderItem = NewServiceOrderItemRecord & {
+  id?: string;
+  margin?: number;
+};
+
+export interface UpdateServiceOrderAmountRecord {
+  articles: ServiceOrderArticleRecord[];
+  globalDiscount?: Discount;
+}
+
+export interface ServiceOrderArticleRecord {
+  articleId?: string;
+  article?: ArticleInfoRecord;
+  name: string;
+  description?: string;
+  quantity: number;
+  unitPurchaseAmount?: AmountRecord;
+  unitAmount: AmountRecord;
+  ownerType?: ServiceOrderArticleOwnerType;
+  discount?: Discount;
+  owner?: {
+    id: string;
+    name: string;
+  };
+  subArticlesConfig?: SubItemsConfig;
+  subArticles?: ServiceOrderSubArticleRecord[];
+  userSeqNumber?: string;
+}
+
+export interface ServiceOrderSubArticleRecord {
+  articleId?: string;
+  id?: string;
+  article?: ArticleInfoRecord;
+  name: string;
+  description?: string;
+  quantity: number;
+  unitAmount: AmountRecord;
+  unitPurchaseAmount?: AmountRecord;
+  userSeqNumber?: string;
+}
+
+export interface ServiceOrderSubArticleAmount {
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeItemDiscount: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount: Amount;
+}
+
+export interface ServiceOrderArticleAmount {
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeItemDiscount?: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount?: Amount;
+  subItems: ServiceOrderSubArticleAmount[];
+}
+
+export interface ServiceOrderAmountDetail {
+  discount: Discount;
+  amountBeforeGlobalDiscount: AggregatedAmount;
+  amountAfterGlobalDiscount: AggregatedAmount;
+  items: ServiceOrderArticleAmount[];
+}
+
+export interface CalculateServiceOrderAmountRecord {
+  articles: ServiceOrderArticleRecord[];
+  globalDiscount?: Discount;
+}
+
+export const statusLabelMap: Record<ServiceOrderStatus, string> = {
+  [ServiceOrderStatus.READY_TO_SCHEDULE]: 'Created on',
+  [ServiceOrderStatus.TECHNICIAN_ASSIGNED]: 'Created on',
+  [ServiceOrderStatus.OVERDUE]: 'Created on',
+
+  [ServiceOrderStatus.PLANNED]: 'Scheduled for',
+  [ServiceOrderStatus.SCHEDULED]: 'Scheduled for',
+
+  [ServiceOrderStatus.PAUSED]: 'Started on',
+  [ServiceOrderStatus.TRAVEL]: 'Started on',
+  [ServiceOrderStatus.IN_PROGRESS]: 'Started on',
+
+  [ServiceOrderStatus.ARCHIVED]: 'Archived on',
+  [ServiceOrderStatus.CANCELLED]: 'Canceled on',
+  [ServiceOrderStatus.COMPLETED]: 'Completed on',
+  [ServiceOrderStatus.ALL]: '',
+  [ServiceOrderStatus.INIT]: '',
+  [ServiceOrderStatus.SCHEDULING]: '',
+  [ServiceOrderStatus.INVOICE_ISSUED]: '',
+  [ServiceOrderStatus.ARTICLES_ORDERED]: '',
+};
+
+export type GetServiceTypeProps = {
+  value?: string;
+  dynamicJobTypes?: ServiceOrderTypeRecord[];
+  oldJobTypes?: ServiceOrderTypeRecord[];
+};

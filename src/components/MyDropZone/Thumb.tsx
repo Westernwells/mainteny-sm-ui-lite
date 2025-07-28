@@ -10,11 +10,11 @@ import {CheckCircleRounded} from '@mui/icons-material';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Grid from '@mui/material/Grid';
 import {Tooltip} from '@mui/material';
+import {FileWithPreview} from 'models/files';
 import {FormInput} from '../form/FormInput';
-import {FileWithPreview} from './MyDropzone';
 
 interface Props {
-  oneMbInByes: number;
+  oneMbInBytes: number;
   onKbinBytes: number;
   file: FileWithPreview;
   onNameChange: (
@@ -30,7 +30,7 @@ interface Props {
 }
 
 export const Thumb = ({
-  oneMbInByes,
+  oneMbInBytes,
   onKbinBytes,
   file,
   onNameChange,
@@ -43,6 +43,22 @@ export const Thumb = ({
   onDeleteFile,
 }: Props) => {
   const theme = useTheme();
+
+  const isSupportedImage = (type: string) => {
+    const supportedTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/gif',
+      'image/webp',
+      'image/svg+xml',
+      'image/bmp',
+    ];
+    return supportedTypes.includes(type.toLowerCase());
+  };
+
+  const isVideo = file.type === 'video/mp4';
+
   return (
     <Box
       sx={{
@@ -51,8 +67,27 @@ export const Thumb = ({
         justifyContent: 'space-between',
       }}>
       <Grid container wrap="nowrap">
-        {file.type.split('/')[0] === 'image' ? (
-          <img alt="" width={36} height={46} src={file.preview} />
+        {isSupportedImage(file.type) ? (
+          <img
+            alt=""
+            width={36}
+            height={46}
+            src={file.preview}
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        ) : isVideo ? (
+          <>
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+            <video
+              src={file.preview}
+              controls
+              width={36}
+              height={46}
+              style={{objectFit: 'cover'}}
+            />
+          </>
         ) : (
           <FileCopyIcon
             sx={{fontSize: '3rem', color: theme.palette.text.secondary}}
@@ -95,8 +130,8 @@ export const Thumb = ({
           )}
 
           <Typography variant="caption" color="text.secondary">
-            {file.size >= oneMbInByes
-              ? `${(file.size / oneMbInByes).toFixed(2)} MB`
+            {file.size >= oneMbInBytes
+              ? `${(file.size / oneMbInBytes).toFixed(2)} MB`
               : `${(file.size / onKbinBytes).toFixed(2)} KB`}
           </Typography>
         </Box>

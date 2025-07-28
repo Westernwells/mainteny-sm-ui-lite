@@ -1,24 +1,23 @@
-import Menu from '@mui/material/Menu';
+import MenuLib from '@mui/material/Menu';
 import {Box} from '@mui/material';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import React from 'react';
 import {MenuAction} from 'models/action';
+import {SxProps} from '@mui/system';
+import Menu from './Menu';
 
 type Props = {
   options: MenuAction[];
   isOpen: boolean;
   anchorEl: HTMLButtonElement | null;
+  sx?: SxProps;
   onClose: () => void;
 };
 
-const TableActionMenu = ({options, isOpen, anchorEl, onClose}: Props) => {
+const TableActionMenu = ({options, isOpen, anchorEl, sx, onClose}: Props) => {
   if (anchorEl && !isOpen) return;
+
   return (
-    <Menu
+    <MenuLib
       id="action-menu"
       anchorEl={anchorEl}
       open={isOpen}
@@ -29,22 +28,11 @@ const TableActionMenu = ({options, isOpen, anchorEl, onClose}: Props) => {
         <Box
           key={`container-menu-option-${option.label}-${index}`}
           data-testid={`container-menu-option-${option.label}-${index}`}>
-          <MenuItem
-            key={`option-menu-index-${index}`}
-            data-testid={`option-menu-index-${index}`}
-            onClick={() => {
-              option.onClick();
-              onClose();
-            }}>
-            <ListItemIcon>{option.icon}</ListItemIcon>
-            <ListItemText>
-              <Typography variant="body2">{option.label}</Typography>
-            </ListItemText>
-          </MenuItem>
+          <Menu sx={sx} option={option} onClose={onClose} index={index} />
           {option.showBorder && <Divider />}
         </Box>
       ))}
-    </Menu>
+    </MenuLib>
   );
 };
 

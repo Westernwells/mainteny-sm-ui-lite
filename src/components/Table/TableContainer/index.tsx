@@ -1,5 +1,5 @@
 import React, {PropsWithChildren, RefObject, useEffect} from 'react';
-import {Box} from '@mui/system';
+import {Box, SxProps} from '@mui/system';
 import {Table} from '@mui/material';
 import {useScrollHorizontalPosition} from 'hooks/useScrollPosition';
 import NoMatchTable from 'components/Table/NoMatchTable';
@@ -9,6 +9,8 @@ type Props = {
   setShowLeftShadow?: (value: boolean) => void;
   setShowRightShadow?: (value: boolean) => void;
   containerRef?: RefObject<HTMLDivElement>;
+  tableLayoutStyles?: SxProps;
+  sx?: SxProps;
 };
 
 const TableContainer = ({
@@ -17,6 +19,8 @@ const TableContainer = ({
   setShowRightShadow,
   setShowLeftShadow,
   containerRef,
+  tableLayoutStyles,
+  sx,
 }: PropsWithChildren<Props>) => {
   const scroller = useScrollHorizontalPosition(containerRef?.current ?? null);
 
@@ -38,9 +42,13 @@ const TableContainer = ({
       sx={{
         overflow: showNoMatchWarning ? undefined : 'auto',
         height: 'fill-available',
+        ...sx,
       }}
-      date-testid="table-scroll-div-container">
-      <Table stickyHeader date-testid="table-container">
+      data-testid="table-scroll-div-container">
+      <Table
+        stickyHeader
+        data-testid="table-container"
+        sx={{...tableLayoutStyles}}>
         {children}
       </Table>
 

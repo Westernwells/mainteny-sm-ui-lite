@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {Dialog} from 'components/Dialog';
 import {Box, Typography} from '@mui/material';
@@ -7,6 +7,7 @@ import {
   ContractTimeUnit,
   ContractServiceForm,
   ExtendedContractComponentRecord,
+  ContractServiceDeliveryType,
 } from 'models/contract';
 import {theme} from 'theme';
 import {FormikProps, useFormik} from 'formik';
@@ -59,6 +60,7 @@ export const NewContractServices = ({
       materialPercentage: 0,
     },
     isAutomaticJobCycle: false,
+    serviceDeliveryType: ContractServiceDeliveryType.CURRENT,
     elevators:
       data
         ?.map((item) => item.data)
@@ -92,6 +94,14 @@ export const NewContractServices = ({
     validateOnChange: true,
   });
 
+  const isAllElevatorsInvoiceFrequencyAfterJob = useMemo(
+    () =>
+      formikContractServiceComponent.values.elevators.every(
+        (elevator) => elevator.invoiceJob?.timeUnit === ContractTimeUnit.NONE,
+      ),
+    [formikContractServiceComponent.values.elevators],
+  );
+
   useEffect(() => {
     if (data && !formikContractServiceComponent.values.elevators.length) {
       formikContractServiceComponent.setFieldValue(
@@ -117,6 +127,23 @@ export const NewContractServices = ({
 
   const handleCancel = () => {
     setIsDialogOpen(false);
+  };
+
+  const shouldDisableSaveBtn = () => {
+    if (Object.keys(formikContractServiceComponent.errors).length > 0)
+      return true;
+
+    const {values} = formikContractServiceComponent;
+
+    if (!isAllElevatorsInvoiceFrequencyAfterJob && !values.serviceDeliveryType)
+      return true;
+
+    if (values.isAutomaticJobCycle) {
+      if (!values.firstOrderDate) return true;
+      if (!values.orderType) return true;
+    }
+
+    return false;
   };
 
   useEffect(() => {
@@ -203,13 +230,7 @@ export const NewContractServices = ({
           open: isDialogOpen || false,
           maxWidth: 'lg',
         }}
-        disableSaveBtn={
-          !!Object.keys(formikContractServiceComponent.errors).length ||
-          (formikContractServiceComponent.values.isAutomaticJobCycle &&
-            !formikContractServiceComponent.values.firstOrderDate) ||
-          (formikContractServiceComponent.values.isAutomaticJobCycle &&
-            !formikContractServiceComponent.values.orderType)
-        }
+        disableSaveBtn={shouldDisableSaveBtn()}
         saveButtonText={isEditForm ? t('Save') : t('Add Service')}
         onSave={() => {
           const existingComponentIndex = formik.values.components.findIndex(

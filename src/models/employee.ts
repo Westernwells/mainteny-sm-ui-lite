@@ -1,7 +1,11 @@
-import {Shift} from 'pages/NewEmployee/model';
-import {Address, DataEditingScope, Meta} from './misc';
+import {Address, AddressRecord, DataEditingScope, Meta} from './misc';
 import {ServiceOrderType} from './service-order';
-import {Role, UserAccountView} from './user';
+import {
+  CreateUserAccountData,
+  Role,
+  UserAccountSimpleView,
+  UserAccountView,
+} from './user';
 import {AvailabilityType} from './availability';
 import {Order} from './pagination';
 
@@ -19,8 +23,21 @@ export interface UserQueryParams {
 
 export interface EmployeeAdditionalInfo {
   leftVacationDays: number;
-  assignedServiceOrderTypes?: ServiceOrderType[];
+  assignedServiceOrderTypes?: string[];
   totalYearlyVacationDaysAllowed?: number;
+}
+
+export enum TimeWindowType {
+  MONDAY = 'MONDAY',
+  TUESDAY = 'TUESDAY',
+  WEDNESDAY = 'WEDNESDAY',
+  THURSDAY = 'THURSDAY',
+  FRIDAY = 'FRIDAY',
+  SATURDAY = 'SATURDAY',
+  SUNDAY = 'SUNDAY',
+  WEEKDAY = 'WEEKDAY',
+  WEEKEND = 'WEEKEND',
+  PUBLIC_HOLIDAY = 'PUBLIC_HOLIDAY',
 }
 
 export interface EmployeesView {
@@ -29,7 +46,7 @@ export interface EmployeesView {
   externalId: string;
   team: string;
   address: Address;
-  workingHours: EmployeeTimeWindowView[];
+  workingHours: TimeWindowRecord[];
   userAccount: UserAccountView;
   isOnline: boolean;
   additionalInfo: EmployeeAdditionalInfo;
@@ -37,19 +54,13 @@ export interface EmployeesView {
   online: boolean;
 }
 
-export interface EmployeeTimeWindowView {
-  id: string;
-  employeeId: string;
+export type TimeWindowRecord = {
   fromTime: string;
   toTime: string;
+  breakFromTime?: string;
+  breakToTime?: string;
   type: TimeWindowType;
-}
-
-export enum TimeWindowType {
-  WEEKDAY = 'WEEKDAY',
-  WEEKEND = 'WEEKEND',
-  PUBLIC_HOLIDAY = 'PUBLIC_HOLIDAY',
-}
+};
 
 export enum EmployeeStatus {
   SICK_LEAVE = 'SICK_LEAVE',
@@ -65,14 +76,29 @@ export interface EmployeeStatusView {
 }
 
 export interface EmployeesSimpleView {
-  additionalInfo: EmployeeAdditionalInfo;
-  address: Address;
   id: string;
-  isOnline: boolean;
-  meta: Meta;
-  userAccount: UserAccountView;
-  online: boolean;
+  number: string;
   externalId: string;
+  team: string;
+  address: Address;
+  userAccount: UserAccountSimpleView;
+  isOnline?: boolean;
+  additionalInfo: EmployeeAdditionalInfo;
+  meta: Meta;
+  online?: boolean;
+}
+
+export interface ServiceOrderEmployeeView {
+  id: string;
+  number: string;
+  externalId: string;
+  team: string;
+  address: Address;
+  userAccount: UserAccountSimpleView;
+  isOnline?: boolean;
+  additionalInfo: EmployeeAdditionalInfo;
+  meta: Meta;
+  online?: boolean;
 }
 
 export interface BasicEmployeeFormModel {
@@ -99,7 +125,6 @@ export interface RoleEmployeeFormModel {
 
 export interface AdditionalInformationEmployeeFormModel {
   serviceOrderTypes: string[];
-  shifts: Shift<string>[];
 }
 
 export interface CredentialEmployeeFormModel {
@@ -203,8 +228,46 @@ export interface SignatureContent {
   images: string[];
   html: string;
 }
+
 export interface CreateEmailSignatureRecord {
   name: string;
   content: SignatureContent;
   enabled?: boolean;
 }
+
+export type Shift = {
+  fromTime: string;
+  toTime: string;
+};
+
+export type ShiftEntry = {
+  firstShift: Shift;
+  secondShift?: Shift;
+};
+
+export type ShiftForm = Record<TimeWindowType, ShiftEntry>;
+
+export type CreateEmployeeAccountData = Partial<CreateUserAccountData> & {
+  phone: string;
+  roles: string[];
+  address: AddressRecord | null;
+  employeeId: string;
+  shifts?: ShiftForm;
+  team?: string;
+  totalYearlyVacationDaysAllowed?: number;
+};
+
+export type EmployeeAccountData = Partial<CreateUserAccountData> & {
+  employeeId: string;
+  team?: string;
+  email: string;
+  phone: string;
+  roles: string[];
+  serviceOrderTypes?: string[];
+  addressFullName?: string | false;
+  address?: AddressRecord | null;
+  firstName?: string;
+  lastName?: string;
+  totalYearlyVacationDaysAllowed?: number;
+  shifts: ShiftForm;
+};

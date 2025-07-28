@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
@@ -13,12 +13,14 @@ import {FormLabel} from 'components/form/FormLabel';
 import {
   useCompleteServiceOrder,
   useSendWorkReport,
+  useServiceOrderSubItems,
   useUpdateServiceOrderReport,
 } from 'hooks/reactQuery/useServiceOrder';
 import {
   CompleteServiceOrder,
   ServiceOrderArticleView,
   ServiceOrderReportView,
+  ServiceOrderSubArticleRecord,
   ServiceOrderView,
 } from 'models/service-order';
 import {PageCard} from 'components/PageCard';
@@ -31,11 +33,12 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {
-  articleViewToArticleRecord,
   calculateTotalBillableHours,
   convertTimeSlotDatesToRestDateTime,
+  formatServiceOrderArticles,
   getJobTypeGivenName,
   getSignatureKeys,
+  serviceOrderItemToServiceOrderItemRecord,
 } from 'utils/service-order-utils';
 import {convertDigitalMinsToHM} from 'utils/datetime';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -58,7 +61,6 @@ import {
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {EmailRecord, PdfGenerationStatus, ReportStatus} from 'models/misc';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {IconButton, InputAdornment} from '@mui/material';
@@ -81,6 +83,12 @@ import {companyLanguageContextMap} from 'utils/language';
 import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmationModal';
 import {Confirm} from 'components/Confirm';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {FileWithPreview} from 'models/files';
+import {useCurrentCurrency} from 'utils/currency';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
+import {useAttachments} from 'hooks/reactQuery/useAttachment';
+import {ATTACHMENT_LIMIT, AttachmentEntityType} from 'models/attachment';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -104,10 +112,14 @@ const validationSchema = Yup.object().shape({
 });
 
 export const WorkReport = ({serviceOrder}: Props) => {
+  const currentCurrency = useCurrentCurrency();
   const {t} = useTranslation();
   const {user} = useUserSession();
   const [queryParams, setQueryParams] = useSearchParams();
   const isEditMode = queryParams.get('edit') === '1';
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
@@ -125,6 +137,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
   // Combine jobTypes and the filtered oldJobTypes
   const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
 
+  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [articles, setArticles] = useState<ServiceOrderArticleView[]>([]);
   const [report, setReport] = useState<ServiceOrderReportView | undefined>(
     serviceOrder?.reports?.[0],
@@ -141,6 +154,23 @@ export const WorkReport = ({serviceOrder}: Props) => {
     .filter((item) => !!item.technician)
     .find((s) => s.technician!.id === report?.technicianId);
 
+  const {data: serviceOrderSubItems} = useServiceOrderSubItems(serviceOrder.id);
+
+  const subItemsMap = useMemo(
+    () =>
+      Object.entries(serviceOrderSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, ServiceOrderSubArticleRecord[]>,
+      ),
+    [serviceOrderSubItems],
+  );
+
   const {data: fetchedTechnician} = useGetTechniciansByEmployeeId(
     report?.technicianId || '',
   );
@@ -154,7 +184,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
     (r) => r.externalId === report?.externalId,
   );
 
-  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: sendWorkReport, isLoading: sendingWorkReport} =
     useSendWorkReport();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
@@ -170,10 +199,29 @@ export const WorkReport = ({serviceOrder}: Props) => {
     {enabled: !!report?.signatures?.length},
   );
 
-  const {data: imageDownloadUrls = {}} = useDownloadUrl(
-    report?.attachments?.map((item) => item.fileResource.uri) ?? [],
-    {enabled: true},
+  const {data: filesResource} = useAttachments(
+    {
+      entityType: AttachmentEntityType.SERVICE_ORDER_REPORT,
+      entityId: serviceOrder.id,
+      isNested: true,
+      isFolder: false,
+      pageSize: ATTACHMENT_LIMIT,
+    },
+    {
+      enabled: !report?.attachments,
+    },
   );
+
+  const filesToDownload = report?.attachments
+    ? report?.attachments?.map((item) => item.fileResource.uri)
+    : filesResource?.data.reduce((acc, attachment) => {
+        if (attachment.uri) return [...acc, attachment.uri];
+        return acc;
+      }, [] as string[]) || [];
+
+  const {data: imageDownloadUrls = {}} = useDownloadUrl(filesToDownload, {
+    enabled: true,
+  });
 
   const technicianSignatureImage = useFetchAndConvertImage(
     downloadUrls[signatureKeys.TECHNICIAN],
@@ -256,7 +304,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
       <WorkReportTemplate
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
-        selectedLng={company?.language}
         translate={translate}
         serviceOrder={serviceOrder}
         report={report}
@@ -269,6 +316,9 @@ export const WorkReport = ({serviceOrder}: Props) => {
         footerInfo={footerInfo}
         technicianName={technicianName}
         serviceOrderType={getJobTypeGivenName(serviceOrder.type, allJobTypes)}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -487,7 +537,10 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
   const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
     initialValues: {
-      articles: articleViewToArticleRecord(articles),
+      articles:
+        articles?.map((item) =>
+          serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
+        ) ?? [],
       description: report?.description ?? '',
       startTime: serviceOrder?.actualStartTime,
       endTime: serviceOrder?.actualEndTime,
@@ -505,12 +558,18 @@ export const WorkReport = ({serviceOrder}: Props) => {
       },
       showTime: report?.additionalInfo.showTime ?? true,
       showHours: report?.additionalInfo.showHours ?? true,
+      customerName: report?.additionalInfo.customerName ?? '',
     },
     onSubmit: (values) => {
       const body = {
         technicianId: report?.technicianId,
         description: values.description,
-        articles: articleViewToArticleRecord(articles),
+        articles: formatServiceOrderArticles(
+          articles?.map((item) =>
+            serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
+          ),
+          currentCurrency,
+        ),
         serviceTime: calculateTotalBillableHours([values.workTimeRecord!]),
         travelTime: calculateTotalBillableHours([values.travelTimeRecord!]),
         onlyShowTotalTime: values.onlyShowTotalTime,
@@ -522,6 +581,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         ),
         showHours: values.showHours,
         showTime: values.showTime,
+        customerName: values.customerName,
       };
 
       const updatedReport: CompleteServiceOrder = {
@@ -558,6 +618,11 @@ export const WorkReport = ({serviceOrder}: Props) => {
     validationSchema,
   });
 
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    formik.values.description || '',
+  );
+
   const [openTextBlockDialog, setOpenTextBlockDialog] =
     useState<boolean>(false);
   const [activeSubDialog, setActiveSubDialog] = useState<
@@ -588,12 +653,15 @@ export const WorkReport = ({serviceOrder}: Props) => {
     if (report) {
       let temp: ServiceOrderArticleView[] = [];
       if ('articles' in serviceOrder) {
-        temp = serviceOrder.articles;
+        temp = serviceOrder.articles ?? [];
       }
       setArticles(temp);
       formik.resetForm({
         values: {
-          articles: articleViewToArticleRecord(temp),
+          articles:
+            articles?.map((item) =>
+              serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
+            ) ?? [],
           description: report?.description ?? '',
           startTime: serviceOrder?.actualStartTime,
           endTime: serviceOrder?.actualEndTime,
@@ -688,7 +756,12 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
   useEffect(() => {
     if (articles.length) {
-      formik.setFieldValue('articles', articleViewToArticleRecord(articles));
+      formik.setFieldValue(
+        'articles',
+        articles?.map((item) =>
+          serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
+        ) ?? [],
+      );
     }
   }, [articles]);
 
@@ -832,6 +905,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
           items={articles}
           setItems={setArticles}
           isEdit={isEditMode || false}
+          propertyOwnerId={serviceOrder?.elevator?.propertyOwner?.id}
         />
 
         <Box mt="1em">
@@ -847,6 +921,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
         <Box mt="1em">
           <RichTextField
+            key={report?.id}
             label="Description of Service"
             html={formik.values.description || ''}
             updateHtml={(h) => formik.setFieldValue('description', h)}
@@ -880,6 +955,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
             <Signature
               name={serviceOrder.elevator.propertyOwner.name}
               designation="Customer"
+              formik={formik}
+              disabled={!isEditMode}
               url={downloadUrls[signatureKeys.CUSTOMER]}
             />
             <Signature
@@ -984,7 +1061,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
           serviceOrder.elevator.propertyOwner?.contact.email
         }
         subject=""
-        content={formik.values.description}
+        content={emailBody}
         callback={(emailRecord) => onSubmitHandler(emailRecord)}
         activeSignature={activeSignature}
         onSignatureSelect={(signature) => setActiveSignature(signature)}

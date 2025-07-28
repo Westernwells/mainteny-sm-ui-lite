@@ -22,6 +22,7 @@ export interface Props {
   disabledHeader?: boolean;
   handleAction?: () => void;
   testId?: string;
+  headerAction?: JSX.Element;
 }
 
 export const InfoCard = ({
@@ -37,10 +38,19 @@ export const InfoCard = ({
   showHeaderBackground,
   disabledHeader = false,
   handleAction,
+  headerAction,
   testId,
 }: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
+
+  const headerActionIconComponent = headerActionIcon ? (
+    <IconButton data-test-id={testId} onClick={handleAction}>
+      {headerActionIcon}
+    </IconButton>
+  ) : null;
+  const headerActionComponent = headerAction ?? headerActionIconComponent;
+
   return (
     <Card
       sx={{
@@ -62,13 +72,7 @@ export const InfoCard = ({
               : null,
             ...headerStyles,
           }}
-          action={
-            headerActionIcon ? (
-              <IconButton data-test-id={testId} onClick={handleAction}>
-                {headerActionIcon}
-              </IconButton>
-            ) : null
-          }
+          action={headerActionComponent}
           title={
             <Grid container gap={headerIcon && '0.5rem'} alignItems="center">
               {headerIcon || null}

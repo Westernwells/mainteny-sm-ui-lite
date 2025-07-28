@@ -1,33 +1,33 @@
-import {useContext, useLayoutEffect, useMemo, useState} from 'react';
-import {useNavigate, useParams} from 'react-router';
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
-import PaymentsIcon from '@mui/icons-material/Payments';
-import GraphicEqIcon from '@mui/icons-material/GraphicEq';
-import ListIcon from '@mui/icons-material/ListAlt';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import SettingsIcon from '@mui/icons-material/Settings';
-import Invoices from 'pages/Invoices';
-import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab';
-import {Confirm} from 'components/Confirm';
-import {LanguageContext} from 'context/LanguageProvider';
-import {useTranslation} from 'react-i18next';
-import {useDeleteElevator} from 'hooks/reactQuery/useElevator';
-import {theme} from 'theme';
-import Box from '@mui/material/Box';
-import {Button} from '@mui/material';
-import {serviceOrderTypeToString} from 'utils/service-order-utils';
-import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
+import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import PaymentsIcon from '@mui/icons-material/Payments';
+import SettingsIcon from '@mui/icons-material/Settings';
+import RuleOutlinedIcon from '@mui/icons-material/RuleOutlined';
+import {Button} from '@mui/material';
+import Box from '@mui/material/Box';
+import {Confirm} from 'components/Confirm';
+import {Tabs} from 'components/Tab';
+import {TabsBody} from 'components/TabsBody';
+import {LanguageContext} from 'context/LanguageProvider';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useDeleteElevator, useElevatorById} from 'hooks/reactQuery/useElevator';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import Invoices from 'pages/Invoices';
 import {iconMapping} from 'pages/ServiceOrders';
-import {OverviewTab} from './Tabs/OverviewTab';
-import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
-import {TodosTab} from './Tabs/TodosTab';
-import {PerformanceTab} from './Tabs/PerformanceTab';
+import {useContext, useLayoutEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {useNavigate, useParams} from 'react-router';
+import {theme} from 'theme';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import UnitNotes from './Notes';
+import {OverviewTab} from './Tabs/OverviewTab';
+import {PerformanceTab} from './Tabs/PerformanceTab';
+import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 import TechnicalDataTab from './Tabs/TechnicalDataTab';
+import TasksTab from './Tabs/TasksTab';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -55,8 +55,8 @@ const tabItems = [
     icon: <GraphicEqIcon />,
   },
   {
-    label: "To-Do's",
-    icon: <ListIcon />,
+    label: 'Tasks',
+    icon: <RuleOutlinedIcon />,
   },
 ];
 
@@ -66,12 +66,14 @@ enum TabIndex {
   SERVICE_HISTORY = 2,
   INVOICE_HISTORY = 3,
   PERFORMANCE = 4,
-  TODOS = 5,
+  TASKS = 5,
 }
 
 export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
   const [value, setValue] = useState<TabIndex>(TabIndex.OVERVIEW);
   const {id: elevatorId} = useParams();
+
+  const {data: elevator} = useElevatorById(elevatorId);
   const {t} = useTranslation();
   const {user} = useUserSession();
   const {data: jobTypes, isLoading: loading} = useCompanyJobTypes(
@@ -108,7 +110,11 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
             : t(serviceOrderTypeToString(jobType?.givenName!)),
         action: () =>
           track(() => {
-            navigate(`/orders/new?type=${encodeURIComponent(jobType.name)}`);
+            navigate(
+              `/orders/new?type=${encodeURIComponent(
+                jobType.name,
+              )}&elevatorId=${elevatorId}`,
+            );
           }),
         icon: <IconComponent fontSize="small" />,
       };
@@ -127,7 +133,8 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
         currentIndex={value}
         onChange={(index) => setValue(index)}
         containerStyles={{
-          marginBottom: theme.spacing(8),
+          marginBottom:
+            value === TabIndex.TASKS ? theme.spacing(4) : theme.spacing(8),
           '& > div:first-of-type': {marginBottom: theme.spacing(2)},
         }}>
         <TabsBody value={value} index={TabIndex.OVERVIEW}>
@@ -143,15 +150,28 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
         </TabsBody>
 
         <TabsBody value={value} index={TabIndex.INVOICE_HISTORY}>
-          <Invoices elevatorId={elevatorId} />
+          <Invoices
+            elevatorId={elevatorId}
+            customerId={elevator?.propertyOwner.id}
+            elevatorExternalId={elevator?.externalId}
+          />
         </TabsBody>
 
         <TabsBody value={value} index={TabIndex.PERFORMANCE}>
           <PerformanceTab />
         </TabsBody>
 
-        <TabsBody value={value} index={TabIndex.TODOS}>
-          <TodosTab />
+        <TabsBody
+          containerStyle={{
+            height: '1px',
+            overflow: 'auto',
+            marginTop: 1,
+            backgroundColor: 'white',
+            padding: 3,
+          }}
+          value={value}
+          index={TabIndex.TASKS}>
+          <TasksTab elevatorId={elevatorId!} />
         </TabsBody>
         <Box
           sx={{

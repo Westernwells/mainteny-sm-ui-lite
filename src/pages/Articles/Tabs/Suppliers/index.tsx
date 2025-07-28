@@ -1,6 +1,6 @@
 import {Box} from '@mui/system';
 import {useNavigate} from 'react-router-dom';
-import React, {useEffect, useMemo, useRef} from 'react';
+import {useMemo, useRef} from 'react';
 import {useQueryState} from 'hooks/useQueryState';
 import {createEmptyResource, makePage, toggleOrder} from 'utils/paging';
 import {ELEMENTS_PER_PAGE_OPTIONS, OrderByParams} from 'models/pagination';
@@ -132,15 +132,6 @@ const Suppliers = () => {
     {keepPreviousData: true},
   );
 
-  useEffect(() => {
-    if (
-      articleSupplierResource.total > 0 &&
-      articleSupplierResource.data.length === 0
-    ) {
-      setPage({...page, pageIndex: 0});
-    }
-  }, [search]);
-
   const rows = useMemo(
     () => aggregateSupplierRow(articleSupplierResource.data),
     [articleSupplierResource],
@@ -216,7 +207,13 @@ const Suppliers = () => {
         <SearchInput
           refInput={textInput}
           defaultValue={search}
-          onChange={(val: string) => setSearch(val)}
+          onChange={(val: string) => {
+            setPage({
+              ...page,
+              pageIndex: 0,
+            });
+            setSearch(val);
+          }}
         />
 
         <AddButton label="New Supplier" onClick={handleNewSupplierClick} />

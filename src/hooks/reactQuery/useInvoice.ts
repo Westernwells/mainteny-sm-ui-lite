@@ -36,6 +36,7 @@ import {
   InvoicePaymentRecord,
   InvoiceStatistics,
   InvoiceStatus,
+  InvoiceSubItemRecord,
   InvoiceView,
   PrintInvoiceRecord,
   QueryCancelInvoiceParams,
@@ -229,6 +230,7 @@ export const useSendInvoice = ({
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
         queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+        queryClient.invalidateQueries([qk.fetchServiceOrderInvoices]);
         enqueueSnackbar(`Invoice sent successfully`, {
           variant: 'success',
         });
@@ -346,6 +348,8 @@ export const useAddInvoicePayment = (disableNavigate = false) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
         queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+        queryClient.invalidateQueries([qk.getServiceOrderDetails]);
+        queryClient.invalidateQueries([qk.fetchServiceOrderInvoices]);
         enqueueSnackbar(`Invoice marked as paid!`, {
           variant: 'success',
         });
@@ -404,6 +408,8 @@ export const useUpdateInvoice = () => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
         queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+        queryClient.invalidateQueries([qk.getServiceOrderDetails]);
+        queryClient.invalidateQueries([qk.fetchServiceOrderInvoices]);
         enqueueSnackbar(`Invoice updated successfully`, {
           variant: 'success',
         });
@@ -778,6 +784,8 @@ export const useCancelInvoice = ({
         queryClient.invalidateQueries([qk.invoiceById]);
         queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
         queryClient.invalidateQueries([qk.fetchInvoiceStatistics]);
+        queryClient.invalidateQueries([qk.getServiceOrderDetails]);
+        queryClient.invalidateQueries([qk.fetchServiceOrderInvoices]);
         if (!disableNavigate) navigate(`/invoices/`);
       },
       onError: (err) => {
@@ -788,16 +796,23 @@ export const useCancelInvoice = ({
 };
 
 export const fetchInvoiceAmountDetail = async (invoiceId: string) => {
-  const response = await axiosClient.get(`/api/invoices/${invoiceId}/amount/`);
+  const response = await axiosClient.get(`/api/invoices/${invoiceId}/amount`);
   return response.data;
 };
 
-export function useInvoiceAmountDetail(invoiceId?: string) {
-  return useQuery(
+export function useInvoiceAmountDetailQuery(
+  invoiceId?: string,
+  options: UseQueryOptions<any, any, any> = {},
+) {
+  const {enabled: userEnabled, ...restOptions} = options;
+  const enabled = (userEnabled ?? true) && Boolean(invoiceId);
+
+  return useQuery<InvoiceAmountDetail, RestError, InvoiceAmountDetail>(
     [qk.invoiceAmountById, invoiceId],
     () => fetchInvoiceAmountDetail(invoiceId!),
     {
-      enabled: !!invoiceId,
+      enabled,
+      ...restOptions,
     },
   );
 }
@@ -900,7 +915,28 @@ export const postInvoiceAmount = async (body: CalculateInvoiceAmountRecord) => {
   return data;
 };
 
-export const useCalculateInvoiceAmount = () =>
+export const useRecalculateInvoiceAmount = () =>
   useMutation(({data}: {data: CalculateInvoiceAmountRecord}) =>
     postInvoiceAmount(data),
   );
+
+export const fetchInvoiceSubItems = async (invoiceId: string) => {
+  const response = await axiosClient.get<
+    Record<string, InvoiceSubItemRecord[]>
+  >(`/api/invoices/${invoiceId}/subItems`);
+  return response.data;
+};
+
+export function useInvoiceSubItems(
+  invoiceId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<
+    Record<string, InvoiceSubItemRecord[]>,
+    RestError,
+    Record<string, InvoiceSubItemRecord[]>
+  >([qk.invoiceSubItem, invoiceId], () => fetchInvoiceSubItems(invoiceId!), {
+    enabled: !!invoiceId,
+    ...options,
+  });
+}

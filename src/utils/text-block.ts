@@ -5,6 +5,7 @@ import {
 } from 'models/text-block';
 import {getPlainStringFromHtml} from 'utils/rich-field-string';
 import {getByteSize} from 'utils/string';
+import DOMPurify from 'dompurify';
 
 export const mapJsonToTextBlockView = (json: any): TextBlockView => ({
   id: json.id,
@@ -80,6 +81,14 @@ export const stripHtmlTags = (html: string): string => {
 
   // Replace consecutive spaces with a single space
   return textContent.replace(/\s+/g, ' ').trim();
+};
+
+export const stripHTMLTagsLight = (html?: string) => {
+  if (!html) {
+    return '';
+  }
+
+  return html.replace(/<\/?[^>]+(>|$)/g, '');
 };
 
 export const cleanHtmlContent = (
@@ -215,58 +224,35 @@ export const isFileSizeValid = (text?: string) => {
   return getByteSize(text) <= TEXT_BLOCK_MEMORY_SIZE_UPPER_LIMIT;
 };
 
-export const rebuildSignatureKeepingUserContent = (
-  emailContent: string,
-  cleanedSignatureImageCid: string,
-): string => {
-  // Detect LAST table in content assuming it's the signature
-  const lastTableRegex = /<table[\s\S]*?<\/table>/gi;
-  const tables = [...emailContent.matchAll(lastTableRegex)];
-  const lastTableMatch = tables.length ? tables[tables.length - 1][0] : null;
+// This function takes a chunk of (already-sanitized) HTML and “collapse” any paragraph (<p>) whose only content is a single <span> containing a non-breaking space (&nbsp;)
+export const collapseNBSPParagraphs = (rawHtml: string): string => {
+  const container = document.createElement('div');
+  container.innerHTML = rawHtml;
 
-  if (!lastTableMatch) {
-    // No table found, return content as-is
-    return emailContent.trim();
-  }
+  container.querySelectorAll('p').forEach((p) => {
+    if (p.children.length === 1 && p.firstElementChild?.tagName === 'SPAN') {
+      const span = p.firstElementChild as HTMLElement;
 
-  // Extract content of the last <td> (user's content)
-  const tdContentRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
-  const tdMatches = [...lastTableMatch.matchAll(tdContentRegex)];
-  const userContentMatch = tdMatches.length
-    ? tdMatches[tdMatches.length - 1][1].trim()
-    : null;
+      if (span.textContent === '\u00A0') {
+        p.style.margin = '0';
+        p.style.padding = '0';
+        p.style.lineHeight = '0';
+        p.style.overflow = 'hidden';
+      }
+    }
+  });
 
-  if (!userContentMatch || userContentMatch === '&nbsp;') {
-    // User cleared signature content, remove entire table
-    return emailContent.replace(lastTableMatch, '').trim();
-  }
-
-  // ---- Build Standard Signature Layout using extracted user content ----
-  const rebuiltSignature = `
-    <table data-signature="true" style="border-collapse: separate; width: 100%; table-layout: fixed; border-spacing: 0 50px">
-      <tr style="width: 100%; padding-right: 1em;">
-        <td style="width: 88px; vertical-align: top; padding-right: 16px;">
-          <!--[if mso]>
-          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
-            style="height:88px; width:88px; v-text-anchor:middle;" arcsize="50%" strokecolor="none" fill="t">
-            <v:fill src="${cleanedSignatureImageCid}" type="frame" />
-            <w:wrap type="none" />
-          </v:roundrect>
-          <![endif]-->
-          <!--[if !mso]><!-- -->
-          <img src="${cleanedSignatureImageCid}" 
-            alt="Signature Image"
-            style="width: 88px; height: 88px; max-height: 88px; border-radius: 50%; object-fit: cover; display: block;" />
-          <!--<![endif]-->
-        </td>
-        <td class="html-content" style="vertical-align: top; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #000; width: 100%;">
-          ${userContentMatch}
-        </td>
-      </tr>
-    </table>`.trim();
-
-  // Replace original table with cleaned one
-  return emailContent
-    .replace(lastTableMatch, `<br />${rebuiltSignature}`)
-    .trim();
+  return container.innerHTML;
 };
+
+// check if a test has html
+export const isHTML = (str: string) => /<\/?[a-z][\s\S]*>/i.test(str);
+
+export const plainTextToParagraphs = (str: string) =>
+  str
+    .split(/\r?\n/)
+    .map((line) => {
+      if (!line.trim()) return '<p><br/></p>';
+      return `<p>${DOMPurify.sanitize(line)}</p>`;
+    })
+    .join('');

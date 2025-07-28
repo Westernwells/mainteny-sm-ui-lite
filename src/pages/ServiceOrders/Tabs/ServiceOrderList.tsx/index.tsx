@@ -26,9 +26,9 @@ import {
 import {createEmptyResource, makePage, toggleOrder} from 'utils/paging';
 import {
   useAllJobs,
-  useServiceOrderComments,
   useServiceOrders,
   useServiceOrdersStatistics,
+  useUpdateServiceOrder,
 } from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
 import {useNavigate} from 'react-router-dom';
@@ -57,6 +57,7 @@ import {
   createSearchQuery,
   filterServiceOrderTypes,
   getJobTypeGivenName,
+  getServiceOrderDateParts,
   getServiceOrderStatusColor,
   serviceOrderPaymentStatusToString,
   serviceOrderStatusToString,
@@ -104,6 +105,14 @@ import {
 } from 'utils/filter';
 import TableCellTextWithTooltip from 'components/Table/TableCellTextWithTooltip';
 import {convertPropertyOwnerObjectToAvatar} from 'utils/account-utils';
+import {useComments} from 'hooks/reactQuery/useComment';
+import {
+  CommentCategory,
+  CommentType,
+  QueryCommentsParams,
+} from 'models/comment';
+import TagCell from 'components/Tag/TagCell';
+import {TagEntityType, TagRecord} from 'models/tag';
 import Actions from './Actions';
 
 const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] =
@@ -332,6 +341,10 @@ export const ServiceOrderList = ({menu}: Props) => {
     },
   );
 
+  const {mutate: updateServiceOrder} = useUpdateServiceOrder(
+    'Service Job updated successfully.',
+  );
+
   const filteredJobTypes = useMemo(
     () =>
       filterServiceOrderTypes({
@@ -365,21 +378,36 @@ export const ServiceOrderList = ({menu}: Props) => {
     },
   );
 
-  const {data: notes} = useServiceOrderComments(
-    hoverNoteServiceId ?? '',
+  const {data: allNotes} = useComments(
     {
       pageIndex: 0,
       pageSize: 1,
+      type: CommentType.SERVICE_ORDER_COMMENT,
+      category: CommentCategory.ALL,
+      refId: hoverNoteServiceId ?? '',
     },
+    {enabled: !!hoverNoteServiceId},
+  );
+  const {data: officeNotes} = useComments(
     {
-      enabled: !!hoverNoteServiceId,
-    },
+      pageIndex: 0,
+      pageSize: 1,
+      type: CommentType.SERVICE_ORDER_COMMENT,
+      category: CommentCategory.OFFICE,
+      refId: hoverNoteServiceId ?? '',
+    } as QueryCommentsParams,
+    {enabled: !!hoverNoteServiceId},
   );
 
-  const fetchedNote = useMemo(() => {
-    if (!hoverNoteServiceId) return undefined;
-    return notes?.data[0];
-  }, [hoverNoteServiceId, notes]);
+  const allNotesCombined = useMemo(
+    () =>
+      [...(allNotes?.data ?? []), ...(officeNotes?.data ?? [])].sort(
+        (a, b) =>
+          new Date(b.meta.createdAt).getTime() -
+          new Date(a.meta.createdAt).getTime(),
+      ),
+    [allNotes, officeNotes],
+  );
 
   totalOrederRef.current =
     totalOrederRef.current || serviceOrdersResource.total;
@@ -473,6 +501,20 @@ export const ServiceOrderList = ({menu}: Props) => {
     ],
   );
 
+  const handleUpdateTags = (serviceOrderId: string) => (tagIds: string[]) => {
+    updateServiceOrder({
+      serviceOrderId,
+      body: {
+        tags: tagIds,
+      },
+    });
+  };
+
+  const handleUpdateServiceOrderTags =
+    (serviceOrderId: string) => (tags: TagRecord[]) => {
+      handleUpdateTags(serviceOrderId)(tags.map((tag) => tag.id));
+    };
+
   const {emptyTable, noMatchingData} = useMemo(() => {
     if (!isFetched) return {emptyTable: false, noMatchingData: false};
 
@@ -545,7 +587,7 @@ export const ServiceOrderList = ({menu}: Props) => {
           serviceOrderTypeToString(
             getJobTypeGivenName(serviceOrder?.type, jobTypes),
           ) === '-'
-            ? getJobTypeGivenName(serviceOrder?.type, jobTypes)
+            ? t(getJobTypeGivenName(serviceOrder?.type, jobTypes))
             : t(
                 serviceOrderTypeToString(
                   getJobTypeGivenName(serviceOrder?.type, jobTypes),
@@ -561,7 +603,7 @@ export const ServiceOrderList = ({menu}: Props) => {
               {serviceOrderTypeToString(
                 getJobTypeGivenName(serviceOrder.type, allJobTypes),
               ) === '-'
-                ? getJobTypeGivenName(serviceOrder.type, allJobTypes)
+                ? t(getJobTypeGivenName(serviceOrder.type, allJobTypes))
                 : t(
                     serviceOrderTypeToString(
                       getJobTypeGivenName(serviceOrder.type, allJobTypes),
@@ -702,6 +744,29 @@ export const ServiceOrderList = ({menu}: Props) => {
         ),
       },
       {
+        headerName: 'Date',
+        key: 'service-order-cell-date',
+        width: '132px',
+        align: 'center',
+        getExportValue: (serviceOrder) =>
+          formatDate(serviceOrder.lastActivityAt) || '',
+        fieldName: ServiceOrderOrderField.LAST_ACTIVITY_AT,
+        renderCell: (serviceOrder, cellProps) => {
+          const {label, date} = getServiceOrderDateParts(serviceOrder);
+          return (
+            <Cell {...cellProps} align="right" noPadding>
+              <Box display="flex" flexDirection="column" textAlign="right">
+                <Typography variant="body2" color="textSecondary">
+                  {date && label !== '-' ? t(label) : '-'}
+                </Typography>
+                {date && <Typography variant="body2">{date}</Typography>}
+              </Box>
+            </Cell>
+          );
+        },
+      },
+
+      {
         headerName: 'Payment',
         key: 'service-order-cell-payment',
         width: '132px',
@@ -749,6 +814,20 @@ export const ServiceOrderList = ({menu}: Props) => {
         },
       },
       {
+        headerName: 'Tag',
+        key: 'service-order-cell-tag',
+        width: '212px',
+        renderCell: (serviceOrder, cellProps) => (
+          <Cell {...cellProps}>
+            <TagCell
+              tags={serviceOrder.tags || []}
+              entity={TagEntityType.SERVICE_ORDER}
+              onChange={handleUpdateServiceOrderTags(serviceOrder.id)}
+            />
+          </Cell>
+        ),
+      },
+      {
         headerName: 'NOTES',
         key: 'service-order-cell-notes',
         width: NOTES_CELL_WIDTH,
@@ -781,14 +860,14 @@ export const ServiceOrderList = ({menu}: Props) => {
                           letterSpacing: '0.8px',
                           textTransform: 'uppercase',
                         }}>
-                        {formatDate(fetchedNote?.meta.lastUpdatedAt)}
+                        {formatDate(allNotesCombined[0]?.meta.lastUpdatedAt)}
                       </Typography>
                       <Typography
                         sx={{
                           lineHeight: '14px',
                           fontSize: '10px',
                         }}>
-                        {fetchedNote?.content}
+                        {allNotesCombined[0]?.content}
                       </Typography>
                     </Box>
                   }
@@ -819,7 +898,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         ),
       },
     ],
-    [fetchedNote, showLeftShadow, showRightShadow],
+    [allNotesCombined, showLeftShadow, showRightShadow],
   );
 
   const handleSortField = (fieldName: string) => {
@@ -963,16 +1042,16 @@ export const ServiceOrderList = ({menu}: Props) => {
   };
 
   const handleFilterReset = () => {
-    setValue('customer', undefined);
-    setValue('contract', undefined);
-    setValue('technician', undefined);
-    setValue('orderNumber', '');
-    setValue('orderTypes', []);
-    setValue('paymentStatus', []);
-    setValue('grossAmountMin', undefined);
-    setValue('grossAmountMax', undefined);
-    setValue('hasComment', undefined);
-    setValue('isAppointmentRequired', undefined);
+    setSelectedCustomer(undefined);
+    setSelectedContract(undefined);
+    setSelectedTechnicianId(undefined);
+    setSelectedOrderNumber(undefined);
+    setSelectedOrderTypes([]);
+    setSelectedPaymentStatus([]);
+    setGrossAmountMin(undefined);
+    setGrossAmountMax(undefined);
+    setIsWithNote(undefined);
+    setIsWithAppointmentRequired(undefined);
   };
 
   const handleExport = async () => {

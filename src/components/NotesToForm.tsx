@@ -1,7 +1,5 @@
-import React, {FC, Fragment, useRef, useState} from 'react';
+import {Fragment, useRef, useState} from 'react';
 import {useInView} from 'react-intersection-observer';
-import {FormikProps, useFormik} from 'formik';
-import * as Yup from 'yup';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import {EmptySection} from 'components/EmptySection';
@@ -9,7 +7,7 @@ import {FormInput} from 'components/form/FormInput';
 import {Button as LoadingButton} from 'components/LoadingButton';
 import {useTranslation} from 'react-i18next';
 import Divider from '@mui/material/Divider';
-import {InvoiceFormData} from 'models/invoice';
+import {CreateInvoiceComment, InvoiceFormData} from 'models/invoice';
 import Typography from '@mui/material/Typography';
 import {Chip} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
@@ -19,19 +17,20 @@ import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {ConfirmDelete} from 'components/ConfirmDelete';
 import {format} from 'date-fns';
+import {UseFormReturn} from 'react-hook-form';
 
 interface Props {
-  form: FormikProps<InvoiceFormData>;
+  form: UseFormReturn<InvoiceFormData>;
 }
 
-const validationSchema = Yup.object().shape({
-  note: Yup.string().required('Note is required'),
-});
-
-const NotesToForm: FC<Props> = ({form}) => {
+const NotesToForm = ({form}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const {user} = useUserSession();
+
+  const {setValue, watch} = form;
+
+  const watchedNotes = watch('notes');
 
   const [activeNote, setActiveNote] = useState<{
     id?: string;
@@ -41,37 +40,31 @@ const NotesToForm: FC<Props> = ({form}) => {
   const {ref: notesRef} = useInView();
   const formInputRef = useRef<HTMLDivElement>(null);
 
-  const formik = useFormik<{note: string}>({
-    initialValues: {
-      note: '',
-    },
-    validationSchema,
-    onSubmit: (values, {setSubmitting}) => {
-      const note = {
-        content: values.note,
-        subject: '',
-        id: getUniqueId(),
-      };
+  const [noteDraft, setNoteDraft] = useState('');
 
-      if (activeNote.id && activeNote.action === 'edit') {
-        const updatedNotes = form.values.notes?.map((n) =>
-          n.id === activeNote.id ? {...note} : n,
-        );
-        form.setFieldValue('notes', updatedNotes);
-        formik.setValues({note: ''});
-        setActiveNote({id: undefined, action: undefined});
-      } else {
-        form.values.notes?.push(note);
-        form.setFieldValue('notes', form.values.notes);
-        formik.setValues({note: ''});
-      }
-      setSubmitting(false);
-    },
-  });
+  const onSubmit = () => {
+    const newComment: CreateInvoiceComment = {
+      content: noteDraft,
+      subject: '',
+      id: getUniqueId(),
+    };
+
+    if (activeNote.id && activeNote.action === 'edit') {
+      const updatedNotes = watchedNotes?.map((n: CreateInvoiceComment) =>
+        n.id === activeNote.id ? newComment : n,
+      );
+      setValue('notes', updatedNotes);
+      setNoteDraft('');
+      setActiveNote({id: undefined, action: undefined});
+    } else {
+      setValue('notes', [...watchedNotes!, newComment]);
+      setNoteDraft('');
+    }
+  };
 
   return (
     <>
-      {!form.values.notes?.length ? (
+      {!watchedNotes?.length ? (
         <Box
           display="flex"
           alignItems="center"
@@ -86,7 +79,7 @@ const NotesToForm: FC<Props> = ({form}) => {
         </Box>
       ) : (
         <Box sx={{width: '100%'}}>
-          {form.values.notes.map((note) => (
+          {watchedNotes.map((note) => (
             <Fragment key={note.id}>
               <Box ref={notesRef}>
                 <Box
@@ -137,7 +130,7 @@ const NotesToForm: FC<Props> = ({form}) => {
                           onClick={() => {
                             setActiveNote({id: note.id, action: 'edit'});
                             if (activeNote.id === note.id) return;
-                            formik.setValues({note: note.content});
+                            setNoteDraft(note.content);
                           }}>
                           <Edit fontSize="small" />
                         </IconButton>
@@ -172,27 +165,30 @@ const NotesToForm: FC<Props> = ({form}) => {
           bottom: 0,
           p: '1.5rem',
         }}>
-        <form onSubmit={formik.handleSubmit}>
+        <form onSubmit={onSubmit}>
           <FormInput
             fieldProps={{
               label: 'Note message',
               size: 'small',
-              name: 'note',
-              value: formik.values.note,
-              onChange: formik.handleChange,
+              name: 'noteDraft',
+              value: noteDraft,
+              onChange: (e) => {
+                setNoteDraft(e.target.value);
+              },
               multiline: true,
               minRows: 5,
               maxRows: 5,
               inputRef: formInputRef,
             }}
           />
+
           <Box display="flex" justifyContent="flex-end" pt="0.625rem">
             <LoadingButton
               buttonProps={{
                 type: 'submit',
                 size: 'medium',
                 variant: 'contained',
-                disabled: !formik.values.note,
+                disabled: !noteDraft,
               }}>
               {t('Add note')}
             </LoadingButton>
@@ -202,16 +198,16 @@ const NotesToForm: FC<Props> = ({form}) => {
       <ConfirmDelete
         open={activeNote.action === 'delete' && activeNote.id !== ''}
         onConfirm={() => {
-          const updatedData = form.values.notes?.filter(
+          const updatedData = watchedNotes?.filter(
             (n) => n.id !== activeNote.id,
           );
-          form.setFieldValue('notes', updatedData);
+          setValue('notes', updatedData);
           setActiveNote({id: undefined, action: undefined});
-          formik.setValues({note: ''});
+          setNoteDraft('');
         }}
         onClose={() => {
           setActiveNote({id: '', action: undefined});
-          formik.setValues({note: ''});
+          setNoteDraft('');
         }}
       />
     </>

@@ -85,6 +85,9 @@ const useInvoiceMenuActions = ({
         InvoiceStatus.PARTIALLY_PAID,
         InvoiceStatus.EXPIRED,
         InvoiceStatus.CREDITED,
+        InvoiceStatus.OVERDUE_NOTICE_1,
+        InvoiceStatus.OVERDUE_NOTICE_2,
+        InvoiceStatus.OVERDUE_NOTICE_3,
       ].includes(invoice.status)
     ) {
       items.push({
@@ -102,7 +105,11 @@ const useInvoiceMenuActions = ({
         InvoiceStatus.PARTIALLY_PAID,
         InvoiceStatus.EXPIRED,
         InvoiceStatus.PAID,
-      ].includes(invoice.status)
+        InvoiceStatus.OVERDUE_NOTICE_1,
+        InvoiceStatus.OVERDUE_NOTICE_2,
+        InvoiceStatus.OVERDUE_NOTICE_3,
+      ].includes(invoice.status) &&
+      invoice.type !== InvoiceType.CREDIT_NOTE
     ) {
       items.push({
         label: t('Create Credit note'),
@@ -137,14 +144,7 @@ const useInvoiceMenuActions = ({
       });
     }
 
-    if (
-      ![
-        InvoiceStatus.NOT_PAID,
-        InvoiceStatus.EXPIRED,
-        InvoiceStatus.CANCELLED,
-      ].includes(invoice.status) ||
-      !invoice.sentDate
-    ) {
+    if (invoice.status === InvoiceStatus.DRAFT) {
       items.push({
         label: t('Delete'),
         icon: <DeleteIcon />,
@@ -157,10 +157,13 @@ const useInvoiceMenuActions = ({
         InvoiceStatus.NOT_PAID,
         InvoiceStatus.EXPIRED,
         InvoiceStatus.CREDITED,
+        InvoiceStatus.OVERDUE_NOTICE_1,
+        InvoiceStatus.OVERDUE_NOTICE_2,
+        InvoiceStatus.OVERDUE_NOTICE_3,
       ].includes(invoice.status)
     ) {
       items.push({
-        label: t('table_action_option.cancel'), // Cancel
+        label: t('table_action_option.cancel'),
         icon: <CancelIcon />,
         onClick: onCancel,
       });
@@ -175,9 +178,13 @@ const useInvoiceMenuActions = ({
     }
 
     if (
-      [InvoiceStatus.EXPIRED, InvoiceStatus.PARTIALLY_PAID].includes(
-        invoice.status,
-      )
+      [
+        InvoiceStatus.EXPIRED,
+        InvoiceStatus.PARTIALLY_PAID,
+        InvoiceStatus.OVERDUE_NOTICE_1,
+        InvoiceStatus.OVERDUE_NOTICE_2,
+        InvoiceStatus.OVERDUE_NOTICE_3,
+      ].includes(invoice.status)
     ) {
       items.push({
         label: t('Send Overdue Notice'),

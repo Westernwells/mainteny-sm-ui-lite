@@ -1,5 +1,5 @@
 import {Button, MenuItem, Radio} from '@mui/material';
-import {Box} from '@mui/system';
+import {Box, SxProps} from '@mui/system';
 import {useTranslation} from 'react-i18next';
 import {Fragment, useMemo, useRef, useState} from 'react';
 import Menu from '@mui/material/Menu';
@@ -19,6 +19,8 @@ type Props = {
   onChange: (page: number) => void;
   onNumberPerPageChange: (page: number) => void;
   afterPageSelectorComponent?: () => JSX.Element;
+  sx?: SxProps;
+  testId?: string;
 };
 
 const Pagination = ({
@@ -28,6 +30,8 @@ const Pagination = ({
   onChange,
   onNumberPerPageChange,
   afterPageSelectorComponent,
+  sx,
+  testId,
 }: Props) => {
   const {t} = useTranslation();
   const anchorEl = useRef<HTMLButtonElement | null>(null);
@@ -72,10 +76,12 @@ const Pagination = ({
 
   return (
     <Box
+      data-testid={testId}
       sx={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        ...sx,
       }}>
       <Box sx={{display: 'flex', alignItems: 'center'}} gap={2}>
         {t('Show rows per page')}

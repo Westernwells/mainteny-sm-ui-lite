@@ -2,6 +2,7 @@ import {useContext, useLayoutEffect, useMemo} from 'react';
 import {
   useInvoiceActivities,
   useInvoiceDetail,
+  useInvoiceSubItems,
 } from 'hooks/reactQuery/useInvoice';
 import {useCompanyNextNumber} from 'hooks/reactQuery/useCompanies';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
@@ -32,6 +33,13 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
   const {user} = useUserSession();
   const {t} = useTranslation();
   const {data: invoice, isLoading, isFetched} = useInvoiceDetail(invoiceId);
+
+  const {
+    data: invoiceSubItems,
+    isIdle: isInvoiceSubItemsIdle,
+    isLoading: isInvoiceSubItemsLoading,
+  } = useInvoiceSubItems(invoiceId);
+
   const {data: invoiceActivities, isLoading: isLoadingInvoiceActivities} =
     useInvoiceActivities({invoiceId: invoiceId ?? ''});
   const {language} = useContext(LanguageContext);
@@ -184,7 +192,9 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
     isLoadingFooterUrl ||
     isLoadingServiceOrderCheckLists ||
     isLoadingSignatureDownloadUrls ||
-    isChecklistImageLoading
+    isChecklistImageLoading ||
+    isInvoiceSubItemsIdle ||
+    isInvoiceSubItemsLoading
   ) {
     return <Progress />;
   }
@@ -215,6 +225,7 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
       }}
       isLoadingHeaderUrl={isLoadingHeaderUrl}
       isLoadingFooterUrl={isLoadingFooterUrl}
+      invoiceSubItems={invoiceSubItems}
     />
   ) : (
     <EmptySection label="Sorry, we couldn't find the invoice." />

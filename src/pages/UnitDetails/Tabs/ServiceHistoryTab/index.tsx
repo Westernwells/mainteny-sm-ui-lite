@@ -152,7 +152,13 @@ export const ServiceHistoryTab = () => {
       renderWidget={
         <Widget
           searchPlaceholder="Search by number, customer, address etc."
-          getSearchValue={(val: string) => setSearch(val)}
+          getSearchValue={(val: string) => {
+            setPage({
+              ...page,
+              pageIndex: 0,
+            });
+            setSearch(val);
+          }}
           filterItems={renderFilterItems()}
           refInput={textInput}
         />

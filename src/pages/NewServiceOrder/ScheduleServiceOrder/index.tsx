@@ -53,6 +53,7 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
   const [notificationChannels, setNotificationChannels] = useState<
     ContactChannel[]
   >([ContactChannel.PUSH_NOTIFICATION]);
+  const [notes, setNotes] = useState('');
 
   const {contractPONumber} = useMemo(() => {
     const activeContracts =
@@ -172,6 +173,7 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
       ...(requireTechnicianNotification
         ? {confirmationChannels: notificationChannels}
         : {notificationChannels}),
+      comments: notes.trim().length > 0 ? [{content: notes, subject: ''}] : [],
     };
 
     const resp = await createServiceOrder(body);
@@ -256,6 +258,8 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
           <AddDescription
             getDescription={(val) => setDescription(val)}
             initialDescription={description}
+            setNotes={setNotes}
+            notes={notes}
             selectedUnit={selectedUnit!}
             selectedTechnicians={selectedTechnicians}
             selectedDateTimeString={selectedDateTimeString || ''}

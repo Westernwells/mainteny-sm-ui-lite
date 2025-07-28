@@ -1,11 +1,4 @@
-import {
-  Document,
-  Font,
-  Image,
-  StyleSheet,
-  Text,
-  View,
-} from '@react-pdf/renderer';
+import {Document, Image, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
 import {ServiceOrderReportView, ServiceOrderView} from 'models/service-order';
@@ -15,14 +8,13 @@ import {convertMinutesWithRounding} from 'utils/work-hours-utils';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {HeaderFooterInfoData} from 'models/misc';
 import {getServiceCompanyInfo} from 'utils/company-utils';
-import {MinToStep} from 'models/service-company';
+import {MinToStep, ServiceCompanyItem} from 'models/service-company';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {getAddressComponentFromServiceOrder} from 'utils/pdfTemplates';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
+import {isSwissAddress} from 'utils/address';
 import PdfTemplateFooter from './PdfTemplateFooter';
 import PdfTemplateHeader from './PdfTemplateHeader';
 import PdfBodyContainer from './containers/PdfBodyContainer';
@@ -30,41 +22,29 @@ import PdfPageContainer from './containers/PdfPageContainer';
 import PdfPageTitle from './containers/PdfPageTitle';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfUnitAddress from './containers/PdfUnitAddress';
+import PdfEmailContent from './containers/PdfEmailContent';
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
+type StyleProps = {
+  isSwissOffset?: boolean;
+} & PdfConfigurationStyles;
 
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  isSwissOffset = false,
+}: StyleProps) =>
   StyleSheet.create({
     rightAddress: {
       minWidth: 200,
       flex: '0 0 42%',
       display: 'flex',
       flexDirection: 'column',
+      paddingTop: '20px',
+      ...(isSwissOffset && {
+        paddingTop: '50px', // make offset be about 55mm
+        paddingLeft: '6px', // make offset be about 22mm
+      }),
     },
     rightAddressContent: {
       display: 'flex',
@@ -76,12 +56,12 @@ const getStyles = (
     tag: {
       ...boldFontStyle,
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       flex: '0 0 43%',
     },
     tagContent: {
       fontSize: 8.5,
-      color: '#616161',
+      color: primaryColor,
       flex: '0 0 57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -96,7 +76,7 @@ const getStyles = (
       ...boldFontStyle,
     },
     contentBody: {
-      color: '#212121',
+      color: primaryColor,
       fontSize: 10,
       marginBottom: 10,
       lineHeight: 1.3,
@@ -115,13 +95,13 @@ const getStyles = (
       padding: 0,
       lineHeight: 0,
       marginTop: 20,
-      color: '#212121',
+      color: primaryColor,
       ...boldFontStyle,
     },
     sectionBody: {
       fontSize: 10,
       ...regularFontStyle,
-      color: '#616161',
+      color: primaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -139,14 +119,14 @@ const getStyles = (
       width: '100%',
     },
     tableHeading: {
-      color: '#616161',
+      color: primaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
       marginRight: -4,
     },
     tableBodyContent: {
-      color: '#212121',
+      color: primaryColor,
       fontSize: 10,
     },
     tableRow: {
@@ -160,7 +140,7 @@ const getStyles = (
       width: '45%',
       display: 'flex',
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       paddingLeft: 20,
       letterSpacing: -0.15,
       marginTop: 2,
@@ -179,13 +159,14 @@ const getStyles = (
       marginHorizontal: 5,
     },
     imageDescription: {
-      color: '#616161',
+      color: primaryColor,
       marginTop: 10,
     },
     signatureWrapper: {
       display: 'flex',
       justifyContent: 'space-between',
       flexDirection: 'row',
+      marginTop: 20,
     },
   });
 
@@ -195,11 +176,10 @@ type BookedHoursProps = {
   percentageSurcharge?: number;
   type: string;
   technicianName?: string;
-  selectedLng?: string;
   translate: (key: string) => string;
   showTime: boolean;
   showHours: boolean;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const BookedHoursRow = ({
   startTime,
@@ -207,21 +187,19 @@ const BookedHoursRow = ({
   percentageSurcharge,
   type,
   technicianName,
-  selectedLng,
   translate,
   showTime,
   showHours,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: BookedHoursProps) => {
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(boldFontStyle, regularFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   return (
     <View style={styles.tableRow}>
@@ -275,11 +253,11 @@ const BookedHoursRow = ({
 };
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string, options?: {context: string}) => string;
   userInfo?: UserAccount | undefined;
   serviceOrder?: ServiceOrderView;
   report?: ServiceOrderReportView;
-  selectedLng?: string;
   technicianSignatureImage?: string;
   customerSignatureImage?: string;
   workReportPictures: {
@@ -292,14 +270,14 @@ type Props = {
   pdfConfigClientStorage: ClientReportForPDFConfig;
   technicianName: string;
   serviceOrderType: string;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const WorkReportTemplate = React.memo(
   ({
+    serviceCompany,
     userInfo,
     serviceOrder,
     report,
-    selectedLng,
     translate,
     customerSignatureImage,
     technicianSignatureImage,
@@ -311,6 +289,9 @@ const WorkReportTemplate = React.memo(
     pdfConfigClientStorage,
     technicianName,
     serviceOrderType,
+    fontStyles,
+    primaryColor,
+    secondaryColor,
   }: Props) => {
     const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
     const company = userInfo?.serviceCompany;
@@ -319,16 +300,13 @@ const WorkReportTemplate = React.memo(
         (item) => !!workReportPictures[item.fileResource.uri],
       ) ?? [];
 
-    const boldFontStyle = {
-      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-    };
-
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
-
-    const styles = getStyles(boldFontStyle, regularFontStyle);
+    const styles = getStyles({
+      boldFontStyle: fontStyles.bold,
+      regularFontStyle: fontStyles.regular,
+      primaryColor,
+      secondaryColor,
+      isSwissOffset: isSwissAddress(serviceCompany?.businessAddress),
+    });
 
     const elevatorAddress = serviceOrder?.elevator?.address;
 
@@ -347,12 +325,13 @@ const WorkReportTemplate = React.memo(
 
     return (
       <Document>
-        <PdfPageContainer selectedLng={selectedLng}>
+        <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
           <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
+                serviceCompany={serviceCompany}
                 serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={
                   serviceOrder?.elevator?.propertyOwner?.name
@@ -360,10 +339,12 @@ const WorkReportTemplate = React.memo(
                 addressComponent={getAddressComponentFromServiceOrder(
                   serviceOrder,
                 )}
-                selectedLng={selectedLng}
                 translate={translate}
                 customerVATId={customerVATId}
                 eanValue={eanValue}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
               />
 
               <View style={styles.rightAddress}>
@@ -415,25 +396,25 @@ const WorkReportTemplate = React.memo(
                 {userInfo?.contact?.phone &&
                   pdfConfigClientStorage.includeUserPhone && (
                     <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Phone number')}
-                      </Text>
+                      <Text style={styles.tag}>{translate('Phone no.')}</Text>
                       <Text style={styles.tagContent}>
                         {userInfo?.contact?.phone}
                       </Text>
                     </View>
                   )}
-                {userInfo?.contact?.email &&
-                  pdfConfigClientStorage.includeUserEmail && (
-                    <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Email address')}
-                      </Text>
-                      <Text style={styles.tagContent}>
-                        {userInfo?.contact?.email}
-                      </Text>
-                    </View>
-                  )}
+                <PdfEmailContent
+                  email={userInfo?.contact?.email}
+                  includeEmail={pdfConfigClientStorage?.includeUserEmail}
+                  translate={translate}
+                  fontStyles={fontStyles}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
+                  styles={{
+                    container: styles.rightAddressContent,
+                    label: styles.tag,
+                    content: styles.tagContent,
+                  }}
+                />
                 {technicianName && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Engineer')}</Text>
@@ -458,7 +439,7 @@ const WorkReportTemplate = React.memo(
                     pdfConfigClientStorage.includeSerialNumber && (
                       <View style={styles.rightAddressContent}>
                         <Text style={styles.tag}>
-                          {translate('Serial number')}
+                          {translate('Serial no.')}
                         </Text>
                         <Text style={styles.tagContent}>
                           {serviceOrder?.elevator?.serialNumber || '-'}
@@ -469,8 +450,10 @@ const WorkReportTemplate = React.memo(
                   <PdfUnitAddress
                     address={elevatorAddress}
                     translate={translate}
-                    selectedLng={selectedLng}
                     building={unitBuilding}
+                    fontStyles={fontStyles}
+                    primaryColor={primaryColor}
+                    secondaryColor={secondaryColor}
                   />
                 </View>
               </View>
@@ -494,23 +477,24 @@ const WorkReportTemplate = React.memo(
                 </Text>
               </View>
 
-              <PdfPageTitle selectedLng={selectedLng}>
+              <PdfPageTitle fontStyles={fontStyles} primaryColor={primaryColor}>
                 {translate('Work Report')} {report?.number}
               </PdfPageTitle>
 
+              <View minPresenceAhead={86} />
               {report?.description.trim() !== '' && (
                 <HtmlPDF
                   html={report?.description || ''}
-                  selectedLng={selectedLng}
                   rootStyle={{
                     ...styles.contentBody,
                   }}
+                  fontStyles={fontStyles}
                 />
               )}
 
-              <Text style={styles.sectionHeading}>{translate('Hours')} </Text>
-
+              <View minPresenceAhead={86} />
               <View style={styles.table}>
+                <Text style={styles.sectionHeading}>{translate('Hours')} </Text>
                 <View style={styles.tableBody}>
                   <View style={styles.tableRow}>
                     <Text
@@ -569,6 +553,7 @@ const WorkReportTemplate = React.memo(
                       {translate('Engineer')}
                     </Text>
                   </View>
+
                   {report?.additionalInfo.workTimeInfo?.timeSlots.map(
                     (s, index) => (
                       <BookedHoursRow
@@ -590,8 +575,10 @@ const WorkReportTemplate = React.memo(
                         }
                         type="Work"
                         technicianName={technicianName}
-                        selectedLng={selectedLng}
                         translate={translate}
+                        fontStyles={fontStyles}
+                        primaryColor={primaryColor}
+                        secondaryColor={secondaryColor}
                       />
                     ),
                   )}
@@ -617,20 +604,23 @@ const WorkReportTemplate = React.memo(
                         }
                         type="Travel"
                         technicianName={technicianName}
-                        selectedLng={selectedLng}
                         translate={translate}
+                        fontStyles={fontStyles}
+                        primaryColor={primaryColor}
+                        secondaryColor={secondaryColor}
                       />
                     ),
                   )}
                 </View>
               </View>
-
+              <View minPresenceAhead={86} />
               {serviceOrder?.articles.length && (
                 <Text style={styles.sectionHeading}>
                   {translate('Articles')}{' '}
                 </Text>
               )}
 
+              <View minPresenceAhead={86} />
               {serviceOrder?.articles.length && (
                 <View style={styles.tableBody}>
                   <View style={styles.table}>
@@ -695,6 +685,7 @@ const WorkReportTemplate = React.memo(
                               ...styles.tableBodyContent,
                             }}
                             html={articleItem.name || '-'}
+                            fontStyles={fontStyles}
                           />
                           <Text
                             style={{
@@ -719,7 +710,7 @@ const WorkReportTemplate = React.memo(
                               marginLeft: 10,
                               ...styles.tableBodyContent,
                             }}>
-                            {translate(articleItem.article?.unit) || '-'}
+                            {translate(articleItem.article?.unit!) || '-'}
                           </Text>
                         </View>
                       ))}
@@ -727,7 +718,7 @@ const WorkReportTemplate = React.memo(
                   </View>
                 </View>
               )}
-
+              <View minPresenceAhead={86} />
               {filteredPictures.length &&
                 Object.keys(workReportPictures).length && (
                   <View>
@@ -763,94 +754,118 @@ const WorkReportTemplate = React.memo(
                   </View>
                 )}
 
-              <View style={styles.signatureWrapper} wrap={false}>
-                {technicianSignatureImage && (
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      border: '1px solid #E4E9F2',
-                      borderRadius: '8px',
-                      marginTop: 20,
-                      width: 150,
-                      height: 56,
-                      textAlign: 'center',
-                      justifyContent: 'space-around',
-                      position: 'relative',
-                    }}>
-                    <View>
-                      {technicianSignatureImage ? (
-                        <Image
-                          src={technicianSignatureImage}
-                          style={{width: 120, height: 40}}
-                        />
-                      ) : (
-                        <Text>{translate('No Signature')}</Text>
-                      )}
-                    </View>
-                    <View
-                      style={{
-                        position: 'absolute',
-                        bottom: -5,
-                        left: '30%',
-                        width: '40%',
-                        backgroundColor: 'white',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                      <Text>{translate('Engineer')}</Text>
-                    </View>
-                  </View>
-                )}
+              <View minPresenceAhead={86} />
 
-                {customerSignatureImage && (
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      border: '1px solid #E4E9F2',
-                      borderRadius: '8px',
-                      marginTop: 20,
-                      width: 150,
-                      height: 56,
-                      textAlign: 'center',
-                      justifyContent: 'space-around',
-                      position: 'relative',
-                    }}>
-                    <View>
-                      {customerSignatureImage ? (
-                        <Image
-                          src={customerSignatureImage}
-                          style={{width: 120, height: 40}}
-                        />
-                      ) : (
-                        <Text>{translate('No Signature')}</Text>
-                      )}
-                    </View>
+              <View style={styles.signatureWrapper} wrap={false}>
+                <View>
+                  {technicianSignatureImage && (
                     <View
                       style={{
-                        position: 'absolute',
-                        bottom: -5,
-                        left: '30%',
-                        width: '40%',
-                        backgroundColor: 'white',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        border: '1px solid #E4E9F2',
+                        borderRadius: '8px',
+                        width: 150,
+                        height: 56,
+                        textAlign: 'center',
+                        justifyContent: 'space-around',
+                        position: 'relative',
                       }}>
-                      <Text>{translate('Customer')}</Text>
+                      <View>
+                        {technicianSignatureImage ? (
+                          <Image
+                            src={technicianSignatureImage}
+                            style={{width: 120, height: 40}}
+                          />
+                        ) : (
+                          <Text>{translate('No Signature')}</Text>
+                        )}
+                      </View>
+                      <View
+                        style={{
+                          position: 'absolute',
+                          bottom: -5,
+                          left: '30%',
+                          width: '40%',
+                          backgroundColor: 'white',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <Text>{translate('Engineer')}</Text>
+                      </View>
                     </View>
-                  </View>
-                )}
+                  )}
+                </View>
+
+                <View>
+                  {customerSignatureImage && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        border: '1px solid #E4E9F2',
+                        borderRadius: '8px',
+
+                        width: 150,
+                        height: 56,
+                        textAlign: 'center',
+                        justifyContent: 'space-around',
+                        position: 'relative',
+                      }}>
+                      <View>
+                        {customerSignatureImage ? (
+                          <Image
+                            src={customerSignatureImage}
+                            style={{width: 120, height: 40}}
+                          />
+                        ) : (
+                          <Text>{translate('No Signature')}</Text>
+                        )}
+                      </View>
+                      <View
+                        style={{
+                          position: 'absolute',
+                          bottom: -5,
+                          left: '30%',
+                          width: '40%',
+                          backgroundColor: 'white',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <Text>{translate('Customer')}</Text>
+                      </View>
+                    </View>
+                  )}
+                </View>
               </View>
+
+              <View minPresenceAhead={86} />
+              {!!report?.additionalInfo.customerName && (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'flex-end',
+                    width: '100%',
+                  }}>
+                  <View style={{width: 150}}>
+                    <Text style={{marginTop: 10, textAlign: 'center'}}>
+                      {report?.additionalInfo.customerName}
+                    </Text>
+                  </View>
+                </View>
+              )}
             </View>
           </PdfBodyContainer>
 
           <PdfTemplateFooter
             userInfo={userInfo}
-            selectedLng={selectedLng}
             translate={translate}
             footerInfo={footerInfo}
             footerPath={footerPath}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         </PdfPageContainer>
       </Document>

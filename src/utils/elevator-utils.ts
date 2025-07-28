@@ -103,6 +103,8 @@ export const getFrequency = (elevator: ContractElevatorView) => {
         return TimeUnitYearView.TRIENNIALLY;
       case ContractTimeUnit.QUADRENNIALLY:
         return TimeUnitYearView.QUADRENNIALLY;
+      case ContractTimeUnit.EVERY_5_YEARS:
+        return TimeUnitYearView.EVERY_5_YEARS;
       case ContractTimeUnit.NONE:
         return '-';
       default:
@@ -142,6 +144,7 @@ export const getListViewFrequency = (
         case ContractTimeUnit.BIENNIALLY:
         case ContractTimeUnit.TRIENNIALLY:
         case ContractTimeUnit.QUADRENNIALLY:
+        case ContractTimeUnit.EVERY_5_YEARS:
           frequencySet.add(t(TimeUnitYearView[timeUnit]));
           break;
         default:
@@ -181,6 +184,7 @@ export const getViewFrequency = (job?: JobTimeUnit): string => {
     case ContractTimeUnit.BIENNIALLY:
     case ContractTimeUnit.TRIENNIALLY:
     case ContractTimeUnit.QUADRENNIALLY:
+    case ContractTimeUnit.EVERY_5_YEARS:
       frequencySet.add(TimeUnitYearView[job.timeUnit]);
       break;
     default:
@@ -191,7 +195,11 @@ export const getViewFrequency = (job?: JobTimeUnit): string => {
     .sort((a, b) => a - b)
     .forEach((unit) => frequencySet.add(monthNames[unit - 1]));
 
-  return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
+  return frequencySet.size
+    ? Array.from(frequencySet)
+        .map((month) => t(month))
+        .join(', ')
+    : '-';
 };
 
 export const inspectionCycleLabels = {
@@ -321,7 +329,7 @@ const OPTION_TO_REST_DISTANCE_VALUES: Record<
 export const getDistanceFromOption = (distance: DISTANCE_FILTER) =>
   OPTION_TO_REST_DISTANCE_VALUES[distance];
 
-export const parseTimeRulesData = (timeRules: ElevatorTimeRuleView[]) => {
+export const parseTimeRulesData = (timeRules?: ElevatorTimeRuleView[]) => {
   const daysOfWeekAndTimeRangeTimeRule = timeRules?.find(
     (timeRule) =>
       timeRule.type === ElevatorTimeRuleType.DAYS_OF_WEEK_AND_TIME_RANGE,

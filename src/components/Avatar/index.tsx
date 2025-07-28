@@ -15,7 +15,9 @@ import {AvatarView} from 'models/avatar';
 interface Props {
   userAccount: AvatarView;
   sx?: SxProps<Theme>;
+  containerSx?: SxProps<Theme>;
   labelStyles?: SxProps<Theme>;
+  initialsTextStyles?: SxProps<Theme>;
   removeNameText?: boolean;
   /**
    * Show only one initial depending on if first name is present fallback last name
@@ -27,7 +29,9 @@ interface Props {
 export const Avatar = ({
   userAccount,
   sx = {},
+  containerSx = {},
   labelStyles = {},
+  initialsTextStyles = {},
   removeNameText = false,
   onlyFirstInitial = false,
 }: Props) => {
@@ -56,6 +60,7 @@ export const Avatar = ({
             lineHeight: '10px',
             letterSpacing: '0.1px',
             textTransform: 'uppercase',
+            ...initialsTextStyles,
           }}>
           {initialsToShow && initialsToShow}
         </Typography>
@@ -64,7 +69,11 @@ export const Avatar = ({
   }, [userAccount, url]);
 
   return (
-    <Box sx={{width: '100%'}} display="flex" alignItems="center" gap={1}>
+    <Box
+      sx={{width: '100%', ...containerSx}}
+      display="flex"
+      alignItems="center"
+      gap={1}>
       <AvatarMui
         alt={userName}
         sx={{

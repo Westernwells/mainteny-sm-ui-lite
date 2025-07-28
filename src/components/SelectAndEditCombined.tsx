@@ -1,7 +1,6 @@
-import React, {ReactNode, useMemo, useState} from 'react';
+import React, {ReactNode, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
-import {FormikProps} from 'formik';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
@@ -12,6 +11,9 @@ import {formatAddressFullname} from 'utils/utils';
 import {TFunction} from 'i18next';
 import AddIcon from '@mui/icons-material/Add';
 import {getCountryCode} from 'utils/countries';
+import {FormProvider, UseFormReturn} from 'react-hook-form';
+import cloneDeep from 'lodash/cloneDeep';
+import EditCustomerBillingAddressForm from 'components/BillingAddress/EditForm';
 import {FormLabel} from './form/FormLabel';
 import {SelectCard} from './SelectCard';
 import {SelectButton} from './SelectButton';
@@ -27,7 +29,7 @@ interface Props {
   editButtonText: string;
   modalHeader: string;
   addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
-  formik: FormikProps<InvoiceFormData>;
+  formMethods: UseFormReturn<InvoiceFormData>;
   address?: AddressRecord;
   customerName?: string;
   translate?: TFunction<'translation', 'translation'>;
@@ -42,7 +44,7 @@ export const SelectAndEditCombined = ({
   editButtonText,
   modalHeader,
   addressType,
-  formik,
+  formMethods,
   address,
   customerName,
   translate,
@@ -51,47 +53,44 @@ export const SelectAndEditCombined = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const theme = useTheme();
 
-  const initialValues: AddressRecord | undefined = useMemo(
-    () => formik.values[addressType],
-    [isModalOpen],
-  );
+  const {setValue, getValues} = formMethods;
+
+  const [savedInitialAddress, setSavedInitialAddress] = useState<
+    AddressRecord | undefined
+  >(undefined);
+
+  const openModal = () => {
+    setSavedInitialAddress(cloneDeep(getValues()[addressType]));
+    setIsModalOpen(true);
+  };
 
   const onCloseDialog = () => {
     setIsModalOpen(false);
-    formik.setValues({
-      ...formik.values,
-      [addressType]: initialValues,
-    });
+    setValue(addressType, savedInitialAddress);
+    setSavedInitialAddress(undefined);
   };
 
   const onSaveAddress = () => {
-    formik.setValues({
-      ...formik.values,
-      [addressType]: {
-        ...formik.values[addressType],
-        component: {
-          ...formik.values[addressType]?.component,
-          country: formik.values[addressType]?.component?.country
-            ? translate
-              ? translate(
-                  formik.values[addressType]?.component
-                    ?.country as unknown as string,
-                )
-              : formik.values[addressType]?.component?.country
-            : '',
-        },
-        ...(formik.values[addressType]?.component?.country && {
-          countryCode: getCountryCode(
-            formik.values[addressType]?.component?.country!,
-          ),
-        }),
-        fullName: formatAddressFullname(
-          formik.values?.[addressType] ?? null,
-          translate,
-        )?.fullName,
+    const currentAddress = getValues(addressType);
+    const updatedAddress = {
+      ...currentAddress,
+      component: {
+        ...currentAddress?.component,
+        country: currentAddress?.component?.country
+          ? translate
+            ? translate(currentAddress.component.country as string)
+            : currentAddress.component.country
+          : '',
       },
-    });
+      ...(currentAddress?.component?.country && {
+        countryCode: getCountryCode(currentAddress.component.country),
+      }),
+      fullName:
+        formatAddressFullname(currentAddress, translate)?.fullName ?? null,
+    };
+    setValue(addressType, updatedAddress);
     setIsModalOpen(false);
+    setSavedInitialAddress(undefined);
   };
 
   const renderSelectedButton = () => {
@@ -108,7 +107,7 @@ export const SelectAndEditCombined = ({
             buttonProps={{
               size: 'small',
               startIcon: <AddIcon />,
-              onClick: () => setIsModalOpen(true),
+              onClick: openModal,
             }}
           />
         </Box>
@@ -118,7 +117,7 @@ export const SelectAndEditCombined = ({
     return (
       <SelectButton
         text={t(buttonText)}
-        onClick={() => setIsModalOpen(true)}
+        onClick={openModal}
         buttonProps={{size: 'small'}}
       />
     );
@@ -152,7 +151,7 @@ export const SelectAndEditCombined = ({
               buttonProps={{
                 size: 'small',
                 startIcon: <EditIcon />,
-                onClick: () => setIsModalOpen(true),
+                onClick: openModal,
                 sx: {
                   display: 'inline-flex',
                   mt: '10px',
@@ -171,15 +170,23 @@ export const SelectAndEditCombined = ({
         title={modalHeader}
         onCancel={onCloseDialog}
         onSave={onSaveAddress}
+        disableSaveBtn={!getValues?.()[addressType]?.component?.name}
         dialogProps={{
           maxWidth: 'md',
           open: isModalOpen || false,
         }}>
-        <EditCustomerForm
-          formik={formik}
-          address={addressType}
-          customerName={customerName}
-        />
+        {addressType === 'billingAddress' && (
+          <FormProvider {...formMethods}>
+            <EditCustomerBillingAddressForm />
+          </FormProvider>
+        )}
+        {addressType !== 'billingAddress' && (
+          <EditCustomerForm
+            formMethods={formMethods}
+            address={addressType}
+            customerName={customerName}
+          />
+        )}
       </Dialog>
     </Box>
   );

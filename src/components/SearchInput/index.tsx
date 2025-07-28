@@ -1,4 +1,12 @@
-import {RefObject, useEffect, useMemo, useState} from 'react';
+import {
+  KeyboardEventHandler,
+  RefObject,
+  SyntheticEvent,
+  useEffect,
+  useRef,
+  useMemo,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -9,28 +17,40 @@ import {IconButton} from '@mui/material';
 import {useTheme} from '@mui/system';
 
 type Props = {
+  /**
+   * Pass a non-undefined value when you need to have external state for input value.
+   */
+  value?: string;
   placeholder?: string;
   width?: string;
   containerStyle?: {[key: string]: string | number};
   label?: string;
   refInput?: RefObject<HTMLInputElement>;
   defaultValue?: string;
+  maxLength?: number;
   onChange?: (value: string) => void;
+  onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
+  onClick?: (e: SyntheticEvent) => void;
 };
 
 // New Search Input Component
 const SearchInput = ({
+  value: externalValue,
   placeholder = 'Search',
   width,
   containerStyle,
   label,
   refInput,
   defaultValue = '',
+  maxLength,
   onChange,
+  onKeyDown,
+  onClick,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const [value, setValue] = useState<string>(defaultValue);
+  const isInitialRender = useRef(true);
 
   const handleChange = (e: {target: {value: string}}) => {
     setValue(e.target.value);
@@ -50,11 +70,21 @@ const SearchInput = ({
 
   // input delay
   useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
     debouncedChangeHandler(value);
     return () => {
       debouncedChangeHandler.cancel();
     };
   }, [value]);
+
+  useEffect(() => {
+    if (externalValue !== undefined) {
+      setValue(externalValue);
+    }
+  }, [externalValue]);
 
   return (
     <TextField
@@ -79,7 +109,10 @@ const SearchInput = ({
       label={label && t(label)}
       inputRef={refInput}
       onChange={handleChange}
+      onKeyDown={onKeyDown}
+      onClick={onClick}
       slotProps={{
+        htmlInput: {maxLength},
         input: {
           id: label,
           name: label,

@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {useState} from 'react';
-import {useParams, useNavigate} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {
   useArticleSupplier,
@@ -12,6 +12,8 @@ import {Button} from 'components/Button';
 import {Confirm} from 'components/Confirm';
 import ContactsWidget from 'pages/Contacts/ContactsWidget';
 import {ContactPersonAssociationType} from 'models/contacts';
+import AttachmentsCard from 'components/Attachments/AttachmentsCard';
+import {AttachmentEntityType} from 'models/attachment';
 import {SupplierBasicInfoCard} from './BasicInfo/SupplierBasicInfoCard';
 import {Notes} from './Notes';
 
@@ -63,6 +65,13 @@ export const SupplierDetails = () => {
         refId={supplierId!}
         refType={ContactPersonAssociationType.ARTICLE_SUPPLIER}
       />
+
+      <Box mt="1em" flexGrow={1}>
+        <AttachmentsCard
+          entityId={supplierId!}
+          entityType={AttachmentEntityType.ARTICLE_SUPPLIER}
+        />
+      </Box>
 
       <Confirm
         open={deleteSupplierConfirm}

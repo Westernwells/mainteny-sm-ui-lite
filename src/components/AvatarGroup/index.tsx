@@ -1,13 +1,13 @@
 import {PropsWithChildren, ReactElement, ReactNode} from 'react';
 import {Avatar} from 'components/Avatar';
-import {UserAccount, UserAccountView} from 'models/user';
+import {UserAccount, UserAccountSimpleView, UserAccountView} from 'models/user';
 import {Box, Tooltip, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {getUserFullName} from 'utils/utils';
 import {useTheme} from '@mui/system';
 
 type Props = {
-  employees: UserAccountView[] | UserAccount[];
+  employees: (UserAccountView | UserAccountSimpleView | UserAccount)[];
 };
 
 type WrapperProps = Pick<Props, 'employees'>;

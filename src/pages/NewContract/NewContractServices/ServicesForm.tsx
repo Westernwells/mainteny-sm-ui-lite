@@ -3,6 +3,7 @@ import {
   Box,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   Popover,
@@ -29,6 +30,7 @@ import {
   calculateContractInvoicePriceTotal,
   ContractComponentElevator,
   ContractServiceForm,
+  ContractTimeUnit,
 } from 'models/contract';
 import {Switch} from 'components/Switch';
 import {FormikProps, getIn} from 'formik';
@@ -37,7 +39,7 @@ import {Button} from 'components/Button';
 import {getArticleTypeText} from 'utils/article-utils';
 import {FormRadio} from 'components/form/FormRadio';
 import CloseIcon from '@mui/icons-material/Close';
-import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
+import {ReactComponent as PackageIcon} from 'assets/icons/PackageLightIcon.svg';
 import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
 import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
 import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
@@ -57,6 +59,13 @@ import {FormCheckbox} from 'components/form/FormCheckbox';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {generateMonthDropdownFromElevatorJobFrequency} from 'utils/utils';
+import {
+  getFirstDayOfMonthInFuture,
+  getMonthNumberFromDate,
+} from 'utils/datetime';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import ServiceDeliveryPeriodInput from 'components/ServiceDeliveryPeriodInput';
 import {isUnitSelected} from '../../../utils/contract';
 
 const articleTypes = [
@@ -104,6 +113,14 @@ const ServicesForm = ({
     user?.userAccount.serviceCompany.id!,
   );
 
+  const isAllElevatorsInvoiceFrequencyAfterJob = useMemo(
+    () =>
+      formikContractServiceComponent.values.elevators.every(
+        (elevator) => elevator.invoiceJob?.timeUnit === ContractTimeUnit.NONE,
+      ),
+    [formikContractServiceComponent.values.elevators],
+  );
+
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
     event.currentTarget.focus();
@@ -128,6 +145,9 @@ const ServicesForm = ({
   const visibleElevators =
     formikContractServiceComponent.values.elevators?.slice(0, visibleItems) ||
     [];
+
+  const filteredElevatorIds =
+    formikContractServiceComponent.values.elevators.map((e) => e.elevatorId);
 
   const columns: {
     name: string;
@@ -177,6 +197,12 @@ const ServicesForm = ({
       formikContractServiceComponent.values.elevators.filter(isUnitSelected),
     [formikContractServiceComponent.values.elevators],
   );
+
+  const jobCreationMonthDropdowns =
+    generateMonthDropdownFromElevatorJobFrequency(
+      formikContractServiceComponent.values.elevators ?? [],
+      t,
+    );
 
   return (
     <>
@@ -479,7 +505,7 @@ const ServicesForm = ({
                                   }}
                                   InputProps={{
                                     name: 'costPackage.materialPercentage',
-                                    placeholder: t(`e.g. 20%`),
+                                    placeholder: t(`e.g. 50%`),
                                     id: `costPackage.materialPercentage`,
                                     inputMode: 'numeric',
                                     disabled: true,
@@ -546,7 +572,13 @@ const ServicesForm = ({
         </Grid>
         <Grid item xs={3}>
           <DatePicker
-            defaultDate={formikContractServiceComponent.values.firstInvoiceDate}
+            defaultDate={
+              formikContractServiceComponent.values.firstInvoiceDate
+                ? new Date(
+                    formikContractServiceComponent.values.firstInvoiceDate,
+                  )
+                : null
+            }
             getSelectedDate={(newValue) => {
               if (newValue)
                 formikContractServiceComponent.setFieldValue(
@@ -608,15 +640,29 @@ const ServicesForm = ({
         </Typography>
       </Box>
 
-      {!formikContractServiceComponent.values.isAutomaticJobCycle && (
-        <Typography
-          variant="body1"
-          sx={{color: 'text.primary', padding: '0.5em 0em 1em 0em'}}>
-          {t(
-            'With this setting there will be no jobs created from this service',
-          )}
-        </Typography>
-      )}
+      {!formikContractServiceComponent.values.isAutomaticJobCycle &&
+        !isAllElevatorsInvoiceFrequencyAfterJob && (
+          <Box>
+            <Typography
+              variant="body1"
+              sx={{color: 'text.primary', padding: '0.5em 0em 1em 0em'}}>
+              {t(
+                'With this setting there will be no jobs created from this service',
+              )}
+            </Typography>
+            <Grid container mb={2}>
+              <Grid item xs={3}>
+                <ServiceDeliveryPeriodInput
+                  value={
+                    formikContractServiceComponent.values.serviceDeliveryType
+                  }
+                  onChange={formikContractServiceComponent.handleChange}
+                  onBlur={formikContractServiceComponent.handleBlur}
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        )}
 
       {formikContractServiceComponent.values.isAutomaticJobCycle && (
         <Grid container spacing={2}>
@@ -652,23 +698,72 @@ const ServicesForm = ({
             </FormControl>
           </Grid>
           <Grid item xs={3}>
-            <DatePicker
-              defaultDate={formikContractServiceComponent.values.firstOrderDate}
-              getSelectedDate={(newValue) => {
-                if (newValue)
+            <FormControl fullWidth required>
+              <InputLabel size="small" shrink variant="outlined">
+                {t('First job creation')}
+                <Tooltip
+                  title={t(
+                    'Please add job generation months to each unit and afterwards chose from which month onwards the generation should start',
+                  )}
+                  placement="top">
+                  <IconButton sx={{marginLeft: '3px', padding: 0}}>
+                    <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0}} />
+                  </IconButton>
+                </Tooltip>
+              </InputLabel>
+              <Select
+                label={`${t('First job creation')}*`}
+                size="small"
+                value={getMonthNumberFromDate(
+                  formikContractServiceComponent.values.firstOrderDate
+                    ? new Date(
+                        formikContractServiceComponent.values.firstOrderDate,
+                      )
+                    : null,
+                )}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    '& legend': {
+                      paddingRight: '13px',
+                    },
+                  },
+                }}
+                required
+                notched
+                name="firstOrderDate"
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 250,
+                    },
+                  },
+                }}
+                onBlur={formikContractServiceComponent.handleBlur}
+                onChange={(event) => {
                   formikContractServiceComponent.setFieldValue(
                     'firstOrderDate',
-                    newValue,
+                    getFirstDayOfMonthInFuture(Number(event.target.value)),
                   );
-              }}
-              textFieldProps={{
-                label: 'First job creation date',
-                required:
-                  !!formikContractServiceComponent.values.isAutomaticJobCycle,
-              }}
-              disableLeapDay
-            />
+                }}>
+                {jobCreationMonthDropdowns.map((month) => (
+                  <MenuItem value={month.value} key={month.value}>
+                    {t(month.label)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
+          {!isAllElevatorsInvoiceFrequencyAfterJob && (
+            <Grid item xs={3}>
+              <ServiceDeliveryPeriodInput
+                value={
+                  formikContractServiceComponent.values.serviceDeliveryType
+                }
+                onChange={formikContractServiceComponent.handleChange}
+                onBlur={formikContractServiceComponent.handleBlur}
+              />
+            </Grid>
+          )}
         </Grid>
       )}
 
@@ -783,6 +878,7 @@ const ServicesForm = ({
                       <JobFrequencyPicker
                         componentId={item.elevatorId}
                         units={formikContractServiceComponent.values.elevators}
+                        filteredUnitIds={filteredElevatorIds}
                         onChange={handleJobFrequencyChange('elevators')}
                         mode="new"
                       />
@@ -801,6 +897,7 @@ const ServicesForm = ({
                       formik={formikContractServiceComponent}
                       componentId={item.elevatorId}
                       mode="new"
+                      filteredUnitIds={filteredElevatorIds}
                     />
                   </TableCell>
 

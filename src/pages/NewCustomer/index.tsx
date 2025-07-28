@@ -39,7 +39,7 @@ interface Props {
 }
 
 const phoneValidationRE =
-  /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+  /^\+?((\d{1,4}[ -]*)|(\([0-9]{2,3}\)[ -]*)|([0-9]{2,4})[ -]*)*?[0-9]{3,4}?[ -]*[0-9]{3,4}?$/;
 
 const isExternalIdUnique = async (
   resource: PropertyOwnerView[],
@@ -118,7 +118,28 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
   });
 
   const validationSchemaContactPersons = Yup.object().shape({
-    contactPersons: Yup.object().nullable(),
+    contactPersons: Yup.array().of(
+      Yup.object().shape({
+        propertyContactPerson: Yup.object().shape({
+          roles: Yup.array().of(Yup.string()).min(1, 'Role is required'),
+          secondaryPhone: Yup.string().matches(
+            phoneValidationRE,
+            'Phone number is not valid',
+          ),
+        }),
+        userAccount: Yup.object().shape({
+          firstName: Yup.string().required('First name is required'),
+          lastName: Yup.string().required('Last name is required'),
+          contact: Yup.object().shape({
+            email: Yup.string().email('Enter a valid email'),
+            phone: Yup.string().matches(
+              phoneValidationRE,
+              'Phone number is not valid',
+            ),
+          }),
+        }),
+      }),
+    ),
   });
 
   const {mutateAsync: createCustomer} = useCreateCustomer(
@@ -226,7 +247,9 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
           (item) => item.externalId === formikBasicInfo.values.externalId,
         ).length > 0) ||
       (activeStep === 1 && Object.keys(formikAddress.errors).length) ||
-      (activeStep === 2 && Object.keys(formikContactPersons.errors).length)
+      (activeStep === 2 &&
+        formikContactPersons.values.contactPersons.length > 0 &&
+        Object.keys(formikContactPersons.errors).length > 0)
     ) {
       return setDisableNextBtn(true);
     }

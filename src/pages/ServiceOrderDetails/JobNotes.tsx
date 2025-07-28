@@ -4,10 +4,10 @@ import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import {useTranslation} from 'react-i18next';
 import {Button} from 'components/Button';
-import useTotalNotesData from 'hooks/useTotalNotesData';
-import {useInfiniteServiceOrderComments} from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrderView} from 'models/service-order';
 import JobNotesDrawer from 'pages/ServiceOrderDetails/JobNotesDrawer';
+import {useComments} from 'hooks/reactQuery/useComment';
+import {CommentCategory, CommentType} from 'models/comment';
 
 interface Props {
   serviceOrder: ServiceOrderView;
@@ -22,10 +22,22 @@ const JobNotes: FC<Props> = ({serviceOrder}) => {
     setShowSideDrawer(true);
   };
 
-  const totalServiceOrderNotes = useTotalNotesData(
-    useInfiniteServiceOrderComments,
-    serviceOrder.id,
-  );
+  const {data: commentsData} = useComments({
+    refId: serviceOrder.id,
+    category: CommentCategory.ALL,
+    type: CommentType.SERVICE_ORDER_COMMENT,
+    pageIndex: 0,
+    pageSize: 1,
+  });
+  const {data: officeNotes} = useComments({
+    refId: serviceOrder.id,
+    category: CommentCategory.OFFICE,
+    type: CommentType.SERVICE_ORDER_COMMENT,
+    pageIndex: 0,
+    pageSize: 1,
+  });
+
+  const totalComments = (commentsData?.total ?? 0) + (officeNotes?.total ?? 0);
 
   return (
     <>
@@ -43,7 +55,7 @@ const JobNotes: FC<Props> = ({serviceOrder}) => {
         <NoteAlt fontSize="small" />
         <Typography>{t('Notes')}</Typography>
         <Chip
-          label={totalServiceOrderNotes}
+          label={totalComments}
           color="primary"
           size="small"
           sx={{

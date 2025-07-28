@@ -1,8 +1,8 @@
-import {convertToText} from '../utils/utils';
 import {FileResource, FileResourceRecord} from './media';
 import {
   Amount,
   AmountRecord,
+  GenerationInfo,
   Meta,
   Money,
   MultiVatsAmount,
@@ -15,10 +15,10 @@ import {
   ArticleSupplierView,
   SupplierRecord,
 } from './supplier';
-import {
-  ServiceOrderArticleOwnerType,
-  ServiceOrderArticleView,
-} from './service-order';
+import {ServiceOrderArticleOwnerType} from './service-order';
+import {ArticleInfoRecord, SubItemsConfig} from './quotation';
+import {Discount} from './invoice';
+import {TagRecord} from 'models/tag';
 
 export enum ArticleType {
   LABOR = 'LABOR',
@@ -71,6 +71,7 @@ export interface ArticleAdditionalInfo {
   pictures?: FileResource[];
   documents?: FileResource[];
   contractName?: string;
+  tags?: TagRecord[];
 }
 
 export interface ArticleView {
@@ -110,8 +111,8 @@ export interface CreateArticleRecord {
   name: string;
   description: string;
   externalId: string;
-  model?: string;
-  type: string;
+  model: string;
+  type: ArticleType;
   category: string;
   subCategory?: string;
   manufacturer: string;
@@ -148,13 +149,14 @@ export interface UpdateArticleRecord {
   storageLocation?: string;
   subCategory?: string;
   suppliers?: SupplierRecord[];
-  type?: string;
+  type?: ArticleType;
   unit?: string;
   unitPurchaseAmount?: AmountRecord;
   unitSellingAmount?: AmountRecord;
   costPackage?: CostPackage;
   pictures?: {description: string; type: string; uri: string}[];
   contractName?: string;
+  tags?: string[];
 }
 
 export interface QueryArticleParams {
@@ -193,16 +195,6 @@ export interface ArticleSupplierItemView {
   isPreferred?: boolean;
   additionalInfo: string;
 }
-
-export interface ServiceOrderArticleRecord {
-  articleId: string;
-  description: string;
-  name: string;
-  quantity: number;
-  unitAmount: AmountRecord;
-  article: ArticleRecord;
-}
-
 export interface ArticleOrderItemRecord {
   articleId: string;
   articleName: string;
@@ -290,31 +282,26 @@ export interface ArticleRecord {
   unit: string;
   unitSellingAmount?: AmountRecord;
   costPackage?: CostPackage;
-  generationInfo?: {
-    contractId: string;
-    componentId: string;
-    elevatorId: string;
-    generationDate: Date;
-  };
+  generationInfo?: GenerationInfo;
 }
 
 // used in job details section
 export type ArticleSectionTableRow = {
   id: string;
-  no: number;
+  userSeqNumber: string;
   number: string;
   name: string;
-  description: string;
-  unit: string;
-  total: string;
-  unitPrice: string;
+  description?: string;
+  type: ArticleType;
+  unit?: string;
+  total?: string;
+  unitAmount: string;
+  unitPurchaseAmount: string;
   quantity: number;
-  percent: string;
-  navigateTo: string;
-  article: ServiceOrderArticleView;
+  article?: ArticleInfoRecord;
   ownerName: string;
   ownerType: ServiceOrderArticleOwnerType;
-  contractNumber: string;
+  contractNumber?: string;
 };
 
 export type ArticleTableRow = {
@@ -328,6 +315,7 @@ export type ArticleTableRow = {
   type: ArticleType;
   unit: string;
   price: string;
+  tags: TagRecord[];
 };
 
 export type ArticleStatistics = {
@@ -372,8 +360,8 @@ export interface MixedPositionRow {
   type: ArticleType;
   unit: string;
   unitPurchaseAmount?: AmountRecord;
-  unitSellingAmount?: AmountRecord;
-  quantity?: number;
+  unitAmount: AmountRecord;
+  quantity: number;
 }
 
 export interface SubPositionRow {
@@ -387,7 +375,7 @@ export interface SubPositionRow {
   type: ArticleType;
   unit: string;
   unitPurchaseAmount?: AmountRecord;
-  unitSellingAmount?: AmountRecord;
+  unitAmount: AmountRecord;
   createdAt?: string;
   lastUpdatedAt?: string;
 }
@@ -398,6 +386,7 @@ export interface MixedPositionFormValues {
   description: string;
   unit: string;
 }
+
 export interface SubPositionFormValues extends MixedPositionFormValues {
   id: string;
   type: ArticleType;
@@ -498,6 +487,7 @@ export interface UpdateArticleSubAssociationBody {
   costPackage?: CostPackage;
   contractName?: string;
 }
+
 export interface UpdateArticleSubAssociationRecord {
   article: UpdateArticleSubAssociationBody;
   quantity?: number;
@@ -515,6 +505,12 @@ export const COLUMN_DATA: ArticleColumnData[] = [
   {title: '#', alignment: 'left', width: '75px'},
   {title: 'Stock', alignment: 'right', width: '56px'},
   {title: 'Type', alignment: 'center', width: '70px'},
-  {title: 'Description', alignment: 'center', width: '80px'},
+  {title: 'Description', alignment: 'center', width: '70px'},
   {title: 'Price (Net)', alignment: 'right', width: '72px'},
+  {title: 'Custom Price (Net)', alignment: 'right', width: '116px'},
 ];
+
+export interface ExtendedArticleView extends ArticleView {
+  isCustom?: boolean;
+  customSellingAmount?: MultiVatsAmount;
+}

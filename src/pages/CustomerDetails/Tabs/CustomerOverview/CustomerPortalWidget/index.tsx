@@ -99,9 +99,7 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
       const contact = contactsResource.data.find((el) => el.id === id);
       inviteContact({
         propertyContactPersonId: id,
-        username: encodeURIComponent(
-          contact?.userAccount?.contact?.email || '',
-        ),
+        username: contact?.userAccount?.contact?.email || '',
       });
     },
     [contactsResource],

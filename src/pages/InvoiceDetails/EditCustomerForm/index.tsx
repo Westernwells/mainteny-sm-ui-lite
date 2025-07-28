@@ -1,62 +1,78 @@
-import {useCallback, useEffect} from 'react';
-import {FormikProps} from 'formik';
+import {useEffect, useRef} from 'react';
 import Grid from '@mui/material/Grid';
-
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {InvoiceFormData} from 'models/invoice';
+import {Controller, UseFormReturn} from 'react-hook-form';
+import NameFields from 'components/BillingAddress/NameFields';
 
 export const EditCustomerForm = ({
-  formik,
+  formMethods,
   address,
   customerName,
 }: {
-  formik: FormikProps<InvoiceFormData>;
+  formMethods: UseFormReturn<InvoiceFormData>;
   address: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
   customerName?: string;
 }) => {
-  const {values, handleChange, handleBlur} = formik;
-  const value = values[address];
+  const {getValues, register, setValue, control, watch} = formMethods;
+  const value = getValues(address);
+  const didInit = useRef(false);
 
-  const statesByCountry = useCallback(
-    (country?: string) => getStatesByCountry(country ?? ''),
-    [value?.component?.country],
-  );
+  const watchName = watch(`${address}.component.name`);
+  const watchName2 = watch(`${address}.component.name2`);
+  const watchName3 = watch(`${address}.component.name3`);
 
-  // populate name field with customer name by default if not set
   useEffect(() => {
-    if (!value?.component?.name && customerName) {
-      formik.setFieldValue(`${address}.component.name`, customerName);
-    }
-  }, []);
+    if (didInit.current) return;
+    didInit.current = true;
 
-  const defaultProps = {
-    onChange: handleChange,
-    onBlur: handleBlur,
-  };
+    const fieldName = `${address}.component.name` as const;
+    const currentName = getValues(fieldName);
+
+    // only if it's truly unset (null or undefined), not just empty-string…
+    if ((currentName === null || currentName === undefined) && customerName) {
+      setValue(fieldName, customerName);
+    }
+  }, [address, customerName, getValues, setValue]);
 
   return (
     <Grid container spacing={3}>
       <Grid item md={3}>
-        <FormInput
-          fieldProps={{
-            size: 'small',
-            label: 'Name',
-            name: `${address}.component.name`,
-            value: value?.component?.name ?? '',
-            ...defaultProps,
-          }}
-        />
+        {address === 'billingAddress' && (
+          <NameFields
+            name={watchName}
+            name2={watchName2}
+            name3={watchName3}
+            fieldWidth="28%"
+            setName={(name: string | null) =>
+              setValue('billingAddress.component.name', name ?? undefined)
+            }
+            setName2={(name2: string | null) =>
+              setValue('billingAddress.component.name2', name2 ?? undefined)
+            }
+            setName3={(name3: string | null) =>
+              setValue('billingAddress.component.name3', name3 ?? undefined)
+            }
+          />
+        )}
+        {address !== 'billingAddress' && (
+          <FormInput
+            fieldProps={{
+              size: 'small',
+              label: 'Name',
+              ...register(`${address}.component.name`),
+            }}
+          />
+        )}
       </Grid>
       <Grid item md={4.5}>
         <FormInput
           fieldProps={{
             size: 'small',
             label: 'Address line 1',
-            name: `${address}.component.street`,
-            value: value?.component?.street ?? '',
-            ...defaultProps,
+            ...register(`${address}.component.street`),
           }}
         />
       </Grid>
@@ -65,9 +81,7 @@ export const EditCustomerForm = ({
           fieldProps={{
             size: 'small',
             label: 'Address line 2',
-            name: `${address}.component.street2`,
-            value: value?.component?.street2 ?? '',
-            ...defaultProps,
+            ...register(`${address}.component.street2`),
           }}
         />
       </Grid>
@@ -76,9 +90,7 @@ export const EditCustomerForm = ({
           fieldProps={{
             size: 'small',
             label: 'City',
-            name: `${address}.component.city`,
-            value: value?.component?.city ?? '',
-            ...defaultProps,
+            ...register(`${address}.component.city`),
           }}
         />
       </Grid>
@@ -87,40 +99,51 @@ export const EditCustomerForm = ({
           fieldProps={{
             size: 'small',
             label: 'ZIP/Postal Code',
-            name: `${address}.component.postalCode`,
-            value: value?.component?.postalCode ?? '',
-            ...defaultProps,
+            ...register(`${address}.component.postalCode`),
           }}
         />
       </Grid>
       <Grid item md={3}>
-        <FormSelect
-          labelId={`${address}.component.country`}
-          label="Country"
-          options={countriesOptions}
-          selectProps={{
-            id: 'component.country',
-            name: `${address}.component.country`,
-            value: value?.component?.country ?? '',
-            multiple: false,
-            onChange: handleChange,
-          }}
-          isCompanyTranslation
+        <Controller
+          name={`${address}.component.country`}
+          control={control}
+          defaultValue={value?.component?.country || ''}
+          render={({field}) => (
+            <FormSelect
+              labelId={`${address}.component.country`}
+              label="Country"
+              options={countriesOptions}
+              selectProps={{
+                ...field,
+                multiple: false,
+                id: `${address}.component.country`,
+              }}
+              isCompanyTranslation
+            />
+          )}
         />
       </Grid>
+
       <Grid item md={3}>
-        <FormSelect
-          labelId={`${address}.component.state`}
-          label="State/Province/Region"
-          options={statesByCountry(value?.component?.country)}
-          selectProps={{
-            id: 'component.state',
-            name: `${address}.component.state`,
-            value: value?.component?.state ?? '',
-            multiple: false,
-            onChange: handleChange,
-          }}
-          isCompanyTranslation
+        <Controller
+          name={`${address}.component.state`}
+          control={control}
+          defaultValue={value?.component?.state || ''}
+          render={({field}) => (
+            <FormSelect
+              labelId={`${address}.component.state`}
+              label="State/Province/Region"
+              options={getStatesByCountry(
+                getValues(`${address}.component.country`) || '',
+              )}
+              selectProps={{
+                ...field,
+                multiple: false,
+                id: `${address}.component.state`,
+              }}
+              isCompanyTranslation
+            />
+          )}
         />
       </Grid>
 
@@ -130,9 +153,7 @@ export const EditCustomerForm = ({
             fieldProps={{
               size: 'small',
               label: 'Additional Information',
-              name: `${address}.component.moreInfo`,
-              value: value?.component?.moreInfo ?? '',
-              ...defaultProps,
+              ...register(`${address}.component.moreInfo`),
             }}
           />
         </Grid>

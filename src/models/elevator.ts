@@ -17,15 +17,16 @@ import {ContractSimpleView, ContractStatus} from './contract';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {
   PropertyContactPersonSimpleView,
+  PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from './propertyManager';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {Order} from './pagination';
 import {InvoiceOrderField, InvoiceStatus, InvoiceType} from 'models/invoice';
 import {theme} from 'theme';
 import {UserAccountSimpleView} from './user';
 import {ContactPersonAdditionalInfo} from './contacts';
 import {CustomizableColumn} from 'models/table';
+import {FileWithPreview} from 'models/files';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',
@@ -91,7 +92,7 @@ export enum ElevatorOrderField {
   STATUS = 'STATUS',
   MANUFACTURER = 'MANUFACTURER',
   SERIAL_NUMBER = 'SERIAL_NUMBER',
-  REQUIRED_TIME = 'REQUIRED_TIME',
+  SERVICE_TIME = 'SERVICE_TIME',
   DISTANCE = 'DISTANCE',
 }
 
@@ -154,7 +155,7 @@ export interface ElevatorAdditionalInfo {
   keyLocation: string;
   lastInspectionDate?: string;
   manufacturer: string;
-  numberOfStops: 5;
+  numberOfStops: number;
   parking: string;
   pictures: FileResource[];
   propertySegment: string;
@@ -178,6 +179,7 @@ export interface ElevatorAdditionalInfo {
   nextInspectionDate?: string;
   billingAddress?: AddressRecord;
   beneficiaryAddress?: AddressRecord;
+  emergencyManufacturer?: string;
 }
 
 export interface ElevatorMaintainerRecord {
@@ -228,7 +230,7 @@ export enum ElevatorTimeRuleType {
 
 export interface ElevatorTimeRuleView {
   id: string;
-  elevator_id: string;
+  elevatorId: string;
   type: ElevatorTimeRuleType;
   data: string;
 }
@@ -262,16 +264,25 @@ export interface ElevatorView {
 
 export interface ElevatorSimpleView {
   id: string;
-  propertyOwner: PropertyOwnerView;
-  properties?: ElevatorProperty[];
-  number: string;
+  number?: string;
+  externalId?: string;
+  serialNumber: string;
   model: string;
   type: string;
   capacity: string;
   category: ElevatorCategory;
+  timeRules?: ElevatorTimeRuleView[];
+  technicianNumber?: number;
   address: Address;
-  lastVisitDate: string;
-  serviceTime: number;
+  propertyOwner: PropertyOwnerSimpleView;
+  site?: {
+    id: string;
+    name: string;
+    meta: Meta;
+  };
+  lastVisitDate?: string;
+  nextVisitDate?: string;
+  serviceTime?: number;
   status: ElevatorStatus;
   labels: string[];
   additionalInfo: ElevatorAdditionalInfo;
@@ -674,7 +685,7 @@ export enum TABLE_COLUMNS_ID {
   MANUFACTURER = 'MANUFACTURER',
   MODEL = 'MODEL',
   LAST_INSPECTION = 'LAST_INSPECTION',
-  REQUIRED_TIME = 'REQUIRED_TIME',
+  SERVICE_TIME = 'SERVICE_TIME',
   APPOINTMENT_PREFERENCE = 'APPOINTMENT_PREFERENCE',
   DISTANCE = 'DISTANCE',
 }
@@ -765,7 +776,7 @@ export const UNIT_TABLE_COLUMNS: CustomizableColumn[] = [
     default: false,
   },
   {
-    id: TABLE_COLUMNS_ID.REQUIRED_TIME,
+    id: TABLE_COLUMNS_ID.SERVICE_TIME,
     columnName: 'Required time',
     orderIndex: 12,
     fixed: false,

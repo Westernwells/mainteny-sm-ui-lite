@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import Box from '@mui/material/Box';
@@ -21,13 +21,19 @@ import {
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
   useFetchXInvoiceByInvoiceId,
-  useInvoiceAmountDetail,
+  useInvoiceAmountDetailQuery,
   useInvoiceDetail,
+  useInvoiceSubItems,
   usePrintInvoice,
   useSendInvoice,
   useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';
-import {InvoiceStatus, InvoiceType, InvoiceView} from 'models/invoice';
+import {
+  InvoiceStatus,
+  InvoiceSubItemRecord,
+  InvoiceType,
+  InvoiceView,
+} from 'models/invoice';
 import {
   fetchDownloadUrls as fetchDownloadUrlsUtil,
   useDownloadUrl,
@@ -58,10 +64,8 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {pdf} from '@react-pdf/renderer';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
-import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
 import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {
   correctCreditNoteInvoicesPercentages,
   formatInvoiceViewToUpdateInvoice,
@@ -69,7 +73,6 @@ import {
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import {fetchAndConvertImageToBase64} from 'hooks/useFetchAndConvertImage';
-import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {ServiceOrderReportView} from 'models/service-order';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import {getJobTypeGivenName, getSignatureKeys} from 'utils/service-order-utils';
@@ -101,8 +104,12 @@ import {useVats} from 'hooks/reactQuery/useVats';
 import useInvoiceDownloadPreparation from 'hooks/reactQuery/useInvoiceDownloadPreparation';
 import {downloadFile} from 'utils/download';
 import printJS from 'print-js';
-import {isXMLNeeded} from 'utils/invoice';
+import {invoiceItemToInvoiceItemRecord, isXMLNeeded} from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
+import FinalInvoicePdfTemplate from 'components/pdf-templates/invoice-previews/FinalInvoicePdfTemplate';
+import {FileWithPreview} from 'models/files';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 
 interface Props {
   invoice: InvoiceView;
@@ -172,6 +179,9 @@ export const Actions = ({
     user?.userAccount.serviceCompany.id!,
   );
 
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
+
   // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
   const filteredOldJobTypes = oldJobTypes?.filter(
     (oldJobType) =>
@@ -180,7 +190,6 @@ export const Actions = ({
 
   // Combine jobTypes and the filtered oldJobTypes
   const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -227,6 +236,11 @@ export const Actions = ({
     [company?.language],
   );
 
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    invoice.description,
+  );
+
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceView | null>(
     null,
   );
@@ -235,8 +249,9 @@ export const Actions = ({
     selectedInvoice?.id!,
   );
 
-  const {data: invoiceAmountDetail} = useInvoiceAmountDetail(
-    selectedInvoice?.id,
+  const {refetch: refetchInvoiceAmountDetail} = useInvoiceAmountDetailQuery(
+    invoice?.id,
+    {enabled: false},
   );
 
   const {refetch: refetchDownloadUrl} = useDownloadUrl(
@@ -247,6 +262,28 @@ export const Actions = ({
   const {refetch: refetchXMLDownloadUrl} = useDownloadUrl(
     invoice?.additionalInfo.xmlPath ? [invoice?.additionalInfo.xmlPath] : [],
     {enabled: false},
+  );
+
+  const {data: invoiceSubItems, refetch: fetchSubItems} = useInvoiceSubItems(
+    invoice?.id,
+    {
+      enabled: false,
+    },
+  );
+
+  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(invoiceSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, InvoiceSubItemRecord[]>,
+      ),
+    [invoiceSubItems],
   );
 
   const fetchUpdatedPdfDownloadUrl = useFetchFromUrl();
@@ -305,7 +342,7 @@ export const Actions = ({
     [previousInvoices],
   );
 
-  const serviceOrder = selectedInvoice?.serviceOrder;
+  const serviceOrder = invoice?.serviceOrder;
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
   const {refetch: refetchChecklists} = useQueryServiceOrderChecklists({
@@ -390,6 +427,9 @@ export const Actions = ({
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
@@ -494,9 +534,9 @@ export const Actions = ({
 
     const blob = await pdf(
       <WorkReportTemplate
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
-        selectedLng={company?.language}
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
         report={workReport}
@@ -509,6 +549,9 @@ export const Actions = ({
         footerInfo={footerInfo}
         technicianName={technicianNameForReport}
         serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
@@ -563,13 +606,28 @@ export const Actions = ({
 
     const {headerInfo, footerInfo} = await onFetchInvoiceInfo();
 
+    const transformedInvoiceItems =
+      invoice?.items.map((item) =>
+        invoiceItemToInvoiceItemRecord(
+          item,
+          invoice.type,
+          currentCurrency,
+          taxRates,
+          subItemsMap,
+        ),
+      ) || [];
+
+    const {data: invoiceAmountDetail} = await refetchInvoiceAmountDetail();
+
     const blob = await pdf(
       <PdfTemplate
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
         invoice={invoiceData}
         invoiceAmountDetail={invoiceAmountDetail}
+        invoiceItems={transformedInvoiceItems}
         selectedLng={company?.language}
         translate={translate}
         previousInvoices={previousInvoicesProp}
@@ -581,21 +639,19 @@ export const Actions = ({
         nextCompanyExternalId={
           invoiceNumber || translate('Automatically assigned')
         }
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
     return {blob, blobURL};
   };
 
-  useEffect(() => {
-    if (reportToUpdate) {
-      setReport(reportToUpdate);
-    }
-  }, [reportToUpdate]);
-
-  const handleClick = (event: any) => {
+  const handleClick = async (event: any) => {
     setAnchorEl(event.currentTarget);
     setSelectedInvoice(invoice);
+    await fetchSubItems();
   };
 
   const handleClose = () => {
@@ -736,7 +792,7 @@ export const Actions = ({
   };
 
   const getChecklistData = async () => {
-    if (!selectedInvoice?.serviceOrder?.id)
+    if (!invoice?.serviceOrder?.id)
       return {
         checklists: [],
         selectedChecklist: undefined,
@@ -831,7 +887,7 @@ export const Actions = ({
           [selectedChecklist?.additionalInfo.pdfPath],
           user?.userAccount.serviceCompany.id!,
         );
-        checklistOperations = fetchAndCreateFiles(
+        checklistOperations = await fetchAndCreateFiles(
           checklistDownloadUrl ? Object.values(checklistDownloadUrl)[0] : '',
           [`${selectedChecklist?.checkListId}.pdf`],
           [
@@ -842,24 +898,23 @@ export const Actions = ({
           ],
         );
       } else {
-        checklistOperations = generateChecklistBlob({
+        const checklistBlob = await generateChecklistBlob({
           checklistData: {
             sortedChecklistComponents,
             selectedChecklist,
             signatureImageUrl,
             checklistImagesDownloadUrl,
           },
-        }).then((checklistBlob) =>
-          createFilesFromBlobArray(
-            [checklistBlob],
-            [`${selectedChecklist?.checkListId}.pdf`],
-            [
-              `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
-                selectedChecklist?.checkList.externalId ||
-                invoiceData?.serviceOrder?.externalId
-              }.pdf`,
-            ],
-          ),
+        });
+        checklistOperations = await createFilesFromBlobArray(
+          [checklistBlob],
+          [`${selectedChecklist?.checkListId}.pdf`],
+          [
+            `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
+              selectedChecklist?.checkList.externalId ||
+              invoiceData?.serviceOrder?.externalId
+            }.pdf`,
+          ],
         );
       }
     }
@@ -892,12 +947,12 @@ export const Actions = ({
     });
 
     // // Work report operations
-    const workReportOperations = getWorkReportOperations(
+    const workReportOperations = await getWorkReportOperations(
       invoiceData,
       workReportDownloadUrlArg,
     );
 
-    const xInvoiceOperation = getXInvoiceOperation(invoiceData);
+    const xInvoiceOperation = await getXInvoiceOperation(invoiceData);
 
     const checklistOperations = await getChecklistOperations(invoiceData);
 
@@ -972,23 +1027,16 @@ export const Actions = ({
     [user, currentCurrency, qrCurrency],
   );
 
-  useEffect(() => {
-    if (qrError) {
-      const errorMessage = getQrErrorMessage(qrError);
-      if (errorMessage) {
-        enqueueSnackbar(t(`${errorMessage}`), {
-          variant: 'error',
-        });
-        setQrError(null);
-      }
-    }
-  }, [qrError]);
-
   const paymentTerm = invoice?.additionalInfo?.paymentTerm;
   const hasPaymentTerm = typeof paymentTerm?.id === 'string';
   const paymentTermDueDays = paymentTerm?.data?.dueDays || 0;
   const dueDate = hasPaymentTerm
-    ? dateToString(addDays(new Date(), paymentTermDueDays))
+    ? dateToString(
+        addDays(
+          invoice?.sentDate ? new Date(invoice?.sentDate) : new Date(),
+          paymentTermDueDays,
+        ),
+      )
     : invoice?.dueDate || dateToString(new Date());
   const invoiceWithUpdatedDueDate = {
     ...invoice,
@@ -1016,7 +1064,10 @@ export const Actions = ({
       try {
         setIsLoadingFiles(true);
         setIsSendEmailDialogOpen(true);
-        await refetchPDFs(companyNextId);
+        const nextId = companyNextId || companyNextNumber?.value;
+        await refetchPDFs(nextId);
+      } catch (err) {
+        setIsSendEmailDialogOpen(false);
       } finally {
         setIsLoadingFiles(false);
       }
@@ -1044,7 +1095,7 @@ export const Actions = ({
     if (companyNextNumber) {
       handleOpenSendEmail(companyNextNumber.value);
     }
-  }, [invoice, companyNextNumber, generateBlobUrl]);
+  }, [invoice, companyNextNumber]);
 
   const handleOpenPrintDialog = () => {
     setIsConfirmPrintDialogOpen(true);
@@ -1150,19 +1201,6 @@ export const Actions = ({
     onResend: handleOpenSendInvoiceModal,
     onPayment: handleOpenPaymentDialog,
   });
-
-  useEffectAfterMount(() => {
-    (async () => {
-      if (companyNextNumber?.value) {
-        try {
-          setIsLoadingFiles(true);
-          await refetchPDFs(companyNextNumber.value);
-        } finally {
-          setIsLoadingFiles(false);
-        }
-      }
-    })();
-  }, [companyNextNumber?.value]);
 
   const handlePrint = async (
     invoiceToPrint: InvoiceView,
@@ -1506,6 +1544,24 @@ export const Actions = ({
     }
   };
 
+  useEffect(() => {
+    if (qrError) {
+      const errorMessage = getQrErrorMessage(qrError);
+      if (errorMessage) {
+        enqueueSnackbar(t(`${errorMessage}`), {
+          variant: 'error',
+        });
+        setQrError(null);
+      }
+    }
+  }, [qrError]);
+
+  useEffect(() => {
+    if (reportToUpdate) {
+      setReport(reportToUpdate);
+    }
+  }, [reportToUpdate]);
+
   return (
     <Box
       sx={{
@@ -1561,7 +1617,7 @@ export const Actions = ({
               data-testid={`invoice-action-menu-item-${item.label}`}
               disabled={item.disabled ?? false}
               onClick={() => {
-                item.onClick();
+                item.onClick?.();
                 handleClose();
               }}
               sx={{py: '0.7rem'}}>
@@ -1615,7 +1671,7 @@ export const Actions = ({
             invoice.propertyOwner?.contact.email
           }
           subject={generateEmailSubject()}
-          content={invoice.description}
+          content={emailBody}
           activeSignature={activeSignature}
           onSignatureSelect={(signature) => setActiveSignature(signature)}
         />

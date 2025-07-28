@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
   QueryObserverResult,
@@ -25,6 +25,7 @@ import {
   FILE_DESCRIPTION_PREFIXES,
   InvoiceActivityView,
   InvoiceStatus,
+  InvoiceSubItemRecord,
   InvoiceType,
   InvoiceTypeMap,
   InvoiceView,
@@ -48,7 +49,7 @@ import {
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
   useFetchXInvoiceByInvoiceId,
-  useInvoiceAmountDetail,
+  useInvoiceAmountDetailQuery,
   useInvoiceDetail,
   useInvoicePaymentStatus,
   usePrintInvoice,
@@ -104,12 +105,9 @@ import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplat
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
 import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
-import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
-import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import DOMPurify from 'dompurify';
 // eslint-disable-next-line import/no-unresolved
 import {SwissQRBill} from 'swissqrbill/svg';
@@ -126,8 +124,16 @@ import {FileResourceRecord} from 'models/media';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {CANCEL_ACTION} from 'models/status';
 import {useVats} from 'hooks/reactQuery/useVats';
-import {getInvoiceStatusStyles} from 'utils/invoice';
+import {
+  getInvoiceStatusStyles,
+  getXmlPath,
+  invoiceItemToInvoiceItemRecord,
+} from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
+import FinalInvoicePdfTemplate from 'components/pdf-templates/invoice-previews/FinalInvoicePdfTemplate';
+import {FileWithPreview} from 'models/files';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -159,6 +165,7 @@ interface Props {
   };
   isLoadingHeaderUrl?: boolean;
   isLoadingFooterUrl?: boolean;
+  invoiceSubItems?: Record<string, InvoiceSubItemRecord[]>;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -184,6 +191,7 @@ export const ViewInvoice = ({
   },
   isLoadingHeaderUrl,
   isLoadingFooterUrl,
+  invoiceSubItems,
 }: Props) => {
   const {t} = useTranslation();
   const {enqueueSnackbar} = useSnackbar();
@@ -219,6 +227,21 @@ export const ViewInvoice = ({
 
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     invoice.id,
+  );
+
+  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(invoiceSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, InvoiceSubItemRecord[]>,
+      ),
+    [invoiceSubItems],
   );
 
   const [activeSignature, setActiveSignature] = useState<
@@ -262,6 +285,9 @@ export const ViewInvoice = ({
   const {refetch: refetchXMLDownloadUrl} = useDownloadUrl(
     invoice?.additionalInfo.xmlPath ? [invoice?.additionalInfo.xmlPath] : [],
   );
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
 
@@ -307,17 +333,24 @@ export const ViewInvoice = ({
   const {mutateAsync: printInvoice} = usePrintInvoice({
     shouldNavigate: false,
   });
-  const {mutateAsync: sendInvoice} = useSendInvoice({
-    shouldNavigate: false,
-  });
+  const {mutateAsync: sendInvoice, isLoading: isSendingInvoice} =
+    useSendInvoice({
+      shouldNavigate: false,
+    });
 
   const {mutateAsync: updateInvoiceAsync} = useUpdateInvoice();
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    invoice.description,
+  );
 
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice.serviceOrder?.id,
   );
-  const {data: invoiceAmountDetail, isLoading: isLoadingInvoiceAmountDetail} =
-    useInvoiceAmountDetail(invoice?.id);
+  const {
+    isLoading: isLoadingInvoiceAmountDetail,
+    refetch: refetchInvoiceAmountDetail,
+  } = useInvoiceAmountDetailQuery(invoice?.id, {enabled: false});
 
   const sortedPreviousInvoices = useMemo(
     () =>
@@ -427,6 +460,7 @@ export const ViewInvoice = ({
 
     const blob = await pdf(
       <ChecklistPdf
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         selectedLng={company?.language}
@@ -440,6 +474,9 @@ export const ViewInvoice = ({
         headerInfo={headerInfo}
         footerPath={footerUrl}
         footerInfo={footerInfo}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
@@ -541,9 +578,9 @@ export const ViewInvoice = ({
 
     const blob = await pdf(
       <WorkReportTemplate
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
-        selectedLng={company?.language}
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
         report={workReport}
@@ -556,17 +593,14 @@ export const ViewInvoice = ({
         footerInfo={footerInfo}
         technicianName={technicianNameForReport}
         serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
     return blob;
   };
-
-  useEffect(() => {
-    if (reportToUpdate) {
-      setReport(reportToUpdate);
-    }
-  }, [reportToUpdate]);
 
   const generateBlobUrl = async ({
     invoiceData,
@@ -618,8 +652,22 @@ export const ViewInvoice = ({
         )
       : [];
 
+    const transformedInvoiceItems =
+      invoice?.items.map((item) =>
+        invoiceItemToInvoiceItemRecord(
+          item,
+          invoice.type,
+          currentCurrency,
+          taxRates,
+          subItemsMap,
+        ),
+      ) || [];
+
+    const {data: invoiceAmountDetail} = await refetchInvoiceAmountDetail();
+
     const blob = await pdf(
       <PdfTemplate
+        serviceCompany={company}
         userInfo={user?.userAccount}
         pdfConfigClientStorage={pdfConfig}
         currentCurrency={currentCurrency}
@@ -636,10 +684,16 @@ export const ViewInvoice = ({
           invoiceNumber || translate('Automatically assigned')
         }
         qrImageSrc={qrImageSrc}
+        invoiceItems={transformedInvoiceItems}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
-    if (setInState) setFilePathToDownload(blobURL);
+    if (setInState && !filePathToDownload) {
+      setFilePathToDownload(blobURL);
+    }
     return blob;
   };
 
@@ -703,39 +757,36 @@ export const ViewInvoice = ({
       invoiceFormat === InvoiceFormat.XML ||
       invoiceFormat === InvoiceFormat.PDF_AND_XML;
     if (invoice.status === InvoiceStatus.DRAFT) {
-      const response = await getXInvoiceByInvoiceId({
-        invoiceId: invoice.id,
-        params: {
-          dueDate: invoice.dueDate!,
-          sentDate: invoice.sentDate ?? formatDate(new Date(), 'yyyy-MM-dd')!,
-          externalId: invoice.externalId ?? companyNextNumber?.value!,
-        },
-      });
-
-      const xmlBlob = new Blob([response], {type: 'application/xml'});
       const blob = await generateBlobUrl({
         invoiceData: invoice,
         setInState: false,
       });
 
       const blobURL = URL.createObjectURL(blob!);
-      const xmlBlobURL = URL.createObjectURL(xmlBlob!);
 
       downloadFile(blobURL); // pdf
       if (shouldDownloadXML) {
+        const response = await getXInvoiceByInvoiceId({
+          invoiceId: invoice.id,
+          params: {
+            dueDate: invoice.dueDate!,
+            sentDate: invoice.sentDate ?? formatDate(new Date(), 'yyyy-MM-dd')!,
+            externalId: invoice.externalId ?? companyNextNumber?.value!,
+          },
+        });
+        const xmlBlob = new Blob([response], {type: 'application/xml'});
+        const xmlBlobURL = URL.createObjectURL(xmlBlob!);
         downloadFile(xmlBlobURL, {extensionArg: '.xml'});
       }
     } else {
-      const [downloadUrlData, xmlDownloadUrlData] = await Promise.all([
-        refetchDownloadUrl(),
-        refetchXMLDownloadUrl(),
-      ]);
+      const downloadUrlData = await refetchDownloadUrl();
 
       downloadFile(
         downloadUrlData.data?.[invoice.additionalInfo?.pdfPath ?? ''],
       ); // pdf
 
       if (shouldDownloadXML && invoice.additionalInfo.xmlPath) {
+        const xmlDownloadUrlData = await refetchXMLDownloadUrl();
         downloadFile(
           xmlDownloadUrlData.data?.[invoice.additionalInfo.xmlPath],
           {extensionArg: '.xml'},
@@ -838,17 +889,16 @@ export const ViewInvoice = ({
 
   const getXInvoiceOperation = async (
     invoiceData: InvoiceView,
-    options?: {forceGet?: boolean; invoiceNumber?: string},
+    options?: {invoiceNumber?: string},
   ) => {
-    const {forceGet = false, invoiceNumber} = options ?? {};
+    const {invoiceNumber} = options ?? {};
 
     // If XML is not opted then do nothing
     if (
       invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
         InvoiceFormat.XML &&
       invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
-        InvoiceFormat.PDF_AND_XML &&
-      !forceGet
+        InvoiceFormat.PDF_AND_XML
     ) {
       return Promise.resolve([]);
     }
@@ -956,33 +1006,16 @@ export const ViewInvoice = ({
     setExistingFiles(allFiles);
   };
 
-  useEffect(() => {
-    if (
-      invoice &&
-      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
-      invoice.status === InvoiceStatus.DRAFT
-    ) {
-      checkValidQrCode(invoice);
-    }
-  }, [invoice]);
-
-  useEffect(() => {
-    if (qrError) {
-      const errorMessage = getQrErrorMessage(qrError);
-      if (errorMessage) {
-        enqueueSnackbar(t(`${errorMessage}`), {
-          variant: 'error',
-        });
-        setQrError(null);
-      }
-    }
-  }, [qrError]);
-
   const paymentTerm = invoice?.additionalInfo?.paymentTerm;
   const hasPaymentTerm = typeof paymentTerm?.id === 'string';
   const paymentTermDueDays = paymentTerm?.data?.dueDays || 0;
   const dueDate = hasPaymentTerm
-    ? dateToString(addDays(new Date(), paymentTermDueDays))
+    ? dateToString(
+        addDays(
+          invoice?.sentDate ? new Date(invoice?.sentDate) : new Date(),
+          paymentTermDueDays,
+        ),
+      )
     : invoice?.dueDate || dateToString(new Date());
   const invoiceWithUpdatedDueDate = {
     ...invoice,
@@ -1077,99 +1110,38 @@ export const ViewInvoice = ({
     (action) => action.label !== primaryLabel,
   );
 
-  useEffect(() => {
-    if (
-      memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT &&
-      !qrError &&
-      !isLoadingInvoiceAmountDetail
-    ) {
-      generateBlobUrl({
-        invoiceData: memorizedUpdateInvoiceData,
-      });
-    }
-  }, [
-    memorizedUpdateInvoiceData,
-    headerUrl,
-    footerUrl,
-    memorizedUpdateInvoiceData?.type === InvoiceType.CREDIT_NOTE ||
-    memorizedUpdateInvoiceData?.type === InvoiceType.FULL ||
-    memorizedUpdateInvoiceData?.type === InvoiceType.AGGREGATE
-      ? null
-      : previousInvoices,
-    qrError,
-    qrImageSrc,
-    isLoadingInvoiceAmountDetail,
-  ]);
-
   const doPrint = async () => {
     const PDFDownloadURLResponse = await refetchDownloadUrl();
-    const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
-
     const PDFDownloadURL =
       PDFDownloadURLResponse.data?.[invoice.additionalInfo?.pdfPath ?? ''];
-    const XMLDownloadURL =
-      XMLDownloadURLResponse.data?.[invoice.additionalInfo.xmlPath!];
-
-    // Fetch XML file
-    const response = await fetch(XMLDownloadURL!);
-    const xmlText = await response.text();
 
     printJS({
       printable: PDFDownloadURL,
       type: 'pdf',
       showModal: true,
-      onPrintDialogClose: () => {
+      onPrintDialogClose: async () => {
         const {invoiceFormat} = invoice.propertyOwner.additionalInfo;
         if (
           invoiceFormat === InvoiceFormat.PDF_AND_XML ||
           invoiceFormat === InvoiceFormat.XML
         ) {
+          const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
+          const XMLDownloadURL =
+            XMLDownloadURLResponse.data?.[invoice.additionalInfo.xmlPath!];
+
+          let xmlText = '';
+          if (XMLDownloadURL) {
+            const response = await fetch(XMLDownloadURL);
+            xmlText = await response.text();
+          }
           setXmlHtmlContent(xmlText);
         }
       },
     });
 
+    // clear state so that if they print again, it can re-trigger
     setActionType('');
-    setFilePathToDownload('');
   };
-
-  useEffect(() => {
-    if (xmlHtmlContent) {
-      printJS({
-        printable: 'xml-content',
-        type: 'html',
-        showModal: true,
-        style: `
-          #xml-content {
-            white-space: break-spaces;
-          }
-        `,
-      });
-
-      setXmlHtmlContent('');
-    }
-  }, [xmlHtmlContent]);
-
-  useEffect(() => {
-    const isSent = invoice.status === InvoiceStatus.NOT_PAID;
-
-    if (actionType === 'PRINT' && isSent) {
-      doPrint();
-    }
-  }, [actionType, invoice]);
-
-  useEffectAfterMount(() => {
-    (async () => {
-      if (companyNextNumber?.value) {
-        try {
-          setIsLoadingFiles(true);
-          await refetchPDFs(companyNextNumber.value);
-        } finally {
-          setIsLoadingFiles(false);
-        }
-      }
-    })();
-  }, [companyNextNumber?.value]);
 
   const onPrintInvoice = async () => {
     setIsConfirmPrintDialogOpen(false);
@@ -1216,6 +1188,7 @@ export const ViewInvoice = ({
               },
               currentCurrency,
               taxRates,
+              subItemsMap,
             ),
             invoiceId: invoice.id,
           },
@@ -1232,7 +1205,6 @@ export const ViewInvoice = ({
               const invoiceXML = await getXInvoiceOperation(
                 updatedInvoiceData?.data!,
                 {
-                  forceGet: true,
                   invoiceNumber: updatedInvoiceData?.data?.externalId,
                 },
               );
@@ -1250,7 +1222,12 @@ export const ViewInvoice = ({
                   uploadPath,
                 });
                 const pdfPath = `${uploadPath}/${updatedInvoiceData.data?.id}.pdf`;
-                const xmlPath = `${uploadPath}/${updatedInvoiceData.data?.id}.xml`;
+                const xmlPath = getXmlPath({
+                  invoiceFormat:
+                    updatedInvoiceData.data?.propertyOwner.additionalInfo
+                      .invoiceFormat,
+                  xmlPath: `${uploadPath}/${updatedInvoiceData.data?.id}.xml`,
+                });
 
                 await printInvoice(
                   {
@@ -1286,7 +1263,6 @@ export const ViewInvoice = ({
         const invoiceXML = await getXInvoiceOperation(
           invoiceWithUpdatedDueDate,
           {
-            forceGet: true,
             invoiceNumber: invoice.externalId,
           },
         );
@@ -1297,7 +1273,10 @@ export const ViewInvoice = ({
           const files = await createFilesFromBlobArray([blobFile!], fileNames);
           await uploadFiles({files: [...files, ...invoiceXML], uploadPath});
           const pdfPath = `${uploadPath}/${invoice.id}.pdf`;
-          const xmlPath = `${uploadPath}/${invoice.id}.xml`;
+          const xmlPath = getXmlPath({
+            invoiceFormat: invoice.propertyOwner.additionalInfo.invoiceFormat,
+            xmlPath: `${uploadPath}/${invoice.id}.xml`,
+          });
 
           await printInvoice(
             {
@@ -1319,12 +1298,16 @@ export const ViewInvoice = ({
         }
       }
     } else {
+      const xmlPath = getXmlPath({
+        invoiceFormat: invoice.propertyOwner.additionalInfo.invoiceFormat,
+        xmlPath: invoice.additionalInfo?.xmlPath,
+      });
       await printInvoice(
         {
           id: invoice.id!,
           body: {
             pdfPath: invoice.additionalInfo?.pdfPath ?? '',
-            xmlPath: invoice.additionalInfo.xmlPath,
+            xmlPath,
             externalId: invoice.externalId!,
             dueDate: invoice.dueDate || dateToString(new Date()),
             sentDate: invoice.sentDate || dateToString(new Date()),
@@ -1355,6 +1338,85 @@ export const ViewInvoice = ({
       invoiceNumber: invoice?.number ?? '',
     });
   };
+
+  useEffect(() => {
+    if (
+      invoice &&
+      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+      invoice.status === InvoiceStatus.DRAFT
+    ) {
+      checkValidQrCode(invoice);
+    }
+  }, [invoice]);
+
+  useEffect(() => {
+    if (qrError) {
+      const errorMessage = getQrErrorMessage(qrError);
+      if (errorMessage) {
+        enqueueSnackbar(t(`${errorMessage}`), {
+          variant: 'error',
+        });
+        setQrError(null);
+      }
+    }
+  }, [qrError]);
+
+  useEffect(() => {
+    if (
+      memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT &&
+      !qrError &&
+      !isLoadingInvoiceAmountDetail
+    ) {
+      generateBlobUrl({
+        invoiceData: memorizedUpdateInvoiceData,
+      });
+    }
+  }, [
+    memorizedUpdateInvoiceData,
+    headerUrl,
+    footerUrl,
+    memorizedUpdateInvoiceData?.type === InvoiceType.CREDIT_NOTE ||
+    memorizedUpdateInvoiceData?.type === InvoiceType.FULL ||
+    memorizedUpdateInvoiceData?.type === InvoiceType.AGGREGATE
+      ? null
+      : previousInvoices,
+    qrError,
+    qrImageSrc,
+    isLoadingInvoiceAmountDetail,
+    company,
+    fontStyles,
+  ]);
+
+  useEffect(() => {
+    if (reportToUpdate) {
+      setReport(reportToUpdate);
+    }
+  }, [reportToUpdate]);
+
+  useEffect(() => {
+    if (xmlHtmlContent) {
+      printJS({
+        printable: 'xml-content',
+        type: 'html',
+        showModal: true,
+        style: `
+          #xml-content {
+            white-space: break-spaces;
+          }
+        `,
+      });
+
+      setXmlHtmlContent('');
+    }
+  }, [xmlHtmlContent]);
+
+  useEffect(() => {
+    const isSent = invoice.status === InvoiceStatus.NOT_PAID;
+
+    if (actionType === 'PRINT' && isSent) {
+      doPrint();
+    }
+  }, [actionType, invoice]);
 
   return (
     <Box>
@@ -1668,21 +1730,15 @@ export const ViewInvoice = ({
           showBorder: filteredActions[filteredActions.length - 1] !== item,
         }))}
         isValid={
-          !isLoadingDownloadUrl && !isLoadingHeaderUrl && !isLoadingFooterUrl
+          !isLoadingDownloadUrl &&
+          !isLoadingHeaderUrl &&
+          !isLoadingFooterUrl &&
+          !isLoadingInvoiceAmountDetail
         }
       />
 
       <SendEmailDialog
         open={isSendEmailDialogOpen}
-        onOpen={() => {
-          if (
-            invoice.propertyOwner.additionalInfo.invoiceFormat ===
-            InvoiceFormat.POST
-          )
-            enqueueSnackbar(t('Customer wants to receive invoice via post'), {
-              variant: 'warning',
-            });
-        }}
         onConfirm={() => {
           setIsSendEmailDialogOpen(false);
           setExistingFiles([]);
@@ -1693,6 +1749,22 @@ export const ViewInvoice = ({
           setActiveSignature(undefined);
         }}
         id={invoice.id}
+        onOpen={() => {
+          if (
+            invoice.propertyOwner.additionalInfo.invoiceFormat ===
+            InvoiceFormat.POST
+          )
+            enqueueSnackbar(t('Customer wants to receive invoice via post'), {
+              variant: 'warning',
+            });
+        }}
+        confirmBtnDisabled={isSendingEmail || isSendingInvoice}
+        email={
+          invoice.propertyOwner?.additionalInfo.billingEmail ||
+          invoice.propertyOwner?.contact.email
+        }
+        subject={generateEmailSubject()}
+        content={emailBody}
         existingFiles={existingFiles}
         isLoadingFiles={isLoadingFiles}
         callback={async (emailRecord) => {
@@ -1749,9 +1821,7 @@ export const ViewInvoice = ({
                   invoiceDownloadUrl,
                   nextNumber: companyNextNumber?.value,
                 }),
-                getXInvoiceOperation(invoiceWithUpdatedDueDate, {
-                  forceGet: true,
-                }),
+                getXInvoiceOperation(invoiceWithUpdatedDueDate),
               ]);
 
               await uploadFiles({
@@ -1811,15 +1881,21 @@ export const ViewInvoice = ({
             );
 
             const sendEmail = async (invoiceData: InvoiceView) => {
+              const xmlPath = getXmlPath({
+                invoiceFormat:
+                  invoiceData?.propertyOwner.additionalInfo.invoiceFormat,
+                xmlPath: isDraftInvoice
+                  ? `${invoiceUploadPath}/${fileNames[1]}`
+                  : invoiceData?.additionalInfo?.xmlPath,
+              });
+
               await sendInvoice({
                 id: invoiceData?.id!,
                 body: {
                   pdfPath: isDraftInvoice
                     ? `${invoiceUploadPath}/${fileNames[0]}`
                     : invoiceData?.additionalInfo?.pdfPath!,
-                  xmlPath: isDraftInvoice
-                    ? `${invoiceUploadPath}/${fileNames[1]}`
-                    : invoiceData?.additionalInfo?.xmlPath!,
+                  xmlPath,
                   externalId:
                     invoiceData?.externalId || companyNextNumber?.value || '',
                   dueDate,
@@ -1882,12 +1958,6 @@ export const ViewInvoice = ({
           }
         }}
         isSending={isSendingEmail}
-        email={
-          invoice.propertyOwner?.additionalInfo.billingEmail ||
-          invoice.propertyOwner?.contact.email
-        }
-        subject={generateEmailSubject()}
-        content={invoice.description}
         activeSignature={activeSignature}
         onSignatureSelect={(signature) => setActiveSignature(signature)}
       />

@@ -1,8 +1,6 @@
-import {AddressRecord, InspectionCycle, SimpleMeta} from 'models/misc';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {AddressRecord, InspectionCycle} from 'models/misc';
 import {ElevatorStatus} from './elevator';
-import {ContactPersonAdditionalInfo} from './contacts';
-import {UserAccountSimpleView} from './user';
+import {FileWithPreview} from 'models/files';
 
 export interface AttachmentFormModel {
   documents?: FileWithPreview[];
@@ -54,6 +52,7 @@ export interface GeneralFormModel {
   number?: string;
   status?: ElevatorStatus;
   unitType?: string;
+  numberOfStops?: number;
 }
 
 export interface TechnicalDataFormModel {

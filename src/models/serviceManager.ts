@@ -1,13 +1,10 @@
-import {AddressRecord, Contact, Meta} from './misc';
-import {ServiceCompany} from './service-company';
+import {AddressRecord, PersonalContact, Meta} from './misc';
 import {UserAccount, UserView} from './user';
-
-// TODO: Validate this model
 export interface Manager {
   id: string;
   name: string;
   address: AddressRecord;
-  contact: Contact;
+  contact: PersonalContact;
   search: string;
   meta: Meta;
 }

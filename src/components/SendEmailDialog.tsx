@@ -124,7 +124,7 @@ export const SendEmailDialog = ({
           <FormInput
             fieldProps={{
               size: 'small',
-              placeholder: 'e.g johndoe@example.com',
+              placeholder: 'e.g. johndoe@example.com',
               label: 'Email Address',
               name: 'email',
               required: true,

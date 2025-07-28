@@ -6,7 +6,7 @@ export const customPopperStyle = {
   paddingTop: '0.6em',
   marginTop: '3.1em',
   border: '1px solid #E4E9F2',
-  width: '858px',
+  width: '880px',
   borderRadius: '4px',
   boxShadow:
     '0px 3px 14px 2px #0000001F, 0px 8px 10px 1px #00000024, 0px 5px 5px -3px #00000033',
@@ -27,6 +27,17 @@ export const footerTableStyle = {
   padding: '0.1em 0em',
   zIndex: 1000,
   background: '#F7F9FC',
+  bottom: 0,
+  position: 'sticky',
+};
+
+export const footerTableContentStyle = {
+  display: 'flex',
+  background: 'white',
+  width: '100%',
+  padding: '0.25em',
+  borderTop: '1px solid #dfe3e6',
+  boxShadow: '0 -2px 5px rgba(0, 0, 0, 0.1)',
 };
 
 export const footerCellStyle = {

@@ -41,3 +41,14 @@ export const zoomButtonStyles = {
   border: '1px solid #00000024',
   zIndex: 10,
 };
+
+export const sanitizedTextStyles = {
+  maxWidth: 250,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  display: '-webkit-box',
+  WebkitLineClamp: 3,
+  WebkitBoxOrient: 'vertical',
+  whiteSpace: 'normal',
+  fontSize: '0.8rem',
+};

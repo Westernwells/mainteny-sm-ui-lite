@@ -1,7 +1,7 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {Box} from '@mui/system';
 import {ServiceCompanyItem} from 'models/service-company';
-import {Alert, Switch, Typography} from '@mui/material';
+import {Alert, SelectChangeEvent, Switch, Typography} from '@mui/material';
 import {InfoCard} from 'components/InfoCard';
 import OfficeFilePDF from 'assets/icons/OfficeFilePDF.svg';
 import {useTranslation} from 'react-i18next';
@@ -9,12 +9,25 @@ import {
   useQueryClientStorageData,
   useUpdateServiceCompanyClientStorage,
 } from 'hooks/useClientStorage';
-import {ClientReportForPDFConfig} from 'models/client-storage';
 import {
-  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  ClientReportForPDFConfig,
+  ClientStorageKeys,
+} from 'models/client-storage';
+import {
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+  PDF_FONTS,
 } from 'utils/constants';
+import {FormSelect} from 'components/form/FormSelect';
+import useTheme from '@mui/material/styles/useTheme';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
+import ColorPickerPopup from 'components/ColorPicker/CustomColorPicker';
+import ColorPickerPredefined from 'components/ColorPicker/ColorPickerPredefined';
 import PdfSettings from '.';
+
+const PDF_FONT_OPTIONS = PDF_FONTS.map((option) => ({
+  label: option,
+  value: option,
+}));
 
 interface Props {
   company?: ServiceCompanyItem;
@@ -22,10 +35,21 @@ interface Props {
 
 const PDFSettingLayout = ({company}: Props) => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const {data: clientStorageData} = useQueryClientStorageData({
     serviceCompanyId: company?.id!,
-    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+    params: {key: ClientStorageKeys.PDF_CONFIG},
   });
+
+  const {
+    primaryColor,
+    secondaryColor,
+    currentPdfFont,
+    disableFontSelection,
+    setPdfFont,
+    setPdfColors,
+  } = useContext(PdfStylesContext);
+
   const [pdfConfigFormState, setPdfConfigFormState] =
     useState<ClientReportForPDFConfig>(DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE);
   const {mutateAsync: updateClientStorage} =
@@ -46,7 +70,7 @@ const PDFSettingLayout = ({company}: Props) => {
   const updatePdfConfig = async (newState: ClientReportForPDFConfig) => {
     await updateClientStorage({
       body: {
-        key: CLIENT_STORAGE_PDF_CONFIG_KEY,
+        key: ClientStorageKeys.PDF_CONFIG,
         value: JSON.stringify(newState),
       },
       serviceCompanyId: company?.id || '',
@@ -62,6 +86,18 @@ const PDFSettingLayout = ({company}: Props) => {
 
     updatePdfConfig(newState);
   };
+
+  const onFontChange = async (e: SelectChangeEvent<string | string[]>) => {
+    const newValue =
+      typeof e.target.value === 'string' ? e.target.value : e.target.value[0];
+
+    await setPdfFont(newValue);
+  };
+
+  const onColorChange =
+    (field: 'primaryColor' | 'secondaryColor') => (value: string) => {
+      setPdfColors(field, value);
+    };
 
   const handleBigVariantToggle = (isBig: boolean) => {
     setIsPDFShowingBig(isBig);
@@ -95,8 +131,15 @@ const PDFSettingLayout = ({company}: Props) => {
               src={OfficeFilePDF}
             />
           }>
-          <Box>
-            <Box display="flex">
+          <Box sx={{display: 'flex', flexDirection: 'column', gap: 3}}>
+            <Box sx={{display: 'flex', flexDirection: 'column', gap: 1}}>
+              <Typography
+                variant="secondary"
+                sx={{
+                  color: theme.palette.text.secondary,
+                }}>
+                {t('Included data')}
+              </Typography>
               <Alert severity="info">
                 <Typography fontWeight="bold" variant="body2">
                   {t('Included data')}
@@ -107,126 +150,196 @@ const PDFSettingLayout = ({company}: Props) => {
                   )}
                 </Typography>
               </Alert>
+              <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center">
+                  <Typography
+                    variant="body2"
+                    fontWeight="bold"
+                    color="primary.main">
+                    {t('Unit number')}
+                  </Typography>
+                  <Switch
+                    onChange={(event) => {
+                      onCheckChange('includeUnitNumber', event.target.checked);
+                    }}
+                    checked={pdfConfigFormState.includeUnitNumber}
+                  />
+                </Box>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center">
+                  <Typography
+                    variant="body2"
+                    fontWeight="bold"
+                    color="primary.main">
+                    {t('Serial number')}
+                  </Typography>
+                  <Switch
+                    onChange={(event) => {
+                      onCheckChange(
+                        'includeSerialNumber',
+                        event.target.checked,
+                      );
+                    }}
+                    checked={pdfConfigFormState.includeSerialNumber}
+                  />
+                </Box>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center">
+                  <Typography
+                    variant="body2"
+                    fontWeight="bold"
+                    color="primary.main">
+                    {t('User name')}
+                  </Typography>
+                  <Switch
+                    onChange={(event) => {
+                      onCheckChange('includeUsername', event.target.checked);
+                    }}
+                    checked={pdfConfigFormState.includeUsername}
+                  />
+                </Box>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center">
+                  <Typography
+                    variant="body2"
+                    fontWeight="bold"
+                    color="primary.main">
+                    {t('User email address')}
+                  </Typography>
+                  <Switch
+                    onChange={(event) => {
+                      onCheckChange('includeUserEmail', event.target.checked);
+                    }}
+                    checked={pdfConfigFormState.includeUserEmail}
+                  />
+                </Box>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center">
+                  <Typography
+                    variant="body2"
+                    fontWeight="bold"
+                    color="primary.main">
+                    {t('User phone number')}
+                  </Typography>
+                  <Switch
+                    onChange={(event) => {
+                      onCheckChange('includeUserPhone', event.target.checked);
+                    }}
+                    checked={pdfConfigFormState.includeUserPhone}
+                  />
+                </Box>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center">
+                  <Typography
+                    variant="body2"
+                    fontWeight="bold"
+                    color="primary.main">
+                    {t('Show customer VAT')}
+                  </Typography>
+                  <Switch
+                    onChange={(event) => {
+                      onCheckChange('includeCustomerVAT', event.target.checked);
+                    }}
+                    checked={pdfConfigFormState.includeCustomerVAT}
+                  />
+                </Box>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center">
+                  <Typography
+                    variant="body2"
+                    fontWeight="bold"
+                    color="primary.main">
+                    {t('Show unit building')}
+                  </Typography>
+                  <Switch
+                    onChange={(event) => {
+                      onCheckChange(
+                        'includeUnitBuilding',
+                        event.target.checked,
+                      );
+                    }}
+                    checked={pdfConfigFormState.includeUnitBuilding}
+                  />
+                </Box>
+              </Box>
             </Box>
-            <Box mt={3}>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center">
-                <Typography
-                  variant="body2"
-                  fontWeight="bold"
-                  color="primary.main">
-                  {t('Unit number')}
+            <Box sx={{display: 'flex', flexDirection: 'column', gap: 1.5}}>
+              <Typography
+                variant="secondary"
+                sx={{
+                  color: theme.palette.text.secondary,
+                }}>
+                {t('Typography and color')}
+              </Typography>
+              {!disableFontSelection && (
+                <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                  <Typography variant="subtitle2">{t('Typeface')}</Typography>
+
+                  <FormSelect
+                    label=""
+                    labelId=""
+                    options={PDF_FONT_OPTIONS}
+                    selectProps={{
+                      id: `id`,
+                      value: currentPdfFont,
+                      multiple: false,
+                      onChange: onFontChange,
+                      notched: true,
+                    }}
+                    isCompanyTranslation
+                  />
+                </Box>
+              )}
+
+              <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                <Typography variant="subtitle2">
+                  {t('Primary text color')}
                 </Typography>
-                <Switch
-                  onChange={(event) => {
-                    onCheckChange('includeUnitNumber', event.target.checked);
-                  }}
-                  checked={pdfConfigFormState.includeUnitNumber}
-                />
+
+                <Box sx={{display: 'flex', flexDirection: 'column', gap: 1.5}}>
+                  <ColorPickerPredefined
+                    selectedColor={primaryColor}
+                    onClick={onColorChange('primaryColor')}
+                  />
+
+                  <ColorPickerPopup
+                    initialValue={primaryColor}
+                    onChange={onColorChange('primaryColor')}
+                  />
+                </Box>
               </Box>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center">
-                <Typography
-                  variant="body2"
-                  fontWeight="bold"
-                  color="primary.main">
-                  {t('Serial number')}
+
+              <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                <Typography variant="subtitle2">
+                  {t('Secondary text color')}
                 </Typography>
-                <Switch
-                  onChange={(event) => {
-                    onCheckChange('includeSerialNumber', event.target.checked);
-                  }}
-                  checked={pdfConfigFormState.includeSerialNumber}
-                />
-              </Box>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center">
-                <Typography
-                  variant="body2"
-                  fontWeight="bold"
-                  color="primary.main">
-                  {t('User name')}
-                </Typography>
-                <Switch
-                  onChange={(event) => {
-                    onCheckChange('includeUsername', event.target.checked);
-                  }}
-                  checked={pdfConfigFormState.includeUsername}
-                />
-              </Box>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center">
-                <Typography
-                  variant="body2"
-                  fontWeight="bold"
-                  color="primary.main">
-                  {t('User email address')}
-                </Typography>
-                <Switch
-                  onChange={(event) => {
-                    onCheckChange('includeUserEmail', event.target.checked);
-                  }}
-                  checked={pdfConfigFormState.includeUserEmail}
-                />
-              </Box>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center">
-                <Typography
-                  variant="body2"
-                  fontWeight="bold"
-                  color="primary.main">
-                  {t('User phone number')}
-                </Typography>
-                <Switch
-                  onChange={(event) => {
-                    onCheckChange('includeUserPhone', event.target.checked);
-                  }}
-                  checked={pdfConfigFormState.includeUserPhone}
-                />
-              </Box>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center">
-                <Typography
-                  variant="body2"
-                  fontWeight="bold"
-                  color="primary.main">
-                  {t('Show customer VAT')}
-                </Typography>
-                <Switch
-                  onChange={(event) => {
-                    onCheckChange('includeCustomerVAT', event.target.checked);
-                  }}
-                  checked={pdfConfigFormState.includeCustomerVAT}
-                />
-              </Box>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center">
-                <Typography
-                  variant="body2"
-                  fontWeight="bold"
-                  color="primary.main">
-                  {t('Show unit building')}
-                </Typography>
-                <Switch
-                  onChange={(event) => {
-                    onCheckChange('includeUnitBuilding', event.target.checked);
-                  }}
-                  checked={pdfConfigFormState.includeUnitBuilding}
-                />
+
+                <Box sx={{display: 'flex', flexDirection: 'column', gap: 1.5}}>
+                  <ColorPickerPredefined
+                    selectedColor={secondaryColor}
+                    onClick={onColorChange('secondaryColor')}
+                  />
+
+                  <ColorPickerPopup
+                    initialValue={secondaryColor}
+                    onChange={onColorChange('secondaryColor')}
+                  />
+                </Box>
               </Box>
             </Box>
           </Box>

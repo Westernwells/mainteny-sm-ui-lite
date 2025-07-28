@@ -7,7 +7,7 @@ import {ThreeDotMenu} from 'components/ThreeDotMenu';
 
 import {ServiceOrderCheckListView} from 'models/checklist';
 import {ChecklistStatus} from 'models/service-order';
-import {UserAccount} from 'models/user';
+import {UserAccountSimpleView} from 'models/user';
 import {useTranslation} from 'react-i18next';
 import {formatDate} from 'utils/datetime';
 import {getUserFullName} from 'utils/utils';
@@ -21,7 +21,7 @@ interface Props {
   onDelete: (selectedChecklist: ServiceOrderCheckListView) => void;
   onEdit: (selectedChecklist: ServiceOrderCheckListView) => void;
   selected?: boolean;
-  technician?: UserAccount;
+  technician?: UserAccountSimpleView;
   disabled: boolean;
 }
 

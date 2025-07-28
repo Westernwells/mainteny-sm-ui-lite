@@ -559,12 +559,12 @@ export const UnitListingView = () => {
         ),
       },
       {
-        id: TABLE_COLUMNS_ID.REQUIRED_TIME,
+        id: TABLE_COLUMNS_ID.SERVICE_TIME,
         headerName: 'Required time',
         textTransform: false,
         key: 'unit-cell-required-time',
         width: '84px',
-        fieldName: ElevatorOrderField.REQUIRED_TIME,
+        fieldName: ElevatorOrderField.SERVICE_TIME,
         getExportValue: (unit) => `${unit.requiredTime}`,
         renderCell: (unit, cellProps) => (
           <Cell {...cellProps}>
@@ -816,20 +816,20 @@ export const UnitListingView = () => {
   };
 
   const handleFilterReset = () => {
-    setValue('address', '');
-    setValue('distance', undefined);
-    setValue('lastInspectionStart', undefined);
-    setValue('lastInspectionEnd', undefined);
-    setValue('nextInspectionStart', undefined);
-    setValue('nextInspectionEnd', undefined);
-    setValue('technician', undefined);
-    setValue('unitNumber', undefined);
-    setValue('fabricNumber', undefined);
-    setValue('modelNumber', undefined);
-    setValue('unitCategory', undefined);
-    setValue('hasActiveContract', undefined);
-    setValue('hasTodos', undefined);
-    setValue('customer', undefined);
+    setSelectedAddress(undefined);
+    setSelectedDistance(undefined);
+    setSelectedLastInspectionStart(undefined);
+    setSelectedLastInspectionEnd(undefined);
+    setSelectedNextInspectionStart(undefined);
+    setSelectedNextInspectionEnd(undefined);
+    setSelectedTechnicianId(undefined);
+    setSelectedUnitNumber(undefined);
+    setSelectedFabricNumber(undefined);
+    setSelectedModelNumber(undefined);
+    setSelectedUnitCategory(undefined);
+    setHasActiveContract(undefined);
+    setHasTodos(undefined);
+    setSelectedCustomer(undefined);
   };
 
   const handleFilterApply: SubmitHandler<UnitFilterForm> = (data) => {
@@ -943,7 +943,13 @@ export const UnitListingView = () => {
           <SearchInput
             refInput={textInput}
             defaultValue={search}
-            onChange={(val: string) => setSearch(val)}
+            onChange={(val: string) => {
+              setPage({
+                ...page,
+                pageIndex: 0,
+              });
+              setSearch(val);
+            }}
           />
           <Filters
             activeFilters={appliedFilterNumber}

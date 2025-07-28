@@ -16,12 +16,14 @@ interface Props<T> {
   items: T[];
   setItems: Dispatch<SetStateAction<T[]>>;
   isEdit: boolean;
+  propertyOwnerId?: string;
 }
 
 export const ArticleItemsTable = ({
   items,
   setItems,
   isEdit,
+  propertyOwnerId,
 }: Props<ServiceOrderArticleView>) => {
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -34,6 +36,7 @@ export const ArticleItemsTable = ({
     quantity: 1,
     serviceOrderId: '',
     unitAmount: article.unitSellingAmount,
+    unitPurchaseAmount: article.unitPurchaseAmount,
   });
 
   const deleteItem = (indexPos: number) => {
@@ -44,6 +47,7 @@ export const ArticleItemsTable = ({
   const handleSelectItem = (row: ArticleView) => {
     setItems([...items, articleViewToItem(row)]);
     setIsArticleModalOpen(false);
+    setSearch('');
   };
 
   return (
@@ -76,7 +80,7 @@ export const ArticleItemsTable = ({
         <Box bgcolor="grey.50" display="flex" flexDirection="column" gap="1em">
           {items.map((item, index) => (
             <ArticleItemRow
-              key={index + item.article.id + item.id}
+              key={index + item.id}
               articleItem={item}
               index={index}
               deleteItem={deleteItem}
@@ -111,16 +115,24 @@ export const ArticleItemsTable = ({
         </Box>
         <SelectModal
           isOpen={isArticleModalOpen}
-          onClose={() => setIsArticleModalOpen(false)}
+          onClose={() => {
+            setIsArticleModalOpen(false);
+            setSearch('');
+          }}
           header="Select Article">
           <Box sx={{py: 2}}>
             <SearchInput
               variant="outlined"
               label="Search"
               onValueChanged={(value) => setSearch(value)}
+              defaultValue={search}
             />
           </Box>
-          <ArticlesDataGrid setRowItem={handleSelectItem} search={search} />
+          <ArticlesDataGrid
+            setRowItem={handleSelectItem}
+            search={search}
+            propertyOwnerId={propertyOwnerId}
+          />
         </SelectModal>
       </Box>
     </Box>

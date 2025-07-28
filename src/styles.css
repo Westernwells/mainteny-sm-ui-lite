@@ -45,6 +45,11 @@ html::-webkit-scrollbar {
   }
 }
 
+/* iPad Desktop Mode Overrides */
+.ipad-desktop-mode {
+  /* Add any specific CSS overrides when in iPad desktop mode */
+}
+
 @font-face {
   font-family: 'Aventa';
   src: local('Aventa'),
@@ -56,6 +61,43 @@ html::-webkit-scrollbar {
   font-family: 'Montserrat';
   src: local('Montserrat'),
     url('./assets/fonts/Montserrat/Montserrat-Regular.ttf') format('truetype');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  src: local('Ubuntu'),
+    url('./assets/fonts/Ubuntu/Ubuntu-Regular.ttf') format('truetype');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Arial';
+  src: local('Arial'),
+    url('./assets/fonts/Arial/Arial-Regular.ttf') format('truetype');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: local('Inter'),
+    url('./assets/fonts/Inter/Inter-Regular.ttf') format('truetype');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'NotoSans';
+  src: local('NotoSans'),
+    url('./assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf')
+      format('truetype');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'TimesNewRoman';
+  src: local('TimesNewRoman'),
+    url('./assets/fonts/TimesNewRoman/TimesNewRoman-Regular.ttf')
+      format('truetype');
   font-weight: 300;
 }
 

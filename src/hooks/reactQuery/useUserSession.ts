@@ -1,5 +1,10 @@
 import {useQuery, useQueryClient} from 'react-query';
-import {getStoredUser, setStoredUser, clearStoredUser} from 'userStorage';
+import {
+  getStoredUser,
+  setStoredUser,
+  clearStoredUser,
+  clearStoredUserAccount,
+} from 'userStorage';
 import {queryKeys} from 'reactQuery/constants';
 import {UserSession} from 'models/session';
 import {differenceInMinutes} from 'date-fns';
@@ -22,6 +27,7 @@ export function useUserSession(): UseUserSession {
         const minuteDiff = differenceInMinutes(expiredAt, currentDate);
         if (minuteDiff <= 0) {
           clearStoredUser();
+          clearStoredUserAccount();
           queryClient.setQueryData(queryKeys.userSession, null);
           window.location.reload();
         }
@@ -43,6 +49,7 @@ export function useUserSession(): UseUserSession {
   const clearUser = () => {
     // remove from localstorage
     clearStoredUser();
+    clearStoredUserAccount();
 
     // reset user to null in query client
     queryClient.setQueryData(queryKeys.userSession, null);

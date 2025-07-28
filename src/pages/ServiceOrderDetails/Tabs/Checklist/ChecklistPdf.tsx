@@ -18,17 +18,34 @@ import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromServiceOrder} from 'utils/pdfTemplates';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
+import {ServiceCompanyItem} from 'models/service-company';
+import {isSwissAddress} from 'utils/address';
+import PdfEmailContent from 'components/pdf-templates/containers/PdfEmailContent';
 import {PdfChecklistComponent} from './PdfChecklistComponent';
 
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+type StyleProps = {
+  isSwissOffset?: boolean;
+} & PdfConfigurationStyles;
+
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  secondaryColor,
+  isSwissOffset = false,
+}: StyleProps) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
       flexDirection: 'column',
+      paddingTop: '20px',
+      ...(isSwissOffset && {
+        paddingTop: '50px', // make offset be about 55mm
+        paddingLeft: '6px', // make offset be about 22mm
+      }),
     },
     rightAddressContent: {
       display: 'flex',
@@ -40,12 +57,12 @@ const getStyles = (
     tag: {
       ...boldFontStyle,
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       flex: '0 0 43%',
     },
     tagContent: {
       fontSize: 8.5,
-      color: '#616161',
+      color: secondaryColor,
       width: '57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -55,7 +72,7 @@ const getStyles = (
       paddingBottom: 1,
     },
     contentBody: {
-      color: '#212121',
+      color: primaryColor,
       fontSize: 10,
       marginBottom: 10,
       lineHeight: 1.3,
@@ -66,13 +83,13 @@ const getStyles = (
       padding: 0,
       lineHeight: 0,
       marginBottom: 6,
-      color: '#212121',
+      color: primaryColor,
       fontWeight: 'extrabold',
     },
     sectionBody: {
       fontSize: 10,
       fontWeight: 'light',
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -109,7 +126,7 @@ const getStyles = (
       width: '45%',
       display: 'flex',
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       paddingLeft: 20,
       letterSpacing: -0.15,
       marginTop: 2,
@@ -118,6 +135,7 @@ const getStyles = (
   });
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string, options?: {context: string}) => string;
   userInfo?: UserAccount | undefined;
   selectedLng?: string;
@@ -131,9 +149,10 @@ type Props = {
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const ChecklistPdf = ({
+  serviceCompany,
   userInfo,
   selectedLng,
   translate,
@@ -147,19 +166,19 @@ const ChecklistPdf = ({
   footerInfo,
   footerPath,
   pdfConfigClientStorage,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
   const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(boldFontStyle, regularFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+    isSwissOffset: isSwissAddress(serviceCompany?.businessAddress),
+  });
 
   const elevatorAddress = serviceOrder?.elevator?.address;
 
@@ -178,29 +197,32 @@ const ChecklistPdf = ({
 
   return (
     <Document>
-      <PdfPageContainer selectedLng={selectedLng}>
+      <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
         <PdfBodyContainer>
           <TopSectionContainer>
             <PdfTemplateLeftAddress
+              serviceCompany={serviceCompany}
               serviceCompanyInfo={serviceCompanyInfo}
               fallbackReceiverName={serviceOrder?.elevator?.propertyOwner?.name}
               addressComponent={getAddressComponentFromServiceOrder(
                 serviceOrder,
               )}
-              selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}
               eanValue={eanValue}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
 
             <View style={styles.rightAddress}>
-              {selectedChecklist?.checkList?.externalId && (
+              {selectedChecklist?.externalId && (
                 <View style={styles.rightAddressContent}>
                   <Text style={styles.tag}>{translate('Checklist no.')}</Text>
                   <Text style={styles.tagContent}>
-                    {selectedChecklist?.checkList?.externalId || '-'}
+                    {selectedChecklist?.externalId || '-'}
                   </Text>
                 </View>
               )}
@@ -226,21 +248,25 @@ const ChecklistPdf = ({
               {userInfo?.contact?.phone &&
                 pdfConfigClientStorage.includeUserPhone && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Phone number')}</Text>
+                    <Text style={styles.tag}>{translate('Phone no.')}</Text>
                     <Text style={styles.tagContent}>
                       {userInfo?.contact?.phone}
                     </Text>
                   </View>
                 )}
-              {userInfo?.contact?.email &&
-                pdfConfigClientStorage.includeUserEmail && (
-                  <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Email address')}</Text>
-                    <Text style={styles.tagContent}>
-                      {userInfo?.contact?.email}
-                    </Text>
-                  </View>
-                )}
+              <PdfEmailContent
+                email={userInfo?.contact?.email}
+                includeEmail={pdfConfigClientStorage?.includeUserEmail}
+                translate={translate}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
+                styles={{
+                  container: styles.rightAddressContent,
+                  label: styles.tag,
+                  content: styles.tagContent,
+                }}
+              />
               {serviceOrder?.elevator?.propertyOwner?.externalId && (
                 <View style={styles.rightAddressContent}>
                   <Text style={styles.tag}>{translate('Customer no.')}</Text>
@@ -273,9 +299,7 @@ const ChecklistPdf = ({
                 {serviceOrder?.elevator?.serialNumber &&
                   pdfConfigClientStorage.includeSerialNumber && (
                     <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Serial number')}
-                      </Text>
+                      <Text style={styles.tag}>{translate('Serial no.')}</Text>
                       <Text style={styles.tagContent}>
                         {serviceOrder?.elevator?.serialNumber}
                       </Text>
@@ -285,15 +309,17 @@ const ChecklistPdf = ({
                 <PdfUnitAddress
                   address={elevatorAddress}
                   translate={translate}
-                  selectedLng={selectedLng}
                   building={unitBuilding}
+                  fontStyles={fontStyles}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
                 />
               </View>
             </View>
           </TopSectionContainer>
 
           <View>
-            <PdfPageTitle selectedLng={selectedLng}>
+            <PdfPageTitle fontStyles={fontStyles} primaryColor={primaryColor}>
               {selectedChecklist?.checkList.name}
             </PdfPageTitle>
 
@@ -354,10 +380,12 @@ const ChecklistPdf = ({
 
         <PdfTemplateFooter
           userInfo={userInfo}
-          selectedLng={selectedLng}
           translate={translate}
           footerInfo={footerInfo}
           footerPath={footerPath}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       </PdfPageContainer>
     </Document>

@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useEffect, useState, useMemo, useCallback} from 'react';
 import {
   useInfiniteQuery,
   UseInfiniteQueryOptions,
@@ -10,7 +10,7 @@ import {
 import {queryKeys, queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
-import _ from 'lodash';
+import {omitBy, debounce} from 'lodash';
 import {
   ArticleComment,
   ArticleOrderView,
@@ -33,6 +33,7 @@ import {data} from 'utils/partial-article-data';
 import {FileResourceRecord} from 'models/media';
 import {useAll} from 'hooks/reactQuery/useAll';
 import {AxiosResponse} from 'axios';
+import {MAX_PAGE_SIZE} from 'models/table';
 import {
   ArticleSupplierView,
   CreateArticleSupplierRecord,
@@ -43,17 +44,14 @@ import {useUserSession} from './useUserSession';
 
 export const fetchArticles = async (
   params: QueryArticleParams,
-  id: string,
+  serviceCompanyId: string,
 ): Promise<Resource<ArticleView>> => {
-  params = <QueryArticleParams>_.omitBy(params, (it) => !it);
-  const response = await axiosClient.get<Resource<ArticleView>>(
-    `/api/serviceCompanies/${id}/articles`,
-    {
-      params,
-      paramsSerializer,
-    },
+  const clean = omitBy(params, (it) => !it) as QueryArticleParams;
+  const {data: responseData} = await axiosClient.get<Resource<ArticleView>>(
+    `/api/serviceCompanies/${serviceCompanyId}/articles`,
+    {params: clean, paramsSerializer},
   );
-  return response.data;
+  return responseData;
 };
 
 // To support the "Partial Invoicing" we use a unique Article which is of category PARTIAL.
@@ -65,11 +63,41 @@ export function useArticles(
   params: QueryArticleParams,
   options?: any,
   showPartial?: boolean,
+  debounceDelay: number = 500,
 ) {
   const {user} = useUserSession();
+
+  // Separate the "query" field from the rest of the params so we can debounce
+  // ONLY the query string. All other parameters (page, filters, etc.) should
+  // trigger an immediate request without delay.
+  const {query: currentQuery, ...restParams} = params;
+
+  const [debouncedQuery, setDebouncedQuery] = useState<string | undefined>(
+    currentQuery,
+  );
+
+  const debouncedSetQuery = useMemo(
+    () =>
+      debounce((q: string | undefined) => setDebouncedQuery(q), debounceDelay),
+    [debounceDelay],
+  );
+
+  useEffect(() => {
+    debouncedSetQuery(currentQuery);
+
+    return () => {
+      debouncedSetQuery.cancel();
+    };
+  }, [currentQuery, debouncedSetQuery]);
+
+  const debouncedParams = {
+    ...restParams,
+    query: debouncedQuery,
+  };
+
   return useQuery<Resource<ArticleView>, RestError>(
-    [qk.fetchArticles, params, user?.userAccount.id],
-    () => fetchArticles(params, user!.userAccount.serviceCompany.id),
+    [qk.fetchArticles, debouncedParams, user?.userAccount.id],
+    () => fetchArticles(debouncedParams, user!.userAccount.serviceCompany.id),
     {
       enabled: !!user,
       select: useCallback(
@@ -96,6 +124,35 @@ export function useArticles(
       ...options,
     },
   );
+}
+
+export function useInfiniteArticles(
+  params: Omit<QueryArticleParams, 'pageSize' | 'pageIndex'>,
+  pageSize = MAX_PAGE_SIZE,
+) {
+  const {user} = useUserSession();
+  const serviceCompanyId = user!.userAccount.serviceCompany.id;
+
+  const query = useInfiniteQuery(
+    // key includes everything except pageIndex
+    [qk.fetchInfiniteArticles, params, serviceCompanyId],
+    ({pageParam = 0}) =>
+      fetchArticles(
+        {...params, pageIndex: pageParam, pageSize},
+        serviceCompanyId,
+      ),
+    {
+      getNextPageParam: (last) =>
+        (last.page.pageIndex + 1) * pageSize < last.total
+          ? last.page.pageIndex + 1
+          : undefined,
+    },
+  );
+
+  return {
+    ...query,
+    items: query.data?.pages.flatMap((p) => p.data) ?? [],
+  };
 }
 
 const fetchArticleDetails = async (articleId: string) => {

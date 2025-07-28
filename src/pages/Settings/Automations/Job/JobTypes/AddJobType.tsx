@@ -126,7 +126,7 @@ const AddJobType = ({
       givenName:
         serviceOrderTypeToString(event?.givenName!) === '-'
           ? event.givenName
-          : serviceOrderTypeToString(event?.givenName!),
+          : t(serviceOrderTypeToString(event?.givenName!)),
       icon: event.icon,
       priority: event.priority,
       createInAdvanceDays: event.createInAdvanceDays || 0,

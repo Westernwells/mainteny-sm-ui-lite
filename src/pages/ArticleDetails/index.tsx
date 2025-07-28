@@ -2,8 +2,10 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {useState} from 'react';
-import {useParams, useNavigate} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
+import AttachmentsCard from 'components/Attachments/AttachmentsCard';
+import {AttachmentEntityType} from 'models/attachment';
 import {
   useArticleDetails,
   useDeleteArticle,
@@ -15,7 +17,6 @@ import {ArticleBasicInfoCard} from './BasicInfo/ArticleBasicInfoCard';
 import {ArticleDescriptionCard} from './BasicInfo/ArticleDescriptionCard';
 import {ArticleStockCard} from './Stock/ArticleStockCard';
 import {ArticleSupplierCard} from './Suppliers/ArticleSupplierCard';
-import {ArticleAttachmentCard} from './Pictures/ArticleAttachmentCard';
 import {ArticleQRCard} from './Pictures/ArticleQRCard';
 import {Notes} from './Notes';
 
@@ -94,10 +95,17 @@ export const ArticleOverView = () => {
           <ArticleDescriptionCard article={articleDetail!} />
           <ArticleStockCard article={articleDetail!} />
           <ArticleSupplierCard article={articleDetail!} />
+          {(articleDetail?.id || articleId) && (
+            <Grid item xs={12} md={12}>
+              <AttachmentsCard
+                entityId={articleDetail?.id ?? articleId!}
+                entityType={AttachmentEntityType.ARTICLE}
+              />
+            </Grid>
+          )}
         </Grid>
         <Grid xs={4} item>
-          <Box display="flex" flexDirection="column" height="100%">
-            <ArticleAttachmentCard article={articleDetail!} />
+          <Box display="flex" flexDirection="column" height="50%">
             <ArticleQRCard article={articleDetail!} />
           </Box>
         </Grid>

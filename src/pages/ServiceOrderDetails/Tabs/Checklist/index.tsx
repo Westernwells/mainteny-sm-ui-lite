@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {
   Alert,
@@ -59,7 +59,6 @@ import {pdf} from '@react-pdf/renderer';
 import {useSnackbar} from 'hooks/useSnackbar';
 import PathImage from 'assets/images/Path.svg';
 import {SnackbarKey} from 'notistack';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
@@ -74,11 +73,14 @@ import {
   IMAGE_SIZE_IN_MB,
 } from 'utils/constants';
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
-import {UserAccount} from 'models/user';
+import {UserAccountSimpleView} from 'models/user';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature} from 'models/employee';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {FileWithPreview} from 'models/files';
+import {useSendEmailDialogContent} from 'hooks/useSendEmailDialogContent';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
 import AddChecklistDialog from './AddChecklistDialog';
@@ -104,6 +106,9 @@ export const CheckList = ({serviceOrder}: Props) => {
   const {t} = useTranslation();
   const {enqueueSnackbar, showError} = useSnackbar();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
@@ -137,6 +142,11 @@ export const CheckList = ({serviceOrder}: Props) => {
   const [activeSignature, setActiveSignature] = useState<
     EmailSignature | undefined
   >();
+
+  const [emailBody] = useSendEmailDialogContent(
+    isSendEmailDialogOpen,
+    serviceOrder.description,
+  );
 
   const {data: signatureUrls = {}} = useDownloadUrl(
     activeSignature?.content?.images || [],
@@ -179,7 +189,7 @@ export const CheckList = ({serviceOrder}: Props) => {
           acc[item.id] = item.technician.userAccount;
         }
         return acc;
-      }, {} as {[key: string]: UserAccount}) ?? {};
+      }, {} as {[key: string]: UserAccountSimpleView}) ?? {};
 
     return candidateTechnicianById;
   }, [serviceOrder]);
@@ -240,7 +250,7 @@ export const CheckList = ({serviceOrder}: Props) => {
   } = useMultiImagesURLToBase64(checklistImagesDownloadUrl ?? {});
 
   const {downloadFile} = useDownloadFileWithCustomName(
-    selectedChecklist?.checkList.number,
+    selectedChecklist?.externalId,
     pdfPathToDownload,
   );
 
@@ -393,6 +403,9 @@ export const CheckList = ({serviceOrder}: Props) => {
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -781,7 +794,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                             alt=""
                             src={signaturePath}
                             style={{
-                              objectFit: 'cover',
+                              objectFit: 'contain',
                               objectPosition: 'top',
                               width: '100%',
                               height: '100%',
@@ -877,7 +890,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                           .billingEmail ||
                         serviceOrder.elevator.propertyOwner?.contact.email
                       }
-                      content={serviceOrder.description}
+                      content={emailBody}
                       existingFiles={existingFiles}
                       isLoadingFiles={isLoadingFiles}
                       callback={async (emailRecord) => {

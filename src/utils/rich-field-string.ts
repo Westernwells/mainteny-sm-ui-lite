@@ -1,17 +1,13 @@
 import {EmailSignature} from 'models/employee';
+import {stripHtmlTags} from './text-block';
 
 export const isPlainString = (value: string) => !/<[^>]+>/.test(value);
 
 // Remove all html tags and return single line string
-export const getPlainStringFromHtml = (value: string) => {
-  // check if value start with a tag
-  if (value[0] !== '<') return value;
-  return value
-    .split('>') // Split on closing tag
-    .slice(0, -1) // remove last entry from the closing tag
-    .filter((element) => element[0] !== '<' && element !== '') // remove all tag element and
-    .map((element) => element.split('<')[0])
-    .join('');
+export const getPlainStringFromHtml = (value: string): string => {
+  if (!value.startsWith('<')) return value;
+  const doc = new DOMParser().parseFromString(value, 'text/html');
+  return doc.body.textContent?.trim() ?? '';
 };
 
 export const generateSignatureHtml = (
@@ -39,7 +35,7 @@ export const generateSignatureHtml = (
           <!--[if !mso]><!-- -->
           <img src="${imageSrc}" 
             alt="${value.name}" 
-            style="width: 88px; height: 88px; max-height: 88px; border-radius: 50%; object-fit: cover; display: block;" />
+            style="width: 88px; max-height: 88px; object-fit: contain; display: block; border: 1px solid #dddddd" />
           <!--<![endif]-->
         </td>
       `
@@ -76,7 +72,6 @@ export const handleSignatureSmartly = (
   const lastTableRegex = /<table[\s\S]*?<\/table>/gi;
   const tables = [...emailContent.matchAll(lastTableRegex)];
   const lastTableMatch = tables.length ? tables[tables.length - 1][0] : null;
-
   if (!lastTableMatch) return emailContent.trim(); // If no table found, return content as-is
 
   // 2. Extract all <td> contents
@@ -90,104 +85,159 @@ export const handleSignatureSmartly = (
   // 3. Clean content check
   const cleanContent = (html: string) =>
     html.replace(/&nbsp;|\s|<br\s*\/?>|<p[^>]*>(\s|&nbsp;)*<\/p>/gi, '').trim();
-
   const isFirstTdEmpty = cleanContent(firstTdContent) === '';
   const isSecondTdEmpty = cleanContent(secondTdContent) === '';
 
   // 4. Check if first TD contains image
-  const containsImage = /<img\s[^>]*src=/.test(firstTdContent);
+  const hasImageTag = /<img\s[^>]*src=/.test(firstTdContent);
 
   // 5. Prepare image URL if valid
-  const finalCidImageUrl =
+  const finalCid =
     cidImageUrl && cidImageUrl !== 'undefined' ? `cid:${cidImageUrl}` : '';
-  const hasValidImage = !!finalCidImageUrl;
 
-  let rebuiltSignature = '';
+  const renderImageCell = () =>
+    `
+    <td
+      width="88" height="88"
+      style="width:88px;height:88px;padding-right:16px;vertical-align:top;"
+      align="center" valign="middle"
+    >
+      <!--[if mso]>
+      <v:rect xmlns:v="urn:schemas-microsoft-com:vml"
+        style="width:88px;height:88px;" stroke="false" fill="true">
+        <v:fill type="frame" src="${finalCid}" />
+      </v:rect>
+      <![endif]-->
 
-  // CASE 1: Both empty -> Remove the entire table (user deleted everything)
+      <!--[if !mso]><!-->
+      <table
+        width="88" height="88"
+        cellpadding="0" cellspacing="0" border="0"
+        style="width:88px;height:88px;"
+      >
+        <tr>
+          <td
+            align="center" valign="top"
+            style="text-align:center;vertical-align:top;"
+          >
+            <img
+              src="${finalCid}"
+              alt="Signature Image"
+              style="
+                display:block;
+                max-width:88px;
+                max-height:88px;
+                min-height: 0px;
+              "
+            />
+          </td>
+        </tr>
+      </table>
+      <!--<![endif]-->
+    </td>`.trim();
+
+  // CASE 1: both cells empty → remove entire signature block
   if (isFirstTdEmpty && (isSecondTdEmpty || tdContents.length === 1)) {
     return emailContent.replace(lastTableMatch, '').trim();
   }
 
-  // CASE 2: Single TD cases
+  let rebuilt = '';
+
+  // CASE 2: single‐cell signature
   if (tdContents.length === 1) {
-    if (containsImage && hasValidImage) {
-      // ✅ Image only case, single TD
-      rebuiltSignature = `
-        <table data-signature="true" style="border-collapse: separate; width: 100%; table-layout: fixed; border-spacing: 0 50px;">
-          <tr style="width: 100%; padding-right: 1em;">
-            <td style="width: 88px; vertical-align: top; padding-right: 16px;">
-              <img src="${finalCidImageUrl}"
-                alt="Signature Image"
-                style="width: 88px; height: 88px; max-height: 88px; border-radius: 50%; object-fit: cover; display: block;" />
-            </td>
+    // image only
+    if (hasImageTag && finalCid) {
+      rebuilt = `
+        <table data-signature="true"
+          style="border-collapse:separate;width:100%;table-layout:fixed;border-spacing:0 50px;"
+        >
+          <tr style="width:100%;padding-right:1em;">
+            ${renderImageCell()}
           </tr>
-        </table>`.trim();
-    } else if (!isFirstTdEmpty && !containsImage) {
-      // ✅ Text only case, single TD
-      rebuiltSignature = `
-        <table data-signature="true" style="border-collapse: separate; width: 100%; table-layout: fixed; border-spacing: 0 50px;">
-          <tr style="width: 100%; padding-right: 1em;">
-            <td class="html-content" style="vertical-align: top; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #000; width: 100%;">
+        </table>
+      `.trim();
+    }
+    // text only
+    else if (!isFirstTdEmpty && !hasImageTag) {
+      rebuilt = `
+        <table data-signature="true"
+          style="border-collapse:separate;width:100%;table-layout:fixed;border-spacing:0 50px;"
+        >
+          <tr style="width:100%;padding-right:1em;">
+            <td class="html-content"
+              style="vertical-align:top;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#000;width:100%;"
+            >
               ${firstTdContent}
             </td>
           </tr>
-        </table>`.trim();
+        </table>
+      `.trim();
     } else {
-      // Image present but invalid/no image URL - remove signature
       return emailContent.replace(lastTableMatch, '').trim();
     }
   }
 
-  // CASE 3: Two TDs (image + text or variations)
+  // CASE 3: two‐cell signature
   if (tdContents.length === 2) {
-    // Image + Text, both valid and image URL present
-    if (containsImage && !isSecondTdEmpty && hasValidImage) {
-      rebuiltSignature = `
-        <table data-signature="true" style="border-collapse: separate; width: 100%; table-layout: fixed; border-spacing: 0 50px;">
-          <tr style="width: 100%; padding-right: 1em;">
-            <td style="width: 88px; vertical-align: top; padding-right: 16px;">
-              <img src="${finalCidImageUrl}"
-                alt="Signature Image"
-                style="width: 88px; height: 88px; max-height: 88px; border-radius: 50%; object-fit: cover; display: block;" />
-            </td>
-            <td class="html-content" style="vertical-align: top; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #000; width: 100%;">
+    // image + text
+    if (hasImageTag && !isSecondTdEmpty && finalCid) {
+      rebuilt = `
+        <table data-signature="true"
+          style="border-collapse:separate;width:100%;table-layout:fixed;border-spacing:0 50px;"
+        >
+          <tr style="width:100%;padding-right:1em;">
+            ${renderImageCell()}
+            <td class="html-content"
+              style="vertical-align:top;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#000;width:100%;"
+            >
               ${secondTdContent}
             </td>
           </tr>
-        </table>`.trim();
+        </table>
+      `.trim();
     }
-    // Only text in second TD
+    // text only in second cell
     else if (isFirstTdEmpty && !isSecondTdEmpty) {
-      rebuiltSignature = `
-        <table data-signature="true" style="border-collapse: separate; width: 100%; table-layout: fixed; border-spacing: 0 50px;">
-          <tr style="width: 100%; padding-right: 1em;">
-            <td class="html-content" style="vertical-align: top; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #000; width: 100%;">
+      rebuilt = `
+        <table data-signature="true"
+          style="border-collapse:separate;width:100%;table-layout:fixed;border-spacing:0 50px;"
+        >
+          <tr style="width:100%;padding-right:1em;">
+            <td class="html-content"
+              style="vertical-align:top;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#000;width:100%;"
+            >
               ${secondTdContent}
             </td>
           </tr>
-        </table>`.trim();
+        </table>
+      `.trim();
     }
-    // Image + text, but image invalid -> Keep text only
-    else if (containsImage && !isSecondTdEmpty && !hasValidImage) {
-      rebuiltSignature = `
-        <table data-signature="true" style="border-collapse: separate; width: 100%; table-layout: fixed; border-spacing: 0 50px;">
-          <tr style="width: 100%; padding-right: 1em;">
-            <td class="html-content" style="vertical-align: top; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #000; width: 100%;">
+    // image present but no valid CID → drop image, keep text
+    else if (hasImageTag && !isSecondTdEmpty && !finalCid) {
+      rebuilt = `
+        <table data-signature="true"
+          style="border-collapse:separate;width:100%;table-layout:fixed;border-spacing:0 50px;"
+        >
+          <tr style="width:100%;padding-right:1em;">
+            <td class="html-content"
+              style="vertical-align:top;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#000;width:100%;"
+            >
               ${secondTdContent}
             </td>
           </tr>
-        </table>`.trim();
+        </table>
+      `.trim();
     }
   }
 
-  // Final replacement if we have rebuilt signature
-  if (rebuiltSignature) {
-    return emailContent
-      .replace(lastTableMatch, `<br />${rebuiltSignature}`)
-      .trim();
-  }
+  // final replace
+  return rebuilt
+    ? emailContent.replace(lastTableMatch, `<br />${rebuilt}`).trim()
+    : emailContent;
+};
 
-  // Fallback - leave as is
-  return emailContent;
+export const cleanHtml = (html?: string) => {
+  const raw = html ?? '';
+  const plain = stripHtmlTags(raw).trim();
+  return {raw, plain};
 };

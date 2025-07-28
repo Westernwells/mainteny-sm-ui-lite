@@ -1,48 +1,37 @@
-import {Text, View, StyleSheet, Font} from '@react-pdf/renderer';
+import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import {formatDate} from 'utils/datetime';
 import {getDisplayDeliveryDate} from 'utils/invoice';
 import {InvoiceType, InvoiceView} from 'models/invoice';
 import {useMemo} from 'react';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {UserAccount} from 'models/user';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
+import {isSwissAddress} from 'utils/address';
+import {ServiceCompanyItem} from 'models/service-company';
 import PdfUnitAddress from './containers/PdfUnitAddress';
+import PdfEmailContent from './containers/PdfEmailContent';
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
+type StyleProps = {
+  isSwissOffset?: boolean;
+} & PdfConfigurationStyles;
 
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  isSwissOffset = false,
+}: StyleProps) =>
   StyleSheet.create({
     rightAddress: {
+      paddingTop: '20px',
       flex: '0 0 42%',
       display: 'flex',
       flexDirection: 'column',
+      ...(isSwissOffset && {
+        paddingTop: '50px', // make offset be about 55mm
+        paddingLeft: '6px', // make offset be about 22mm
+      }),
     },
     rightAddressContent: {
       display: 'flex',
@@ -50,17 +39,19 @@ const getStyles = (
       flexDirection: 'row',
       justifyContent: 'space-between',
       paddingBottom: 6,
+      flexWrap: 'wrap',
     },
     tag: {
       ...boldFontStyle,
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       flex: '0 0 43%',
     },
     tagContent: {
       fontSize: 8.5,
-      color: '#616161',
+      color: primaryColor,
       flex: '0 0 57%',
+      minWidth: 0,
       textAlign: 'right',
       ...regularFontStyle,
     },
@@ -69,35 +60,35 @@ const getStyles = (
 type Props = {
   translate: (key: string, options?: {context: string}) => string;
   invoice?: InvoiceView;
-  selectedLng?: string;
   nextCompanyExternalId?: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
   userInfo?: UserAccount;
-};
+  serviceCompany?: ServiceCompanyItem;
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const PdfTemplateInvoiceDetails = ({
   translate,
   invoice,
-  selectedLng,
   nextCompanyExternalId,
   pdfConfigClientStorage,
   userInfo,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
+  serviceCompany,
 }: Props) => {
   const startDate = invoice?.additionalInfo.deliveryStartDate;
   const endDate = invoice?.additionalInfo.deliveryEndDate;
 
   const displayDeliveryDate = getDisplayDeliveryDate(startDate, endDate);
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(boldFontStyle, regularFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+    isSwissOffset: isSwissAddress(serviceCompany?.businessAddress),
+  });
 
   const getInvoiceDate = () =>
     invoice?.sentDate ? formatDate(invoice?.sentDate) : formatDate(new Date());
@@ -128,7 +119,7 @@ const PdfTemplateInvoiceDetails = ({
         <View style={styles.rightAddressContent}>
           <Text style={styles.tag}>
             {invoice?.type === InvoiceType.CREDIT_NOTE
-              ? translate('Credit no.')
+              ? translate('Credit No.')
               : translate('Invoice no.')}
           </Text>
           <Text style={styles.tagContent}>
@@ -169,26 +160,24 @@ const PdfTemplateInvoiceDetails = ({
 
       {userInfo?.contact?.phone && pdfConfigClientStorage.includeUserPhone && (
         <View style={styles.rightAddressContent}>
-          <Text style={styles.tag}>{translate('Phone number')}</Text>
+          <Text style={styles.tag}>{translate('Phone no.')}</Text>
           <Text style={styles.tagContent}>{userInfo?.contact?.phone}</Text>
         </View>
       )}
-      {userInfo?.contact?.email && pdfConfigClientStorage.includeUserEmail && (
-        <>
-          <View style={styles.rightAddressContent}>
-            <Text style={styles.tag}>{translate('Email address')}</Text>
-            <Text style={styles.tagContent}>
-              {userInfo.contact.email.split('@')[0]}@
-            </Text>
-          </View>
-          <View style={[styles.rightAddressContent, {marginTop: -6}]}>
-            <Text style={styles.tag} />
-            <Text style={[styles.tagContent, {marginLeft: 10}]}>
-              {userInfo.contact.email.split('@')[1]}
-            </Text>
-          </View>
-        </>
-      )}
+
+      <PdfEmailContent
+        email={userInfo?.contact?.email}
+        includeEmail={pdfConfigClientStorage?.includeUserEmail}
+        translate={translate}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
+        styles={{
+          container: styles.rightAddressContent,
+          label: styles.tag,
+          content: styles.tagContent,
+        }}
+      />
 
       {invoice?.propertyOwner?.externalId && (
         <View style={styles.rightAddressContent}>
@@ -252,7 +241,7 @@ const PdfTemplateInvoiceDetails = ({
         {invoice?.serviceOrder?.elevator.serialNumber &&
           pdfConfigClientStorage.includeSerialNumber && (
             <View style={styles.rightAddressContent}>
-              <Text style={styles.tag}>{translate('Serial number')}</Text>
+              <Text style={styles.tag}>{translate('Serial no.')}</Text>
               <Text style={styles.tagContent}>
                 {invoice?.serviceOrder?.elevator.serialNumber ?? '-'}
               </Text>
@@ -262,8 +251,10 @@ const PdfTemplateInvoiceDetails = ({
         <PdfUnitAddress
           address={invoice?.serviceOrder?.elevator?.address}
           translate={translate}
-          selectedLng={selectedLng}
           building={unitBuilding}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       </View>
     </View>

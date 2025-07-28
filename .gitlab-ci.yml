@@ -1,8 +1,8 @@
 stages:
   - lint
+  - playwright-tests
   - test
   - build-project
-  - build-images
   - deploy
 
 variables:
@@ -15,65 +15,32 @@ variables:
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   dependencies:
     - lint-project
-    - e2e-tests
-    - component-tests
+    - playwright-tests
+    - vitest
   script:
     - node -v
     - export NODE_OPTIONS='--max-old-space-size=4096'
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn prepare_env
-    - yarn check-format
-    - yarn check-types
-    - yarn check-lint
     - yarn build:${ENV}
   artifacts:
     paths:
       - build/
-      - Dockerfile
-      - nginx.prod.conf
-      - nginx.stage.conf
-
-.build-images: &build-image-template
-  stage: build-images
-  variables:
-    GIT_STRATEGY: none
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  before_script:
-    - mkdir -p /kaniko/.docker
-    - echo "{\"credsStore\":\"ecr-login\",\"credHelpers\":{\"$DOCKER_REGISTRY\":\"ecr-login\"}}" > /kaniko/.docker/config.json
-  script:
-    - >
-      /kaniko/executor
-      --cache=true
-      --context $CI_PROJECT_DIR 
-      --dockerfile Dockerfile 
-      --destination ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
-      --build-arg ENV=${ENV}
 
 .deploy_project: &deploy-template
   stage: deploy
   allow_failure: false
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
-  before_script:
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/mainteny/infra/sm-ui-lite-deployment
-    - cd sm-ui-lite-deployment
-    - npm ci
-    - aws sts get-caller-identity
-    - pulumi login s3://mainteny-pulumi-state
   variables:
     ENV: stage
     CACHE_PATH: /*
+    DISTRIBUTION_ID: E24VZD1QKFHU18
   script:
-    - pulumi stack select "sm-ui-lite.${STACK}"
-    - pulumi config set aws:region eu-central-1
-    - echo "Deploying ${IMAGE_SUFFIX} on environment $STACK"
-    - pulumi config set --path "mainteny:imageName" ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
-    - pulumi config set mainteny:version ${CI_COMMIT_SHORT_SHA}_$(date '+%Y%m%d')
-    - pulumi config set mainteny:deploymentTimeStamp "$(date)"
-    - pulumi up -y
-    - aws cloudfront create-invalidation --distribution-id $(pulumi stack output cdnDistributionId) --paths "$CACHE_PATH"
+    - echo "Deploying environment ${ENV}"
+    - DATE=$(date +"%Y_%m_%d")
+    - aws s3 cp ./build/ s3://mainteny-deployments/sm/${ENV}/current/ --recursive
+    - aws s3 cp ./build/ s3://mainteny-deployments/sm/${ENV}/${DATE}_${CI_COMMIT_SHORT_SHA}/ --recursive
+    - aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID} --paths "$CACHE_PATH"
     - >-
       curl -X POST
       --data-urlencode
@@ -139,58 +106,92 @@ lint-project:
     - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
     - when: never
 
-component-tests:
-  stage: test
-  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
-  variables:
-    ENV: stage
-    REACT_APP_BASE_URL: http://localhost:5173
-    REACT_APP_API_URL: $REACT_APP_API_URL_STAGE
-    REACT_APP_GOOGLE_MAPS_KEY: $REACT_APP_GOOGLE_MAPS_KEY_STAGE
-    npm_config_cache: "$CI_PROJECT_DIR/.npm"
-    CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
-  rules:
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
-    - when: never
-  script:
-    - yarn install --frozen-lockfile --cache-folder .yarn-cache
-    - yarn start & # Start the application in the background
-    - yarn cypress:install # Install Cypress binary
-    - yarn cypress:component --reporter junit --reporter-options "mochaFile=results/component-[hash].xml,toConsole=true,testCaseSwitchClassnameAndName=true,testsuitesTitle=true,suiteTitleSeparatedBy='.'" # Run Cypress tests
-  artifacts:
-    when: always
-    paths:
-      - results/component-*.xml
-    reports:
-      junit: results/component-*.xml
-
-e2e-tests:
-  stage: test
+playwright-tests:
+  stage: playwright-tests
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   parallel: 6
-  timeout: 2h 
+  timeout: 2h
+  dependencies:
+    - lint-project
   variables:
     ENV: stage
     REACT_APP_BASE_URL: http://localhost:5173
     REACT_APP_API_URL: $REACT_APP_API_URL_STAGE
     REACT_APP_GOOGLE_MAPS_KEY: $REACT_APP_GOOGLE_MAPS_KEY_STAGE
-    npm_config_cache: "$CI_PROJECT_DIR/.npm"
-    CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
+    PERCY_TOKEN: $PERCY_TOKEN
+  cache:
+    - <<: *global_cache_node_mods
+      when: on_success
+      policy: pull
   rules:
     - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
     - when: never
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn start & # Start the application in the background
-    - yarn cypress:install # Install Cypress binary
-    - yarn cypress:split-e2e --reporter junit --reporter-options "mochaFile=results/e2e-[hash].xml,toConsole=true,testCaseSwitchClassnameAndName=true,testsuitesTitle=true,suiteTitleSeparatedBy='.'" # Run Cypress tests
+    - sleep 30 # Wait for the application to start
+    - yarn playwright:install # Install Playwright chromium browser
+    - |
+      # Debug parallel job information
+      echo "Parallel job info - CI_NODE_INDEX: $CI_NODE_INDEX, CI_NODE_TOTAL: $CI_NODE_TOTAL"
+      
+      # Run Percy tests only on the first parallel job (CI_NODE_INDEX=1 for GitLab)
+      if [ "$CI_NODE_INDEX" = "1" ]; then
+        yarn percy:test &
+        PERCY_PID=$!
+      fi
+      
+      # Run Playwright tests split across parallel jobs (CI_NODE_INDEX is 1-based in GitLab)
+      echo "Running Playwright tests with shard: $CI_NODE_INDEX/$CI_NODE_TOTAL"
+      yarn playwright:test --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL &
+      PLAYWRIGHT_PID=$!
+      
+      # Wait for processes and capture exit codes
+      if [ "$CI_NODE_INDEX" = "1" ]; then
+        wait $PERCY_PID
+        PERCY_EXIT=$?
+      else
+        PERCY_EXIT=0
+      fi
+      
+      wait $PLAYWRIGHT_PID
+      PLAYWRIGHT_EXIT=$?
+      
+      # Fail if either test suite failed
+      if [ $PERCY_EXIT -ne 0 ] || [ $PLAYWRIGHT_EXIT -ne 0 ]; then
+        echo "Tests failed - Percy exit code: $PERCY_EXIT, Playwright exit code: $PLAYWRIGHT_EXIT"
+        exit 1
+      fi
+      
+      echo "All tests passed successfully"
   artifacts:
     when: always
     paths:
-      - results/e2e-*.xml
-      - cypress/screenshots/**/*.png
+      - results/playwright-results.xml
+      - playwright-report/
+      - test-results/
     reports:
-      junit: results/e2e-*.xml
+      junit: results/playwright-results.xml
+
+vitest:
+  stage: test
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
+  cache:
+    - <<: *global_cache_node_mods
+      when: on_success
+      policy: pull-push
+  script:
+    - yarn install --frozen-lockfile --cache-folder .yarn-cache
+    - yarn vitest run --coverage --reporter junit --output-file results/vitest-[hash].xml
+  artifacts:
+    when: always
+    paths:
+      - results/vitest-*.xml
+    reports:
+      junit: results/vitest-*.xml
+  rules:
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
+    - when: never
 
 build-feature-branch:
   <<: *build-template
@@ -224,46 +225,11 @@ build-prod:
     - if: $CI_COMMIT_REF_NAME == 'main'
     - when: never
 
-build-stage-image:
-  <<: *build-image-template
-  dependencies:
-    - build-stage
-  rules:
-    - if: $CI_COMMIT_REF_NAME == 'develop'
-      when: on_success
-      variables:
-        ENV: stage
-        IMAGE_ENV: stage
-    - when: never
-
-build-release-image:
-  <<: *build-image-template
-  dependencies:
-    - build-release
-  rules:
-    - if: $CI_COMMIT_REF_NAME == 'main'
-      when: on_success
-      variables:
-        ENV: stage
-        IMAGE_ENV: release
-    - when: never
-
-build-prod-image:
-  <<: *build-image-template
-  dependencies:
-    - build-prod
-  rules:
-    - if: $CI_COMMIT_REF_NAME == 'main'
-      when: on_success
-      variables:
-        ENV: prod
-        IMAGE_ENV: prod
-    - when: never
 
 deploy-stage:
   <<: *deploy-template
   dependencies:
-    - build-stage-image
+    - build-stage
   rules:
     - if: "$CI_COMMIT_REF_NAME == 'develop'"
       variables:
@@ -271,27 +237,29 @@ deploy-stage:
         STACK: stage
         IMAGE_ENV: stage
         CACHE_PATH: /*
+        DISTRIBUTION_ID: E24VZD1QKFHU18
       when: on_success
     - when: never
 
 deploy-release:
   <<: *deploy-template
   dependencies:
-    - build-stage-image
+    - build-release
   rules:
     - if: "$CI_COMMIT_REF_NAME == 'main'"
       variables:
-        ENV: stage
+        ENV: release
         STACK: release
         IMAGE_ENV: release
         CACHE_PATH: /*
+        DISTRIBUTION_ID: E3F5LYXHAYQH8G
       when: on_success
     - when: never
 
 deploy-production:
   <<: *deploy-template
   dependencies:
-    - build-prod-image
+    - build-prod
   rules:
     - if: "$CI_COMMIT_REF_NAME == 'main'"
       variables:
@@ -299,5 +267,6 @@ deploy-production:
         STACK: prod
         IMAGE_ENV: prod
         CACHE_PATH: /*
+        DISTRIBUTION_ID: E25UK9TDV510UC
       when: manual
     - when: never
